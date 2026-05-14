@@ -455,7 +455,7 @@ const MAP_LOCS=[
   {id:'m6',mx:170.7,my:217.4, lat:47.5796, lng:-122.3131, cat:'school',   label:'Giddens School (2120 21st Ave S)', desc:'Private K-5 school opened December 2019, directly on the project block. Hundreds of children arrive and depart daily on a street with no sidewalk on either side. A neighbor named Kashina said her family chose not to rent here because her child would have to walk in the travel lane to reach a school bus.', color:'#185FA5'},
   {id:'m7',mx:213.3,my:201.9, lat:47.5800, lng:-122.3119, cat:'school',   label:'Lake Washington Girls Middle School (2100 S Walker St)', desc:'Middle school at the north end of the project corridor. SDOT cited this school as part of the justification for the 21st Ave S walkway — yet the proposed design provides no safe crossing connection on the east side of 21st Ave S where many students approach from Rainier Ave.',    color:'#185FA5'},
   {id:'m8',mx:176.4,my:300.0, lat:47.5779, lng:-122.3115, cat:'school',   label:'French American School of Puget Sound', desc:'Under construction at the 22nd/23rd/Walker/College block. Development permits do not include a sidewalk on 22nd Ave S. As enrollment grows, families will walk to a school on a street that has been promised — and denied — safe infrastructure for over four years.', color:'#185FA5'},
-  {id:'m9',mx:358.4,my:370.0, lat:47.5921, lng:-122.2964, cat:'transit',  label:'Judkins Park Station',        desc:'Sound Transit 2 Line station opened March 28, 2026, in the median of I-90 at Rainier Ave S. Half a mile from 21st Ave S. The Urbanist named this block as a pedestrian gap threatening safe access to the newly opened station. An asphalt path on one side of one street does not close that gap.', color:'#533AB7'},
+  {id:'m9',mx:358.4,my:370.0, lat:47.5886, lng:-122.3038, cat:'transit',  label:'Judkins Park Station',        desc:'Sound Transit 2 Line station opened March 28, 2026, in the median of I-90 at Rainier Ave S. Half a mile from 21st Ave S. The Urbanist named this block as a pedestrian gap threatening safe access to the newly opened station. An asphalt path on one side of one street does not close that gap.', color:'#533AB7'},
   {id:'m10',mx:344.2,my:165.7,lat:47.5792, lng:-122.3069, cat:'dev',      label:'900 Rainier Ave S',           desc:'396-unit apartment building completed 2025, part of 2,000+ units added near Judkins Park Station since 2018. The city upzoned North Beacon Hill for density in 2019 with no corresponding commitment to pedestrian safety. New residents are arriving on streets that have not been upgraded to match.', color:'#0F6E56'},
   {id:'m11',mx:162.1,my:310.0,lat:47.5769, lng:-122.3131, cat:'dev',      label:'1910 21st Ave S (proposed)',  desc:'Proposed 7-story, 212-unit apartment building on the project block itself, currently in permitting. Hundreds of new residents would walk this street daily. Approving dense housing on a block while installing a temporary asphalt path and calling it done is a study in mismatched investment.', color:'#0F6E56'},
   {id:'m12',mx:341.3,my:233.0,lat:47.5776, lng:-122.3069, cat:'dev',      label:'Community Roots / Jazz House (Rainier)', desc:'128 units of affordable housing above a performing arts space, in development on Rainier Ave S. Affordable housing residents are more likely to be transit-dependent pedestrians. Safe walking infrastructure between this development and the light rail stations is not optional.', color:'#0F6E56'},
@@ -492,6 +492,8 @@ function buildMap(){
         lh+=`<div class="map-leg"><div class="map-leg-dot" style="background:${mc.color}"></div>${mc.label}</div>`;
       }
     });
+    lh+=`<div class="map-leg"><div style="width:18px;height:2px;border-radius:1px;background:#c8791a;opacity:0.8;flex-shrink:0"></div>0.5 mi walkshed</div>`;
+    lh+=`<div class="map-leg"><div style="width:18px;height:2px;border-radius:1px;background:#c8791a;opacity:0.45;flex-shrink:0"></div>1 mi walkshed</div>`;
     leg.innerHTML=lh;
   }
 
@@ -512,7 +514,7 @@ function initGMap(){
 
   const map=new google.maps.Map(mapEl,{
     center:{lat:47.5780,lng:-122.3100},
-    zoom:16,
+    zoom:13,
     mapTypeControl:false,
     streetViewControl:false,
     fullscreenControl:true,
@@ -523,31 +525,94 @@ function initGMap(){
   });
 
   // Highlight the two advocacy blocks
-  new google.maps.Polyline({
+  const line21=new google.maps.Polyline({
     path:[{lat:47.5800,lng:-122.3131},{lat:47.5757,lng:-122.3131}],
-    strokeColor:'#A32D2D',strokeOpacity:0.85,strokeWeight:8,map
-  }).addListener('click',()=>infoWin.setContent('<strong style="color:#A32D2D">21st Ave S</strong><br>Proposed 6-ft asphalt walkway, west side only. No sidewalk on either side today.'));
+    strokeColor:'#A32D2D',strokeOpacity:0.85,strokeWeight:8,map,clickable:true
+  });
+  line21.addListener('click',()=>{
+    infoWin.setContent('<div style="font-family:sans-serif;max-width:220px;padding:4px 2px"><strong style="color:#A32D2D;display:block;margin-bottom:4px;font-size:13px">21st Ave S — proposed walkway</strong><span style="font-size:12px;line-height:1.5;color:#3D3830">No sidewalk exists on either side today; SDOT proposes a 6-ft asphalt path on the west side only — the community is asking whether this permanently closes the need for concrete sidewalks on both sides.</span></div>');
+    infoWin.setPosition({lat:47.5779,lng:-122.3131});
+    infoWin.open(map);
+  });
 
-  new google.maps.Polyline({
+  const line22=new google.maps.Polyline({
     path:[{lat:47.5800,lng:-122.3119},{lat:47.5757,lng:-122.3119}],
-    strokeColor:'#854F0B',strokeOpacity:0.75,strokeWeight:8,map
+    strokeColor:'#854F0B',strokeOpacity:0.75,strokeWeight:8,map,clickable:true
+  });
+  line22.addListener('click',()=>{
+    infoWin.setContent('<div style="font-family:sans-serif;max-width:220px;padding:4px 2px"><strong style="color:#854F0B;display:block;margin-bottom:4px;font-size:13px">22nd Ave S — promised, then cancelled</strong><span style="font-size:12px;line-height:1.5;color:#3D3830">SDOT promised a concrete sidewalk here in 2021; the project was quietly cancelled in July 2023, a $2M Council proviso directing funds to this block was redirected without notice, and no sidewalk was ever built.</span></div>');
+    infoWin.setPosition({lat:47.5779,lng:-122.3119});
+    infoWin.open(map);
+  });
+
+  // Walkshed circles centered on the 21st/22nd Ave S corridor midpoint
+  const corridorCenter={lat:47.5779,lng:-122.3125};
+  new google.maps.Circle({
+    map,
+    center:corridorCenter,
+    radius:804.67,
+    strokeColor:'#c8791a',
+    strokeOpacity:0.75,
+    strokeWeight:2,
+    fillColor:'#c8791a',
+    fillOpacity:0.07
+  });
+  new google.maps.Circle({
+    map,
+    center:corridorCenter,
+    radius:1609.34,
+    strokeColor:'#c8791a',
+    strokeOpacity:0.45,
+    strokeWeight:1.5,
+    fillColor:'#c8791a',
+    fillOpacity:0.03,
+    strokePattern:[{icon:{path:'M 0,-1 0,1',strokeOpacity:1,scale:3},offset:'0',repeat:'10px'}]
   });
 
   const infoWin=new google.maps.InfoWindow();
 
+  function mkSvgIcon(loc){
+    const c=loc.color;
+    const isTransit=loc.cat==='transit';
+    const isSchool=loc.cat==='school';
+    const size=isTransit?28:isSchool?28:22;
+    const r=isTransit?13:10;
+    let symbol='';
+    if(isTransit){
+      // Light rail icon scaled to fit inside 28x28 circle
+      symbol=`<g transform="translate(5,3) scale(0.75)">
+        <path d="M8.5 19V21.2C8.5 21.48 8.5 21.62 8.4455 21.727C8.39757 21.8211 8.32108 21.8976 8.227 21.9455C8.12004 22 7.98003 22 7.7 22H5.8C5.51997 22 5.37996 22 5.273 21.9455C5.17892 21.8976 5.10243 21.8211 5.0545 21.727C5 21.62 5 21.48 5 21.2V19M19 19V21.2C19 21.48 19 21.62 18.9455 21.727C18.8976 21.8211 18.8211 21.8976 18.727 21.9455C18.62 22 18.48 22 18.2 22H16.3C16.02 22 15.88 22 15.773 21.9455C15.6789 21.8976 15.6024 21.8211 15.5545 21.727C15.5 21.62 15.5 21.48 15.5 21.2V19M3 12H21M3 5.5H21M6.5 15.5H8M16 15.5H17.5M7.8 19H16.2C17.8802 19 18.7202 19 19.362 18.673C19.9265 18.3854 20.3854 17.9265 20.673 17.362C21 16.7202 21 15.8802 21 14.2V6.8C21 5.11984 21 4.27976 20.673 3.63803C20.3854 3.07354 19.9265 2.6146 19.362 2.32698C18.7202 2 17.8802 2 16.2 2H7.8C6.11984 2 5.27976 2 4.63803 2.32698C4.07354 2.6146 3.6146 3.07354 3.32698 3.63803C3 4.27976 3 5.11984 3 6.8V14.2C3 15.8802 3 16.7202 3.32698 17.362C3.6146 17.9265 4.07354 18.3854 4.63803 18.673C5.27976 19 6.11984 19 7.8 19Z"
+          stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </g>`;
+      // Graduation cap icon (scaled to fit 28x28 circle, original viewBox 24x24 offset to center)
+      symbol=`<g transform="translate(2,2) scale(1.0)">
+        <path d="M17 14.5001V11.4945C17 11.315 17 11.2253 16.9727 11.146C16.9485 11.076 16.9091 11.0122 16.8572 10.9592C16.7986 10.8993 16.7183 10.8592 16.5578 10.779L12 8.50006M4 9.50006V16.3067C4 16.6786 4 16.8645 4.05802 17.0274C4.10931 17.1713 4.1929 17.3016 4.30238 17.4082C4.42622 17.5287 4.59527 17.6062 4.93335 17.7612L11.3334 20.6945C11.5786 20.8069 11.7012 20.8631 11.8289 20.8853C11.9421 20.9049 12.0579 20.9049 12.1711 20.8853C12.2988 20.8631 12.4214 20.8069 12.6666 20.6945L19.0666 17.7612C19.4047 17.6062 19.5738 17.5287 19.6976 17.4082C19.8071 17.3016 19.8907 17.1713 19.942 17.0274C20 16.8645 20 16.6786 20 16.3067V9.50006M2 8.50006L11.6422 3.67895C11.7734 3.61336 11.839 3.58056 11.9078 3.56766C11.9687 3.55622 12.0313 3.55622 12.0922 3.56766C12.161 3.58056 12.2266 3.61336 12.3578 3.67895L22 8.50006L12.3578 13.3212C12.2266 13.3868 12.161 13.4196 12.0922 13.4325C12.0313 13.4439 11.9687 13.4439 11.9078 13.4325C11.839 13.4196 11.7734 13.3868 11.6422 13.3212L2 8.50006Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </g>`;
+    const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+      <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="${c}" stroke="white" stroke-width="2"/>
+      ${symbol}
+    </svg>`;
+    return {
+      url:'data:image/svg+xml,'+encodeURIComponent(svg),
+      scaledSize:new google.maps.Size(size,size),
+      anchor:new google.maps.Point(size/2,size/2)
+    };
+  }
+
   function mkMarker(loc){
     const mc=MAP_CATS[loc.cat]||{color:'#666'};
+    const useCustomIcon=loc.cat==='transit'||loc.cat==='school';
     const marker=new google.maps.Marker({
       position:{lat:loc.lat,lng:loc.lng},
       map,
       title:loc.label,
-      icon:{
+      icon: useCustomIcon ? mkSvgIcon(loc) : {
         path:google.maps.SymbolPath.CIRCLE,
         fillColor:loc.color,
         fillOpacity:0.92,
         strokeColor:'#ffffff',
         strokeWeight:2.5,
-        scale:loc.cat==='transit'?11:8
+        scale:8
       }
     });
     marker.addListener('click',()=>{
@@ -561,6 +626,11 @@ function initGMap(){
   }
 
   MAP_LOCS.forEach(mkMarker);
+
+  // Fit map to show all markers
+  const bounds = new google.maps.LatLngBounds();
+  MAP_LOCS.forEach(loc => bounds.extend({lat:loc.lat, lng:loc.lng}));
+  map.fitBounds(bounds, {top:40, right:40, bottom:40, left:40});
 }
 
 const CC={'sdot':'#0F6E56','community':'#185FA5','decision':'#854F0B','open':'#A32D2D','levy':'#533AB7','context':'#4A6741'};
