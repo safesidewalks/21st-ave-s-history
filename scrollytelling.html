@@ -59,38 +59,6 @@ body {
   font-size: 13px; color: rgba(245,240,232,0.75);
 }
 
-/* ── YEAR SPINE (left, Ch2+) ───────────────────── */
-.year-spine {
-  position: fixed; left: 0; top: 50%; transform: translateY(-50%) translateX(-100%);
-  z-index: 200; opacity: 0;
-  transition: opacity 0.7s ease, transform 0.7s ease;
-  pointer-events: none;
-}
-.year-spine.on {
-  opacity: 1; transform: translateY(-50%) translateX(0);
-}
-.year-spine-inner {
-  display: flex; flex-direction: column; align-items: center; gap: 6px;
-  padding: 18px 14px;
-  background: rgba(24,20,14,0.88);
-  backdrop-filter: blur(10px);
-  border-right: 1px solid rgba(200,169,110,0.25);
-  border-radius: 0 8px 8px 0;
-}
-.ys-label {
-  font-size: 8px; font-weight: 500; letter-spacing: 0.13em;
-  text-transform: uppercase; color: var(--gold); opacity: 0.7;
-  writing-mode: vertical-rl; transform: rotate(180deg);
-}
-.ys-num {
-  font-family: 'DM Serif Display', serif;
-  font-size: 1.6rem; line-height: 1; color: var(--cream);
-  writing-mode: vertical-rl; transform: rotate(180deg);
-}
-.ys-sub {
-  font-size: 8px; color: rgba(245,240,232,0.3); line-height: 1.4;
-  writing-mode: vertical-rl; transform: rotate(180deg); text-align: center;
-}
 
 /* ── SHARED SCROLL-REVEAL ──────────────────────── */
 [data-reveal] {
@@ -101,6 +69,8 @@ body {
 [data-reveal][data-delay="1"] { transition-delay: 0.15s; }
 [data-reveal][data-delay="2"] { transition-delay: 0.3s;  }
 [data-reveal][data-delay="3"] { transition-delay: 0.45s; }
+[data-reveal][data-delay="5"] { transition-delay: 0.75s; }
+[data-reveal][data-delay="6"] { transition-delay: 1.25s; }
 
 /* ── CHAPTER 1 ─────────────────────────────────── */
 
@@ -115,6 +85,12 @@ body {
 .scene-bg img {
   width: 100%; height: 100%;
   object-fit: cover; object-position: center 28%;
+  animation: kenburns 22s ease-out forwards;
+  transform-origin: center 35%;
+}
+@keyframes kenburns {
+  0%   { transform: scale(1)    translateX(0); }
+  100% { transform: scale(1.09) translateX(-1.5%); }
 }
 .scene-overlay {
   position: absolute; inset: 0;
@@ -152,7 +128,7 @@ body {
 }
 .step-quote {
   font-family: 'DM Serif Display', serif; font-style: italic;
-  font-size: clamp(1.4rem, 3.2vw, 2rem); line-height: 1.42;
+  font-size: clamp(1.9rem, 4.2vw, 2.9rem); line-height: 1.3;
   color: var(--cream);
   text-shadow: 0 2px 24px rgba(0,0,0,0.55);
   margin-bottom: 1rem;
@@ -187,9 +163,14 @@ body {
 .dp-statement {
   font-family: 'DM Serif Display', serif;
   font-size: clamp(1.9rem, 4.2vw, 2.9rem); line-height: 1.13;
-  color: var(--cream); max-width: 600px; margin-bottom: 4rem;
+  color: var(--cream); max-width: 600px; margin-bottom: 3.5rem;
 }
 .dp-statement em { color: #E24B4A; font-style: italic; }
+.dp-follow {
+  font-style: italic; color: var(--gold);
+  opacity: 0; transition: opacity 1.1s ease;
+}
+.dp-statement.on .dp-follow { opacity: 1; transition-delay: 1.6s; }
 
 .stats-row {
   display: flex; gap: 3.5rem; flex-wrap: wrap;
@@ -389,13 +370,6 @@ body {
   <div class="ch-nav-title" id="ch-nav-title">The Street</div>
 </div>
 
-<div class="year-spine" id="year-spine">
-  <div class="year-spine-inner">
-    <div class="ys-label">Waiting since</div>
-    <div class="ys-num" id="ys-num">1889</div>
-    <div class="ys-sub">no<br>sidewalk</div>
-  </div>
-</div>
 
 
 <!-- ═══════════════════════════════════════════ -->
@@ -422,22 +396,7 @@ body {
         </div>
       </div>
 
-      <div class="step">
-        <div class="step-inner" data-step>
-          <p class="step-quote">&ldquo;The absence of a sidewalk on my street effectively renders me a prisoner in my own home.&rdquo;</p>
-          <p class="step-cite">&mdash; Katt, resident and wheelchair user</p>
-        </div>
-      </div>
     </div>
-  </div>
-
-  <!-- Children photo -->
-  <div class="full-img">
-    <img src="imgs/21st-ave-2025_02.jpg"
-         alt="A long line of young children from Giddens School walk in the gravel shoulder of 21st Ave S with no sidewalk">
-    <p class="full-img-cap">
-      Children from Giddens School navigate 21st Ave S — no sidewalk on either side. The school opened December 2019, one block from where the city plans to pour asphalt in August 2026.
-    </p>
   </div>
 
   <!-- The clock + stats -->
@@ -445,20 +404,20 @@ body {
     <div class="dp-inner">
       <p class="dp-eyebrow" data-reveal>North Beacon Hill &middot; The Record</p>
       <p class="dp-statement" data-reveal data-delay="1">
-        In August 2026, Seattle plans to pour <em>asphalt</em> on this street&mdash;and call it done.
+        In August 2026, Seattle plans to pour <em>asphalt</em> on a single side of the street <span class="dp-follow">and call it done.</span>
       </p>
-      <div class="stats-row" data-reveal data-delay="2">
-        <div>
-          <div class="stat-num">130<span style="font-size:0.5em;vertical-align:super">+</span></div>
+      <div class="stats-row">
+        <div data-reveal data-delay="2">
+          <div class="stat-num" data-count-up="130">0<span style="font-size:0.5em;vertical-align:super">+</span></div>
           <div class="stat-label">years this block has waited for a sidewalk</div>
         </div>
-        <div>
-          <div class="stat-num">58</div>
-          <div class="stat-label">residents surveyed in February 2026</div>
+        <div data-reveal data-delay="5">
+          <div class="stat-num" data-count-up="58">0</div>
+          <div class="stat-label">residents surveyed in the past year</div>
         </div>
-        <div>
+        <div data-reveal data-delay="6">
           <div class="stat-num red">0</div>
-          <div class="stat-label">preferred the asphalt plan</div>
+          <div class="stat-label">prefer the asphalt plan</div>
         </div>
       </div>
     </div>
@@ -573,12 +532,28 @@ window.addEventListener('scroll', () => {
   prog.style.width = Math.min(pct, 100) + '%';
 }, { passive: true });
 
+// ── COUNT-UP ─────────────────────────────────────
+function countUp(el, to, ms) {
+  const t0 = performance.now();
+  (function tick(now) {
+    const p = Math.min((now - t0) / ms, 1);
+    const e = 1 - Math.pow(1 - p, 3);
+    el.childNodes[0].textContent = Math.round(to * e);
+    if (p < 1) requestAnimationFrame(tick);
+  })(t0);
+}
+
 // ── GENERIC SCROLL REVEALS ───────────────────────
 const revealEls = document.querySelectorAll('[data-reveal]');
 const revealObs = new IntersectionObserver((entries) => {
   entries.forEach(e => {
     if (e.isIntersecting) {
       e.target.classList.add('on');
+      const countEl = e.target.querySelector('[data-count-up]');
+      if (countEl) {
+        const delay = parseFloat(getComputedStyle(e.target).transitionDelay) * 1000 || 0;
+        setTimeout(() => countUp(countEl, parseInt(countEl.dataset.countUp), 1400), delay);
+      }
       revealObs.unobserve(e.target);
     }
   });
@@ -599,31 +574,6 @@ const stepObs = new IntersectionObserver((entries) => {
   });
 }, { threshold: 0.55 });
 steps.forEach(el => stepObs.observe(el));
-
-// ── YEAR SPINE ───────────────────────────────────
-const yearSpine = document.getElementById('year-spine');
-const ysNum     = document.getElementById('ys-num');
-
-function animateYear(from, to, ms) {
-  const t0 = performance.now();
-  (function tick(now) {
-    const p = Math.min((now - t0) / ms, 1);
-    const e = 1 - Math.pow(1 - p, 3); // ease-out cubic
-    ysNum.textContent = Math.round(from + (to - from) * e);
-    if (p < 1) requestAnimationFrame(tick);
-  })(t0);
-}
-
-const ch2Obs = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      yearSpine.classList.add('on');
-      animateYear(1889, 2026, 3500);
-      ch2Obs.disconnect();
-    }
-  });
-}, { threshold: 0.25 });
-ch2Obs.observe(document.getElementById('ch2-trigger'));
 
 // ── CHAPTER NAV ──────────────────────────────────
 const chNav      = document.getElementById('ch-nav');
