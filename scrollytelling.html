@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Long Wait — 21st Ave S, North Beacon Hill</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+
+/* ── RESET ─────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: #18140E;
+  color: #F5F0E8;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+:root {
+  --cream:    #F5F0E8;
+  --ink:      #18140E;
+  --ink-soft: #433F38;
+  --ink-muted:#8A837A;
+  --rule:     #D8D0C4;
+  --gold:     #C8A96E;
+  --red:      #9B1C1C;
+  --red-mid:  #7F1D1D;
+  --red-pale: #FEF2F2;
+}
+
+/* ── PROGRESS BAR ──────────────────────────────── */
+.progress-bar {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: 2px; background: rgba(245,240,232,0.08); z-index: 300;
+}
+.progress-fill {
+  height: 100%; background: var(--gold); width: 0%;
+  transition: width 0.1s linear;
+}
+
+/* ── CHAPTER NAV (top-right) ───────────────────── */
+.ch-nav {
+  position: fixed; top: 1.5rem; right: 1.5rem; z-index: 200;
+  text-align: right; opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+.ch-nav.on { opacity: 1; }
+.ch-nav-label {
+  font-size: 9px; font-weight: 500; letter-spacing: 0.14em;
+  text-transform: uppercase; color: rgba(245,240,232,0.35);
+  margin-bottom: 2px;
+}
+.ch-nav-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 13px; color: rgba(245,240,232,0.75);
+}
+
+/* ── YEAR SPINE (left, Ch2+) ───────────────────── */
+.year-spine {
+  position: fixed; left: 0; top: 50%; transform: translateY(-50%) translateX(-100%);
+  z-index: 200; opacity: 0;
+  transition: opacity 0.7s ease, transform 0.7s ease;
+  pointer-events: none;
+}
+.year-spine.on {
+  opacity: 1; transform: translateY(-50%) translateX(0);
+}
+.year-spine-inner {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 18px 14px;
+  background: rgba(24,20,14,0.88);
+  backdrop-filter: blur(10px);
+  border-right: 1px solid rgba(200,169,110,0.25);
+  border-radius: 0 8px 8px 0;
+}
+.ys-label {
+  font-size: 8px; font-weight: 500; letter-spacing: 0.13em;
+  text-transform: uppercase; color: var(--gold); opacity: 0.7;
+  writing-mode: vertical-rl; transform: rotate(180deg);
+}
+.ys-num {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.6rem; line-height: 1; color: var(--cream);
+  writing-mode: vertical-rl; transform: rotate(180deg);
+}
+.ys-sub {
+  font-size: 8px; color: rgba(245,240,232,0.3); line-height: 1.4;
+  writing-mode: vertical-rl; transform: rotate(180deg); text-align: center;
+}
+
+/* ── SHARED SCROLL-REVEAL ──────────────────────── */
+[data-reveal] {
+  opacity: 0; transform: translateY(22px);
+  transition: opacity 0.85s ease, transform 0.85s ease;
+}
+[data-reveal].on { opacity: 1; transform: translateY(0); }
+[data-reveal][data-delay="1"] { transition-delay: 0.15s; }
+[data-reveal][data-delay="2"] { transition-delay: 0.3s;  }
+[data-reveal][data-delay="3"] { transition-delay: 0.45s; }
+
+/* ── CHAPTER 1 ─────────────────────────────────── */
+
+/* Sticky scene */
+.sticky-scene { position: relative; }
+
+.scene-bg {
+  position: sticky; top: 0;
+  height: 100vh; width: 100%;
+  overflow: hidden; z-index: 0;
+}
+.scene-bg img {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center 28%;
+}
+.scene-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(24,20,14,0.30) 0%,
+    rgba(24,20,14,0.05) 20%,
+    rgba(24,20,14,0.25) 55%,
+    rgba(24,20,14,0.82) 100%
+  );
+}
+
+.scene-steps {
+  position: relative; z-index: 10;
+  margin-top: -100vh;
+}
+.step {
+  min-height: 100vh;
+  display: flex; align-items: flex-end; justify-content: center;
+  padding: 0 2rem 13vh;
+}
+.step-blank { pointer-events: none; }
+
+.step-inner {
+  max-width: 600px; text-align: center;
+  opacity: 0; transform: translateY(28px);
+  transition: opacity 0.9s ease, transform 0.9s ease;
+}
+.step-inner.on { opacity: 1; transform: translateY(0); }
+.step-inner.off { opacity: 0; transform: translateY(-16px); }
+
+.step-eyebrow {
+  font-size: 10px; font-weight: 500; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--gold); margin-bottom: 1.25rem;
+}
+.step-quote {
+  font-family: 'DM Serif Display', serif; font-style: italic;
+  font-size: clamp(1.4rem, 3.2vw, 2rem); line-height: 1.42;
+  color: var(--cream);
+  text-shadow: 0 2px 24px rgba(0,0,0,0.55);
+  margin-bottom: 1rem;
+}
+.step-cite {
+  font-size: 11px; font-weight: 500; letter-spacing: 0.09em;
+  text-transform: uppercase; color: rgba(245,240,232,0.55);
+}
+
+/* Full-width second image */
+.full-img { position: relative; z-index: 10; }
+.full-img img {
+  width: 100%; display: block;
+  max-height: 72vh; object-fit: cover; object-position: center 38%;
+}
+.full-img-cap {
+  padding: 0.9rem 2rem;
+  font-size: 12px; line-height: 1.65;
+  color: rgba(245,240,232,0.42); font-style: italic;
+}
+
+/* Dark stat panel */
+.dark-panel {
+  background: var(--ink); padding: 6rem 2rem;
+  position: relative; z-index: 10;
+}
+.dp-inner { max-width: 680px; }
+.dp-eyebrow {
+  font-size: 10px; font-weight: 500; letter-spacing: 0.15em;
+  text-transform: uppercase; color: var(--gold); margin-bottom: 1.5rem;
+}
+.dp-statement {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(1.9rem, 4.2vw, 2.9rem); line-height: 1.13;
+  color: var(--cream); max-width: 600px; margin-bottom: 4rem;
+}
+.dp-statement em { color: #E24B4A; font-style: italic; }
+
+.stats-row {
+  display: flex; gap: 3.5rem; flex-wrap: wrap;
+}
+.stat-num {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(3.2rem, 6.5vw, 5rem); line-height: 1;
+  color: var(--cream); margin-bottom: 0.4rem;
+}
+.stat-num.red { color: #E24B4A; }
+.stat-label {
+  font-size: 13px; color: rgba(245,240,232,0.45);
+  max-width: 160px; line-height: 1.5;
+}
+
+/* ── CHAPTER 2 ─────────────────────────────────── */
+
+/* Chapter divider (dark → cream transition) */
+.ch-divider {
+  background: var(--ink);
+  padding: 5rem 2rem 4rem;
+  position: relative; z-index: 10;
+  border-top: 1px solid rgba(245,240,232,0.05);
+}
+.ch-divider-inner { max-width: 680px; }
+.ch-num-bg {
+  font-family: 'DM Serif Display', serif;
+  font-size: 7rem; line-height: 1; color: rgba(245,240,232,0.05);
+  margin-bottom: -1.2rem; user-select: none;
+}
+.ch-eyebrow {
+  font-size: 10px; font-weight: 500; letter-spacing: 0.15em;
+  text-transform: uppercase; color: var(--gold); margin-bottom: 0.75rem;
+}
+.ch-divider h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(2rem, 4.5vw, 3rem); line-height: 1.1;
+  color: var(--cream); max-width: 500px;
+}
+.ch-divider h2 em { font-style: italic; color: rgba(245,240,232,0.65); }
+
+/* Cream prose sections */
+.cream-section {
+  background: var(--cream); color: var(--ink);
+  padding: 5rem 2rem; position: relative; z-index: 10;
+}
+.cream-section + .cream-section { padding-top: 0; }
+
+.prose {
+  max-width: 600px; margin: 0 auto;
+  font-size: 15.5px; line-height: 1.87; color: var(--ink-soft);
+}
+.prose p { margin-bottom: 1.1rem; }
+.prose p:last-child { margin-bottom: 0; }
+.prose strong { color: var(--ink); font-weight: 500; }
+
+/* Covenant two-col grid */
+.cov-section {
+  background: var(--cream); padding: 0 2rem 5rem;
+  position: relative; z-index: 10;
+}
+.cov-grid {
+  max-width: 620px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+}
+.cov-col { border-radius: 8px; overflow: hidden; }
+.cov-hd {
+  padding: 0.7rem 1.25rem;
+  font-size: 9.5px; font-weight: 500; letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+.cov-hd.restricted { background: var(--red-mid); color: rgba(245,240,232,0.9); }
+.cov-hd.available  { background: var(--ink-soft); color: rgba(245,240,232,0.9); }
+.cov-body {
+  padding: 0.85rem 1.25rem;
+  border: 1px solid var(--rule); border-top: none;
+  border-radius: 0 0 8px 8px;
+  background: rgba(0,0,0,0.025);
+}
+.cov-row {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; color: var(--ink-soft);
+  padding: 0.3rem 0; border-bottom: 1px solid var(--rule);
+}
+.cov-row:last-child { border-bottom: none; }
+.cov-row.here { font-weight: 500; color: var(--ink); }
+.cov-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+
+/* Covenant doc quote */
+.cov-quote-section {
+  background: var(--cream); padding: 0 2rem 4.5rem;
+  position: relative; z-index: 10;
+}
+.cov-quote-inner {
+  max-width: 600px; margin: 0 auto;
+  border-left: 3px solid var(--red);
+  padding: 1rem 1.5rem;
+  background: var(--red-pale);
+  border-radius: 0 6px 6px 0;
+}
+.cov-quote-text {
+  font-family: 'DM Serif Display', serif; font-style: italic;
+  font-size: 1.2rem; line-height: 1.55;
+  color: var(--red-mid); margin-bottom: 0.5rem;
+}
+.cov-quote-cite {
+  font-size: 11px; font-weight: 500; letter-spacing: 0.08em;
+  text-transform: uppercase; color: rgba(127,29,29,0.65);
+}
+
+/* Sandi card */
+.sandi-section {
+  background: var(--cream); padding: 0 2rem 5rem;
+  position: relative; z-index: 10;
+}
+.sandi-card {
+  max-width: 600px; margin: 0 auto;
+  background: var(--ink); border-radius: 10px;
+  padding: 2rem 2.25rem;
+}
+.sandi-label {
+  font-size: 9.5px; font-weight: 500; letter-spacing: 0.13em;
+  text-transform: uppercase; color: var(--gold); margin-bottom: 0.8rem;
+}
+.sandi-text {
+  font-family: 'DM Serif Display', serif; font-style: italic;
+  font-size: 1.05rem; line-height: 1.67;
+  color: rgba(245,240,232,0.85); margin-bottom: 1rem;
+}
+.sandi-sub {
+  font-size: 13px; line-height: 1.75;
+  color: rgba(245,240,232,0.45);
+  border-top: 1px solid rgba(245,240,232,0.08);
+  padding-top: 1rem; margin-top: 0.25rem;
+}
+
+/* Debt close */
+.debt-section {
+  background: var(--ink); padding: 7rem 2rem;
+  position: relative; z-index: 10;
+}
+.debt-inner { max-width: 600px; }
+.debt-label {
+  font-size: 10px; font-weight: 500; letter-spacing: 0.15em;
+  text-transform: uppercase; color: var(--gold); margin-bottom: 1.25rem;
+}
+.debt-statement {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(1.65rem, 3.6vw, 2.3rem); line-height: 1.2;
+  color: var(--cream); margin-bottom: 1.5rem;
+}
+.debt-statement em { color: var(--gold); font-style: italic; }
+.debt-sub {
+  font-size: 15px; line-height: 1.85;
+  color: rgba(245,240,232,0.5); max-width: 500px;
+  border-top: 1px solid rgba(245,240,232,0.09);
+  padding-top: 1.5rem;
+}
+
+/* Chapters placeholder */
+.chapters-coming {
+  background: var(--ink); padding: 3rem 2rem 6rem;
+  position: relative; z-index: 10;
+}
+.chapters-coming-inner {
+  max-width: 600px; margin: 0 auto;
+  border: 1px dashed rgba(245,240,232,0.1);
+  border-radius: 8px; padding: 2.5rem;
+  text-align: center;
+}
+.chapters-coming-inner p {
+  font-size: 12px; color: rgba(245,240,232,0.25);
+  letter-spacing: 0.05em; line-height: 1.8;
+}
+.chapters-coming-inner strong {
+  color: rgba(245,240,232,0.45); font-weight: 500;
+}
+
+/* ── RESPONSIVE ─────────────────────────────────── */
+@media (max-width: 600px) {
+  .year-spine { display: none; }
+  .step { padding: 0 1.25rem 10vh; }
+  .stats-row { gap: 2rem; }
+  .cov-grid { grid-template-columns: 1fr; }
+  .dark-panel { padding: 4rem 1.5rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar"><div class="progress-fill" id="prog"></div></div>
+
+<div class="ch-nav" id="ch-nav">
+  <div class="ch-nav-label" id="ch-nav-label">Chapter 1</div>
+  <div class="ch-nav-title" id="ch-nav-title">The Street</div>
+</div>
+
+<div class="year-spine" id="year-spine">
+  <div class="year-spine-inner">
+    <div class="ys-label">Waiting since</div>
+    <div class="ys-num" id="ys-num">1889</div>
+    <div class="ys-sub">no<br>sidewalk</div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- CHAPTER 1 — THE STREET                     -->
+<!-- ═══════════════════════════════════════════ -->
+<section id="ch1">
+
+  <!-- Sticky image scene -->
+  <div class="sticky-scene">
+    <div class="scene-bg">
+      <img src="imgs/21st-ave-2025_01.jpg"
+           alt="An elderly woman uses a cane to walk in the travel lane of 21st Ave S — there is no sidewalk">
+      <div class="scene-overlay"></div>
+    </div>
+
+    <div class="scene-steps">
+      <div class="step step-blank"></div>
+
+      <div class="step">
+        <div class="step-inner" data-step>
+          <p class="step-eyebrow">21st Ave S &middot; North Beacon Hill &middot; Seattle &middot; 2026</p>
+          <p class="step-quote">&ldquo;Walking this street feels like a matter of when a pedestrian will be hit, not if.&rdquo;</p>
+          <p class="step-cite">&mdash; Letha, resident</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-inner" data-step>
+          <p class="step-quote">&ldquo;The absence of a sidewalk on my street effectively renders me a prisoner in my own home.&rdquo;</p>
+          <p class="step-cite">&mdash; Katt, resident and wheelchair user</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Children photo -->
+  <div class="full-img">
+    <img src="imgs/21st-ave-2025_02.jpg"
+         alt="A long line of young children from Giddens School walk in the gravel shoulder of 21st Ave S with no sidewalk">
+    <p class="full-img-cap">
+      Children from Giddens School navigate 21st Ave S — no sidewalk on either side. The school opened December 2019, one block from where the city plans to pour asphalt in August 2026.
+    </p>
+  </div>
+
+  <!-- The clock + stats -->
+  <div class="dark-panel">
+    <div class="dp-inner">
+      <p class="dp-eyebrow" data-reveal>North Beacon Hill &middot; The Record</p>
+      <p class="dp-statement" data-reveal data-delay="1">
+        In August 2026, Seattle plans to pour <em>asphalt</em> on this street&mdash;and call it done.
+      </p>
+      <div class="stats-row" data-reveal data-delay="2">
+        <div>
+          <div class="stat-num">130<span style="font-size:0.5em;vertical-align:super">+</span></div>
+          <div class="stat-label">years this block has waited for a sidewalk</div>
+        </div>
+        <div>
+          <div class="stat-num">58</div>
+          <div class="stat-label">residents surveyed in February 2026</div>
+        </div>
+        <div>
+          <div class="stat-num red">0</div>
+          <div class="stat-label">preferred the asphalt plan</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- CHAPTER 2 — HOW THEY GOT HERE              -->
+<!-- ═══════════════════════════════════════════ -->
+<section id="ch2">
+
+  <div class="ch-divider" id="ch2-trigger">
+    <div class="ch-divider-inner">
+      <div class="ch-num-bg">02</div>
+      <p class="ch-eyebrow">How they got here &middot; 1889&ndash;1967</p>
+      <h2 data-reveal>This block wasn&rsquo;t<br><em>chosen.</em><br>It was what remained.</h2>
+    </div>
+  </div>
+
+  <div class="cream-section">
+    <div class="prose" data-reveal>
+      <p>When Beacon Hill was platted in 1889, restrictive covenants were already written into Seattle property deeds. The language was explicit: <strong>&ldquo;No person other than the Caucasian race.&rdquo;</strong> The covenants weren&rsquo;t private preferences &mdash; they were backed by federal mortgage policy. The FHA refused to insure loans in integrated neighborhoods, a practice documented in Seattle from the 1930s onward and known as redlining.</p>
+      <p>The result was a city that was legally partitioned. Most of Seattle &mdash; North Seattle, West Seattle, Magnolia, Ballard, Wallingford, Queen Anne &mdash; was made unavailable to Chinese, Japanese, Filipino, and Black families. A small number of neighborhoods were not.</p>
+    </div>
+  </div>
+
+  <!-- Covenant two-column visual -->
+  <div class="cov-section">
+    <div class="cov-grid" data-reveal>
+      <div class="cov-col">
+        <div class="cov-hd restricted">Most of Seattle &mdash; Restricted</div>
+        <div class="cov-body">
+          <div class="cov-row"><div class="cov-dot" style="background:#9B1C1C;opacity:.65"></div>North Seattle</div>
+          <div class="cov-row"><div class="cov-dot" style="background:#9B1C1C;opacity:.65"></div>Ballard</div>
+          <div class="cov-row"><div class="cov-dot" style="background:#9B1C1C;opacity:.65"></div>Wallingford</div>
+          <div class="cov-row"><div class="cov-dot" style="background:#9B1C1C;opacity:.65"></div>Fremont</div>
+          <div class="cov-row"><div class="cov-dot" style="background:#9B1C1C;opacity:.65"></div>Queen Anne</div>
+          <div class="cov-row"><div class="cov-dot" style="background:#9B1C1C;opacity:.65"></div>Magnolia</div>
+          <div class="cov-row"><div class="cov-dot" style="background:#9B1C1C;opacity:.65"></div>West Seattle</div>
+          <div class="cov-row"><div class="cov-dot" style="background:#9B1C1C;opacity:.65"></div>Laurelhurst</div>
+          <div class="cov-row"><div class="cov-dot" style="background:#9B1C1C;opacity:.65"></div>Ravenna</div>
+        </div>
+      </div>
+      <div class="cov-col">
+        <div class="cov-hd available">Where families could buy</div>
+        <div class="cov-body">
+          <div class="cov-row"><div class="cov-dot" style="background:#433F38;opacity:.5"></div>Central District</div>
+          <div class="cov-row"><div class="cov-dot" style="background:#433F38;opacity:.5"></div>International District</div>
+          <div class="cov-row"><div class="cov-dot" style="background:#433F38;opacity:.5"></div>Rainier Valley</div>
+          <div class="cov-row here"><div class="cov-dot" style="background:#C8A96E"></div>Beacon Hill &larr; here</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cov-quote-section">
+    <div class="cov-quote-inner" data-reveal>
+      <p class="cov-quote-text">&ldquo;No person other than the Caucasian race.&rdquo;</p>
+      <p class="cov-quote-cite">Language in Seattle property deeds, documented 1889 through the 1960s &mdash; UW Civil Rights &amp; Labor History Project</p>
+    </div>
+  </div>
+
+  <div class="cream-section" style="padding-top:0">
+    <div class="prose" data-reveal>
+      <p>The families who settled 21st Ave S and 22nd Ave S in the 1940s, 50s, and 60s were not choosing Beacon Hill over somewhere else. They were choosing Beacon Hill because somewhere else had been closed to them &mdash; legally, systematically, with the full backing of the federal government.</p>
+      <p>The neighborhoods that were closed to them were being built out in the 1950s with FHA-backed mortgages and promised sidewalks. The families on Beacon Hill received none of that. They received a block they were confined to, without sidewalks, and no promise of when that would change. <strong>In 1967, Sandi&rsquo;s family moved to 21st Ave S. There was no sidewalk. There had never been one. There still isn&rsquo;t one today.</strong></p>
+    </div>
+  </div>
+
+  <!-- Sandi card -->
+  <div class="sandi-section">
+    <div class="sandi-card" data-reveal>
+      <div class="sandi-label">Neighbor record &middot; 1967&ndash;present</div>
+      <p class="sandi-text">In the decades after her family moved in, Sandi&rsquo;s father did what the city would not: he tried to organize the neighbors to fund sidewalk construction themselves. He couldn&rsquo;t get enough buy-in. The sidewalk didn&rsquo;t get built.</p>
+      <p class="sandi-sub">When public infrastructure investment is withheld from communities of color, the burden of filling that gap falls on residents themselves &mdash; through self-organized funding drives, advocacy labor, and decades of effort that change nothing. The families on 21st Ave S have paid property taxes for 40 to 60 years. Those taxes funded sidewalks in other Seattle neighborhoods &mdash; neighborhoods that were, by legal design, more accessible to white families.</p>
+    </div>
+  </div>
+
+  <!-- Debt close -->
+  <div class="debt-section">
+    <div class="debt-inner" data-reveal>
+      <div class="debt-label">The core argument</div>
+      <p class="debt-statement">The 2024 Transportation Levy was supposed to be the mechanism that made self-funding <em>unnecessary.</em></p>
+      <p class="debt-sub">Its equity framework was explicitly designed to identify and correct exactly this kind of long-term, racially rooted disinvestment. It found 21st Ave S. It scored this block at the top of its own priority list &mdash; 12 out of 12 on equity, the maximum possible. And then directed the minimum possible resources to address it. The question ahead is whether the levy &mdash; and the city &mdash; will pay the debt it identified.</p>
+    </div>
+  </div>
+
+  <!-- Placeholder for remaining chapters -->
+  <div class="chapters-coming">
+    <div class="chapters-coming-inner" data-reveal>
+      <p>
+        <strong>Coming &darr;</strong><br><br>
+        Chapter 3 &mdash; The Promise &nbsp;&middot;&nbsp;
+        Chapter 4 &mdash; What They Gave Us Instead<br>
+        Chapter 5 &mdash; The Levy &nbsp;&middot;&nbsp;
+        Chapter 6 &mdash; The Opportunity Zone &nbsp;&middot;&nbsp;
+        Chapter 7 &mdash; The Ask
+      </p>
+    </div>
+  </div>
+
+</section>
+
+
+<script>
+// ── PROGRESS BAR ────────────────────────────────
+const prog = document.getElementById('prog');
+window.addEventListener('scroll', () => {
+  const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+  prog.style.width = Math.min(pct, 100) + '%';
+}, { passive: true });
+
+// ── GENERIC SCROLL REVEALS ───────────────────────
+const revealEls = document.querySelectorAll('[data-reveal]');
+const revealObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('on');
+      revealObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.2, rootMargin: '0px 0px -60px 0px' });
+revealEls.forEach(el => revealObs.observe(el));
+
+// ── STEP QUOTES (sticky scene) ───────────────────
+const steps = document.querySelectorAll('[data-step]');
+const stepObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('on');
+      e.target.classList.remove('off');
+    } else {
+      e.target.classList.remove('on');
+      e.target.classList.add('off');
+    }
+  });
+}, { threshold: 0.55 });
+steps.forEach(el => stepObs.observe(el));
+
+// ── YEAR SPINE ───────────────────────────────────
+const yearSpine = document.getElementById('year-spine');
+const ysNum     = document.getElementById('ys-num');
+
+function animateYear(from, to, ms) {
+  const t0 = performance.now();
+  (function tick(now) {
+    const p = Math.min((now - t0) / ms, 1);
+    const e = 1 - Math.pow(1 - p, 3); // ease-out cubic
+    ysNum.textContent = Math.round(from + (to - from) * e);
+    if (p < 1) requestAnimationFrame(tick);
+  })(t0);
+}
+
+const ch2Obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      yearSpine.classList.add('on');
+      animateYear(1889, 2026, 3500);
+      ch2Obs.disconnect();
+    }
+  });
+}, { threshold: 0.25 });
+ch2Obs.observe(document.getElementById('ch2-trigger'));
+
+// ── CHAPTER NAV ──────────────────────────────────
+const chNav      = document.getElementById('ch-nav');
+const chNavLabel = document.getElementById('ch-nav-label');
+const chNavTitle = document.getElementById('ch-nav-title');
+
+const chapters = [
+  { id: 'ch1', label: 'Chapter 1', title: 'The Street' },
+  { id: 'ch2', label: 'Chapter 2', title: 'How They Got Here' },
+];
+
+const chObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const meta = chapters.find(c => c.id === e.target.id);
+      if (meta) {
+        chNavLabel.textContent = meta.label;
+        chNavTitle.textContent = meta.title;
+        chNav.classList.add('on');
+      }
+    }
+  });
+}, { threshold: 0.15, rootMargin: '-15% 0px -70% 0px' });
+
+document.querySelectorAll('section[id]').forEach(el => chObs.observe(el));
+</script>
+</body>
+</html>
