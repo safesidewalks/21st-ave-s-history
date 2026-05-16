@@ -105,8 +105,8 @@ body {
 }
 .step {
   min-height: 100vh;
-  display: flex; align-items: flex-end; justify-content: center;
-  padding: 0 2rem 13vh;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 2rem;
 }
 .step-blank { pointer-events: none; }
 
@@ -403,15 +403,15 @@ body {
         In August 2026, Seattle plans to pour <em>asphalt</em> on a single side of the street <span class="dp-follow">and call it done.</span>
       </p>
       <div class="stats-row">
-        <div data-reveal data-delay="2">
+        <div data-scroll-stat="0.2">
           <div class="stat-num" data-count-up="130">0<span style="font-size:0.5em;vertical-align:super">+</span></div>
           <div class="stat-label">years this block has waited for a sidewalk</div>
         </div>
-        <div data-reveal data-delay="5">
+        <div data-scroll-stat="0.5">
           <div class="stat-num" data-count-up="58">0</div>
           <div class="stat-label">residents surveyed in the past year</div>
         </div>
-        <div data-reveal data-delay="6">
+        <div data-scroll-stat="0.78">
           <div class="stat-num red">0</div>
           <div class="stat-label">prefer the asphalt plan</div>
         </div>
@@ -521,21 +521,37 @@ body {
 
 
 <script>
-// ── PROGRESS BAR + SCROLL-DRIVEN KEN BURNS ───────
-const prog = document.getElementById('prog');
+// ── PROGRESS BAR + SCROLL-DRIVEN KEN BURNS + STATS
+const prog     = document.getElementById('prog');
 const sceneEl  = document.querySelector('.sticky-scene');
 const sceneImg = sceneEl.querySelector('.scene-bg img');
+const darkPanel = document.querySelector('.dark-panel');
+const scrollStats = [...document.querySelectorAll('[data-scroll-stat]')];
 
 window.addEventListener('scroll', () => {
+  // progress bar
   const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
   prog.style.width = Math.min(pct, 100) + '%';
 
+  // ken burns
   const rect     = sceneEl.getBoundingClientRect();
-  const travel   = sceneEl.offsetHeight - window.innerHeight;
+  const travel   = sceneEl.offsetHeight;
   const progress = Math.max(0, Math.min(1, -rect.top / travel));
   const scale    = 1 + progress * 0.09;
   const tx       = progress * -1.5;
   sceneImg.style.transform = `scale(${scale}) translateX(${tx}%)`;
+
+  // scroll-triggered stats
+  const dp       = darkPanel.getBoundingClientRect();
+  const dpProgress = Math.max(0, Math.min(1, (window.innerHeight - dp.top) / (window.innerHeight + darkPanel.offsetHeight)));
+  scrollStats.forEach(el => {
+    const threshold = parseFloat(el.dataset.scrollStat);
+    if (dpProgress >= threshold && !el.classList.contains('on')) {
+      el.classList.add('on');
+      const countEl = el.querySelector('[data-count-up]');
+      if (countEl) countUp(countEl, parseInt(countEl.dataset.countUp), 1400);
+    }
+  });
 }, { passive: true });
 
 // ── COUNT-UP ─────────────────────────────────────
