@@ -120,7 +120,7 @@ body {
 
 .step-eyebrow {
   font-size: 10px; font-weight: 500; letter-spacing: 0.16em;
-  text-transform: uppercase; color: var(--gold); margin-bottom: 1.25rem;
+  text-transform: uppercase; color: rgba(245,240,232,0.8); margin-bottom: 1.25rem;
 }
 .step-quote {
   font-family: 'DM Serif Display', serif; font-style: italic;
@@ -154,19 +154,31 @@ body {
 .dp-inner { max-width: 680px; }
 .dp-eyebrow {
   font-size: 10px; font-weight: 500; letter-spacing: 0.15em;
-  text-transform: uppercase; color: var(--gold); margin-bottom: 1.5rem;
+  text-transform: uppercase; color: rgba(245,240,232,0.8); margin-bottom: 1.5rem;
 }
 .dp-statement {
   font-family: 'DM Serif Display', serif;
   font-size: clamp(1.9rem, 4.2vw, 2.9rem); line-height: 1.13;
   color: var(--cream); max-width: 600px; margin-bottom: 3.5rem;
 }
-.dp-statement em { color: #E24B4A; font-style: italic; }
+.dp-statement em { font-style: normal; }
 .dp-follow {
-  font-style: italic; color: var(--gold);
+  font-style: italic; color: rgba(245,240,232,0.9);
   opacity: 0; transition: opacity 1.1s ease;
 }
 .dp-statement.on .dp-follow { opacity: 1; transition-delay: 1.6s; }
+
+/* ── HIGHLIGHT TAG ─────────────────────────────── */
+.hl {
+  display: inline-block;
+  background: rgba(255,255,255,0.18);
+  color: #ffffff;
+  border-radius: 8px;
+  padding: 2px 5px 3px;
+  vertical-align: 0;
+  font-style: normal;
+  line-height: 1;
+}
 
 .stats-row {
   display: flex; gap: 3.5rem; flex-wrap: wrap;
@@ -206,7 +218,7 @@ body {
 }
 .ch-eyebrow {
   font-size: 10px; font-weight: 500; letter-spacing: 0.15em;
-  text-transform: uppercase; color: var(--gold); margin-bottom: 0.75rem;
+  text-transform: uppercase; color: rgba(245,240,232,0.8); margin-bottom: 0.75rem;
 }
 .ch-divider h2 {
   font-family: 'DM Serif Display', serif;
@@ -271,19 +283,11 @@ body {
 }
 .cov-quote-inner {
   max-width: 600px; margin: 0 auto;
-  border-left: 3px solid var(--red);
-  padding: 1rem 1.5rem;
-  background: var(--red-pale);
-  border-radius: 0 6px 6px 0;
-}
-.cov-quote-text {
-  font-family: 'DM Serif Display', serif; font-style: italic;
-  font-size: 1.2rem; line-height: 1.55;
-  color: var(--red-mid); margin-bottom: 0.5rem;
 }
 .cov-quote-cite {
-  font-size: 11px; font-weight: 500; letter-spacing: 0.08em;
-  text-transform: uppercase; color: rgba(127,29,29,0.65);
+  font-size: 11px; font-weight: 400; letter-spacing: 0.06em;
+  color: var(--ink-muted);
+  margin-top: 0.65rem;
 }
 
 /* Sandi card */
@@ -298,7 +302,7 @@ body {
 }
 .sandi-label {
   font-size: 9.5px; font-weight: 500; letter-spacing: 0.13em;
-  text-transform: uppercase; color: var(--gold); margin-bottom: 0.8rem;
+  text-transform: uppercase; color: rgba(245,240,232,0.8); margin-bottom: 0.8rem;
 }
 .sandi-text {
   font-family: 'DM Serif Display', serif; font-style: italic;
@@ -320,14 +324,14 @@ body {
 .debt-inner { max-width: 600px; }
 .debt-label {
   font-size: 10px; font-weight: 500; letter-spacing: 0.15em;
-  text-transform: uppercase; color: var(--gold); margin-bottom: 1.25rem;
+  text-transform: uppercase; color: rgba(245,240,232,0.8); margin-bottom: 1.25rem;
 }
 .debt-statement {
   font-family: 'DM Serif Display', serif;
   font-size: clamp(1.65rem, 3.6vw, 2.3rem); line-height: 1.2;
   color: var(--cream); margin-bottom: 1.5rem;
 }
-.debt-statement em { color: var(--gold); font-style: italic; }
+.debt-statement em { color: rgba(245,240,232,0.9); font-style: italic; }
 .debt-sub {
   font-size: 15px; line-height: 1.85;
   color: rgba(245,240,232,0.5); max-width: 500px;
@@ -407,7 +411,7 @@ body {
     <div class="dp-inner">
       <p class="dp-eyebrow" data-reveal>North Beacon Hill &middot; The Record</p>
       <p class="dp-statement" data-reveal data-delay="1">
-        In August 2026, Seattle plans to pour <em>asphalt</em> on a single side of the street <span class="dp-follow">and call it done.</span>
+        In August 2026, Seattle plans to pour <span class="hl">asphalt</span> on a single side of a Beacon Hill street <span class="dp-follow">and call it done.</span>
       </p>
       <div class="stats-row">
         <div data-scroll-stat="0.2">
@@ -436,16 +440,14 @@ body {
 
   <div class="ch-divider" id="ch2-trigger">
     <div class="ch-divider-inner">
-      <div class="ch-num-bg">02</div>
-      <p class="ch-eyebrow">How they got here &middot; 1889&ndash;1967</p>
-      <h2 data-reveal>This block wasn&rsquo;t<br><em>chosen.</em><br>It was what remained.</h2>
+      <p class="ch-eyebrow">Redlining &middot; 1889&ndash;1954</p>
+      <h2 data-reveal>&ldquo;No person other than<br>the Caucasian race.&rdquo;</h2>
     </div>
   </div>
 
   <div class="cream-section">
     <div class="prose" data-reveal>
-      <p>When Beacon Hill was platted in 1889, restrictive covenants were already written into Seattle property deeds. The language was explicit: <strong>&ldquo;No person other than the Caucasian race.&rdquo;</strong> The covenants weren&rsquo;t private preferences &mdash; they were backed by federal mortgage policy. The FHA refused to insure loans in integrated neighborhoods, a practice documented in Seattle from the 1930s onward and known as redlining.</p>
-      <p>The result was a city that was legally partitioned. Most of Seattle &mdash; North Seattle, West Seattle, Magnolia, Ballard, Wallingford, Queen Anne &mdash; was made unavailable to Chinese, Japanese, Filipino, and Black families. A small number of neighborhoods were not.</p>
+      <p>Seattle&rsquo;s neighborhoods were not shaped by preference. By 1889, property deeds named who could live where &mdash; most of the city legally closed to Chinese, Japanese, Filipino, Black, and Jewish families. Beacon Hill was not.</p>
     </div>
   </div>
 
@@ -480,15 +482,14 @@ body {
 
   <div class="cov-quote-section">
     <div class="cov-quote-inner" data-reveal>
-      <p class="cov-quote-text">&ldquo;No person other than the Caucasian race.&rdquo;</p>
-      <p class="cov-quote-cite">Language in Seattle property deeds, documented 1889 through the 1960s &mdash; UW Civil Rights &amp; Labor History Project</p>
+      <img src="imgs/magnoliaCovenant.png" alt="Magnolia covenant document showing restrictive racial language" style="width:100%;display:block;border-radius:4px;">
+      <p class="cov-quote-cite" style="margin-top:0.75rem;">Restrictive covenant language in Seattle property deeds &mdash; Magnolia Community Council Racial Restrictive Covenants Project</p>
     </div>
   </div>
 
   <div class="cream-section" style="padding-top:0">
     <div class="prose" data-reveal>
-      <p>The families who settled 21st Ave S and 22nd Ave S in the 1940s, 50s, and 60s were not choosing Beacon Hill over somewhere else. They were choosing Beacon Hill because somewhere else had been closed to them &mdash; legally, systematically, with the full backing of the federal government.</p>
-      <p>The neighborhoods that were closed to them were being built out in the 1950s with FHA-backed mortgages and promised sidewalks. The families on Beacon Hill received none of that. They received a block they were confined to, without sidewalks, and no promise of when that would change. <strong>In 1967, Sandi&rsquo;s family moved to 21st Ave S. There was no sidewalk. There had never been one. There still isn&rsquo;t one today.</strong></p>
+      <p>The neighborhoods that were off-limits were being built out in the 1950s with FHA-backed mortgages and promised sidewalks. The families on 21st Ave S received neither. <strong>In 1967, Sandi&rsquo;s family moved here. There was no sidewalk. There had never been one. There still isn&rsquo;t one today.</strong></p>
     </div>
   </div>
 
@@ -504,9 +505,47 @@ body {
   <!-- Debt close -->
   <div class="debt-section">
     <div class="debt-inner" data-reveal>
-      <div class="debt-label">The core argument</div>
-      <p class="debt-statement">The 2024 Transportation Levy was supposed to be the mechanism that made self-funding <em>unnecessary.</em></p>
-      <p class="debt-sub">Its equity framework was explicitly designed to identify and correct exactly this kind of long-term, racially rooted disinvestment. It found 21st Ave S. It scored this block at the top of its own priority list &mdash; 12 out of 12 on equity, the maximum possible. And then directed the minimum possible resources to address it. The question ahead is whether the levy &mdash; and the city &mdash; will pay the debt it identified.</p>
+      <p class="debt-statement">Seattle publicly names redlining as a harm to repair. Its transportation department has a dedicated Office of Equity and Economic Inclusion. It publishes equity frameworks.</p>
+      <p class="debt-statement">The 2024 Transportation Levy was supposed to change that.</p>
+      <p class="debt-statement">But on these historically redlined blocks, the plan is still to do it as cheaply as possible.</p>
+    </div>
+  </div>
+
+  <!-- ── CHAPTER 3 ─────────────────────────────────── -->
+  <div class="ch-divider" id="ch3-trigger">
+    <div class="ch-divider-inner">
+      <p class="ch-eyebrow">The Promise &middot; 2021&ndash;2024</p>
+      <h2 data-reveal>The station opened<br>on time.</h2>
+    </div>
+  </div>
+
+  <div class="cream-section">
+    <div class="prose" data-reveal>
+      <p>On March 28, 2026, Judkins Park Station opened half a mile from 21st Ave S. It was a milestone for Seattle transit — a new light rail stop connecting North Beacon Hill to downtown in minutes, anchoring years of planned development along the corridor.</p>
+      <p>SDOT had made a specific commitment tied to that opening. In October 2021, a department official told community member Letha directly: 22nd Ave S would have a concrete sidewalk before Judkins Park opened. The neighborhood had been asking for years. Now there was a date, a deliverable, and a name attached to it.</p>
+    </div>
+  </div>
+
+  <!-- Morales proviso visual -->
+  <div class="cov-quote-section">
+    <div class="cov-quote-inner" data-reveal>
+      <img src="imgs/morales-newsletter-jul2023.png" alt="CM Morales newsletter referencing the $2M sidewalk proviso" style="width:100%;display:block;border-radius:4px;">
+      <p class="cov-quote-cite" style="margin-top:0.75rem;">CM Tammy Morales newsletter, July 2023 &mdash; referencing the $2M REET I proviso secured in the 2022 budget</p>
+    </div>
+  </div>
+
+  <div class="cream-section" style="padding-top:0">
+    <div class="prose" data-reveal>
+      <p>The commitment wasn't just verbal. In the 2022 city budget, Councilmember Tammy Morales secured a $2 million proviso directing funds specifically to District 2 sidewalks, with 22nd Ave S named first. The money existed. The priority was on paper. The neighborhood was never notified.</p>
+    </div>
+  </div>
+
+  <!-- Promise close — dark panel -->
+  <div class="debt-section">
+    <div class="debt-inner" data-reveal>
+      <p class="debt-statement">The station opened on March 28, 2026.</p>
+      <p class="debt-statement">There was no sidewalk on 22nd Ave S.</p>
+      <p class="debt-statement">There still isn&rsquo;t one on 21st Ave S.</p>
     </div>
   </div>
 
@@ -515,9 +554,8 @@ body {
     <div class="chapters-coming-inner" data-reveal>
       <p>
         <strong>Coming &darr;</strong><br><br>
-        Chapter 3 &mdash; The Promise &nbsp;&middot;&nbsp;
-        Chapter 4 &mdash; What They Gave Us Instead<br>
-        Chapter 5 &mdash; The Levy &nbsp;&middot;&nbsp;
+        Chapter 4 &mdash; What They Gave Us Instead &nbsp;&middot;&nbsp;
+        Chapter 5 &mdash; The Levy<br>
         Chapter 6 &mdash; The Opportunity Zone &nbsp;&middot;&nbsp;
         Chapter 7 &mdash; The Ask
       </p>
