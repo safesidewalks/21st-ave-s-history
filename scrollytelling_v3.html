@@ -1033,10 +1033,10 @@ body {
           <p class="dg-step-caption">Gold dots are segments SDOT scores highest for historical underinvestment. The rest of District 2&rsquo;s missing sidewalks are shown in grey.</p>
         </div>
       </div>
-      <div class="dg-step" data-phase="9">
+      <div class="dg-step" data-phase="12">
         <div class="dg-step-content">
-          <p class="dg-step-sentence">Among those 2,596 &mdash; <strong style="color:#E24B4A">4 segments</strong> are the two blocks of 21st Ave S. One block east, 4 more on 22nd Ave S share the same story.</p>
-          <p class="dg-step-caption">8 segments. Two streets. Scroll to see them.</p>
+          <p class="dg-step-sentence">Among those 2,596 — <strong style="color:rgba(195,150,75,1)">4 segments are 21st Ave S.</strong> One block east, <strong style="color:rgba(24,20,14,0.88);background:rgba(245,240,232,0.85);padding:0 3px;border-radius:2px">4 more mark 22nd Ave S.</strong> Eight segments. Two streets.</p>
+          <p class="dg-step-caption">Gold = 21st Ave S · Dark = 22nd Ave S · Both run Walker St to Bayview St. Scroll to see them on the map.</p>
         </div>
       </div>
       <div class="dg-step-spacer"></div>
@@ -1500,6 +1500,18 @@ revealEls.forEach(el => revealObs.observe(el));
   const flags = new Uint8Array(N);
   for (let i = 0; i < N; i++) flags[i] = raw.charCodeAt(i);
 
+  // Phase 12 — specific segment indices within D2
+  // D2_21ST: 4 dots flagged bit6 (thisblock = 21st Ave S)
+  // D2_22ND: first 4 non-bit6 D2 dots in original order (proxy for 22nd Ave S;
+  //          in SORTED_POS[9] these rank immediately after the bit6 dots, so they
+  //          appear visually adjacent to 21st Ave S at the top of the D2 band)
+  const D2_21ST = [];
+  const D2_22ND = [];
+  for (let i = D2_START; i < D2_END; i++) {
+    if (flags[i] & 64) D2_21ST.push(i);
+    else if (D2_22ND.length < 4) D2_22ND.push(i);
+  }
+
   // Flat positions (row-major, 110×105)
   const px      = new Float32Array(N);
   const py_flat = new Float32Array(N);
@@ -1553,7 +1565,7 @@ revealEls.forEach(el => revealObs.observe(el));
   const canvasWrap = document.getElementById('dotgrid-canvas-wrap');
   function updateCanvasScale(phase) {
     if (!canvasWrap) return;
-    if (phase === 11) {
+    if (phase === 11 || phase === 12) {
       // Translate-only: center D2 in the sticky pane, no upscale → no pixelation, labels stay normal size
       // Sticky pane is 700px wide; canvas (660px wide) is flex-centered → 20px left margin
       // D2 center in pane currently: (20 + D2_CX, 5vh + D2_CY)  target: (350, 50vh)
@@ -1640,6 +1652,35 @@ revealEls.forEach(el => revealObs.observe(el));
       for (let i = D2_START; i < D2_END; i++) {
         if (flags[i] & 2) { ctx.moveTo(SX[i]+R,SY[i]); ctx.arc(SX[i],SY[i],R,0,Math.PI*2); }
       }
+      ctx.fill();
+      return;
+    }
+    if (phase === 12) {
+      // D2 isolated, bit6-sorted so 21st Ave S dots sit at very top of D2 band,
+      // 22nd Ave S proxy dots (4 immediately after) highlighted in dark ink
+      const [SX, SY] = SORTED_POS[9];
+      drawLabels(1, 2);
+      // Non-D2: nearly invisible
+      ctx.fillStyle = 'rgba(24,20,14,0.04)'; ctx.beginPath();
+      for (let i = 0; i < N; i++) {
+        if (i < D2_START || i >= D2_END) { ctx.moveTo(SX[i]+R,SY[i]); ctx.arc(SX[i],SY[i],R,0,Math.PI*2); }
+      }
+      ctx.fill();
+      // D2 background (everything else): muted
+      const set21 = new Set(D2_21ST);
+      const set22 = new Set(D2_22ND);
+      ctx.fillStyle = C_MUTED; ctx.beginPath();
+      for (let i = D2_START; i < D2_END; i++) {
+        if (!set21.has(i) && !set22.has(i)) { ctx.moveTo(SX[i]+R,SY[i]); ctx.arc(SX[i],SY[i],R,0,Math.PI*2); }
+      }
+      ctx.fill();
+      // 22nd Ave S proxy: dark ink
+      ctx.fillStyle = 'rgba(24,20,14,0.88)'; ctx.beginPath();
+      for (const i of D2_22ND) { ctx.moveTo(SX[i]+R,SY[i]); ctx.arc(SX[i],SY[i],R+1,0,Math.PI*2); }
+      ctx.fill();
+      // 21st Ave S: gold
+      ctx.fillStyle = C_EQUITY; ctx.beginPath();
+      for (const i of D2_21ST) { ctx.moveTo(SX[i]+R,SY[i]); ctx.arc(SX[i],SY[i],R+1,0,Math.PI*2); }
       ctx.fill();
       return;
     }
