@@ -771,9 +771,13 @@ body {
 }
 .street-map-wrap {
   width: 100%; height: 100%;
-  opacity: 0; transition: opacity 1.2s ease;
+  opacity: 0;    /* scroll-driven via JS — no CSS transition */
 }
-.street-map-wrap.visible { opacity: 1; }
+#map-dots-canvas {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none; z-index: 5;
+}
 .map-text-panel {
   position: absolute; bottom: 0; left: 0; right: 0;
   padding: 6rem 3rem 3.5rem;
@@ -1052,18 +1056,19 @@ body {
 <section id="map-reveal" class="map-reveal-section">
   <div class="map-sticky-pane" id="map-sticky-pane">
     <div id="street-map" class="street-map-wrap"></div>
+    <canvas id="map-dots-canvas"></canvas>
     <div class="map-text-panel">
 
-      <div class="map-step-text" id="map-text-22" data-map-step="0.38" data-map-end="0.52">
-        <p class="map-street-label" style="color:rgba(24,20,14,0.65);font-weight:700;letter-spacing:0.15em;text-transform:uppercase">22nd Ave S &middot; S Walker St to S Bayview St</p>
-        <p class="map-headline" style="color:var(--ink)">The cautionary tale.</p>
-        <p class="map-sub" style="color:rgba(24,20,14,0.6)">Residents reported crashes. Asked about timelines. Were told a sidewalk was coming. It wasn&rsquo;t.</p>
+      <div class="map-step-text" id="map-text-22" data-map-step="0.42" data-map-end="0.50">
+        <p class="map-street-label" style="color:rgba(245,240,232,0.5);font-weight:700;letter-spacing:0.15em;text-transform:uppercase">22nd Ave S &middot; S Walker St to S Bayview St</p>
+        <p class="map-headline">The cautionary tale.</p>
+        <p class="map-sub">Residents reported crashes. Asked about timelines. Were told a sidewalk was coming. It wasn&rsquo;t.</p>
       </div>
 
       <div class="map-step-text" id="map-text-21" data-map-step="0.85">
         <p class="map-street-label gold">21st Ave S &middot; S Walker St to S Bayview St</p>
-        <p class="map-headline" style="color:var(--ink)">The current fight.</p>
-        <p class="map-sub" style="color:rgba(24,20,14,0.6)">No permanent sidewalk was ever promised here. The city went straight to cheap asphalt &mdash; and didn&rsquo;t tell the neighbors until the scope was already signed.</p>
+        <p class="map-headline">The current fight.</p>
+        <p class="map-sub">No permanent sidewalk was ever promised here. The city went straight to cheap asphalt &mdash; and didn&rsquo;t tell the neighbors until the scope was already signed.</p>
       </div>
 
     </div>
@@ -1877,26 +1882,16 @@ if (dgSteps.length) {
 
 // ── GOOGLE MAPS — Two Streets ────────────────────
 (function() {
-  const section = document.getElementById('map-reveal');
-  const mapEl   = document.getElementById('street-map');
+  const section   = document.getElementById('map-reveal');
+  const mapEl     = document.getElementById('street-map');
+  const overlayEl = document.getElementById('map-dots-canvas');
   if (!section || !mapEl) return;
 
   let mapInited = false, gmap = null;
-  let poly22 = null, poly21 = null;
+  let tilesLoaded = false, oCtx = null;
 
-  // 80 interpolated points per street — finer resolution = smoother scroll draw
-  function lerpPath(lat1, lng1, lat2, lng2, n) {
-    const pts = [];
-    for (let i = 0; i <= n; i++) {
-      const t = i / n;
-      pts.push({ lat: lat1 + (lat2 - lat1) * t, lng: lng1 + (lng2 - lng1) * t });
-    }
-    return pts;
-  }
-  // 22nd Ave S: Walker → Bayview (one block east of 21st)
-  const PATH_22 = lerpPath(47.5836616, -122.3043196, 47.5810366, -122.3043196, 80);
-  // 21st Ave S: Walker → Bayview
-  const PATH_21 = lerpPath(47.5836616, -122.3055831, 47.5810366, -122.3055831, 80);
+  // Canvas pixel positions for line endpoints (computed after tiles load)
+  let px21 = null, px22 = null, pyWalker = null, pyBayview = null;
 
   function initMap() {
     if (mapInited) return;
@@ -1905,8 +1900,8 @@ if (dgSteps.length) {
     const mapStyle = [
       { featureType: 'poi',       stylers: [{ visibility: 'off' }] },
       { featureType: 'transit',   stylers: [{ visibility: 'off' }] },
-      { featureType: 'road',      elementType: 'geometry',      stylers: [{ color: '#e4ddd3' }] },
-      { featureType: 'road.arterial', elementType: 'geometry',  stylers: [{ color: '#d5cec4' }] },
+      { featureType: 'road',      elementType: 'geometry',         stylers: [{ color: '#e4ddd3' }] },
+      { featureType: 'road.arterial', elementType: 'geometry',     stylers: [{ color: '#d5cec4' }] },
       { featureType: 'road',      elementType: 'labels.text.fill', stylers: [{ color: '#8a837a' }] },
       { featureType: 'landscape', stylers: [{ color: '#ede8e0' }] },
       { featureType: 'water',     stylers: [{ color: '#c8d4cf' }] },
@@ -1914,28 +1909,44 @@ if (dgSteps.length) {
     ];
 
     gmap = new google.maps.Map(mapEl, {
-      center:             { lat: 47.5823491, lng: -122.3049514 },
-      zoom:               17,
-      styles:             mapStyle,
-      disableDefaultUI:   true,
-      gestureHandling:    'none',
-      keyboardShortcuts:  false,
+      center:            { lat: 47.5823491, lng: -122.3049514 },
+      zoom:              17,
+      styles:            mapStyle,
+      disableDefaultUI:  true,
+      gestureHandling:   'none',
+      keyboardShortcuts: false,
     });
 
-    // 22nd Ave S = dark ink (matches dot-grid phase 12 "22nd" color)
-    poly22 = new google.maps.Polyline({
-      path: [], strokeColor: '#18140E', strokeOpacity: 0.85,
-      strokeWeight: 10, map: gmap,
-    });
-    // 21st Ave S = gold (matches dot-grid phase 12 "21st" color)
-    poly21 = new google.maps.Polyline({
-      path: [], strokeColor: '#C8A96E', strokeOpacity: 0.95,
-      strokeWeight: 10, map: gmap,
-    });
-
-    // Fade map in once tiles load, then trigger an initial scroll update
     google.maps.event.addListenerOnce(gmap, 'tilesloaded', () => {
-      mapEl.classList.add('visible');
+      // ── Setup DPR-aware overlay canvas ──────────────────────────────
+      const W   = mapEl.offsetWidth;
+      const H   = mapEl.offsetHeight;
+      const DPR = Math.min(window.devicePixelRatio || 1, 2);
+      if (overlayEl) {
+        overlayEl.width  = W * DPR;
+        overlayEl.height = H * DPR;
+        overlayEl.style.width  = W + 'px';
+        overlayEl.style.height = H + 'px';
+        oCtx = overlayEl.getContext('2d');
+        oCtx.scale(DPR, DPR);
+      }
+
+      // ── Compute fixed pixel positions from Maps projection ───────────
+      const proj   = gmap.getProjection();
+      const center = proj.fromLatLngToPoint(gmap.getCenter());
+      const scale  = Math.pow(2, gmap.getZoom());
+      function toPx(lat, lng) {
+        const pt = proj.fromLatLngToPoint(new google.maps.LatLng(lat, lng));
+        return { x: (pt.x - center.x) * scale + W / 2,
+                 y: (pt.y - center.y) * scale + H / 2 };
+      }
+      const w21 = toPx(47.5836616, -122.3055831);  // 21st Ave S — Walker St
+      const b21 = toPx(47.5810366, -122.3055831);  // 21st Ave S — Bayview St
+      const w22 = toPx(47.5836616, -122.3043196);  // 22nd Ave S — Walker St
+      px21 = w21.x;  px22 = w22.x;
+      pyWalker = w21.y;  pyBayview = b21.y;
+
+      tilesLoaded = true;
       updateLines();
     });
   }
@@ -1956,46 +1967,86 @@ if (dgSteps.length) {
     document.head.appendChild(s);
   }
 
-  // Load map when section is near viewport
   const obs = new IntersectionObserver((entries) => {
     if (entries[0].isIntersecting) { loadMapsAPI(); obs.disconnect(); }
   }, { rootMargin: '200px' });
   obs.observe(section);
 
-  // ── Scroll-driven line growth ─────────────────────────────────────────
-  // Scroll progress 0→1 over the full map-reveal section (300vh).
+  // ── Scroll-driven animation ───────────────────────────────────────────
   //
-  //  0.00–0.05  map fades in, nothing drawn yet
-  //  0.05–0.45  22nd Ave S (dark) draws south, Walker → Bayview
-  //  0.38       22nd text label appears
-  //  0.50–0.90  21st Ave S (gold) draws south, Walker → Bayview
-  //  0.85       21st text label appears
+  //  progress 0.00→0.08   map fades in from dark body background
+  //  progress 0.05→0.45   22nd Ave S: 4-dot cluster at Walker St → line grows south
+  //  progress 0.42        22nd text appears
+  //  progress 0.50        22nd text fades out
+  //  progress 0.48→0.88   21st Ave S: 4-dot cluster at Walker St → line grows south
+  //  progress 0.85        21st text appears
   //
   const mapTextEls = [...section.querySelectorAll('[data-map-step]')];
 
+  // Draw one street: a cluster of 4 dots at Walker St that condenses into a growing line
+  function drawStreet(px, r, g, b, startP, endP, progress) {
+    const p = Math.max(0, Math.min(1, (progress - startP) / (endP - startP)));
+    if (p <= 0 || !oCtx) return;
+
+    const DOT_PHASE = 0.10;   // first 10% = dot cluster phase
+
+    // 4-dot cluster at Walker St (fades out as line takes over)
+    if (p < DOT_PHASE * 2.5) {
+      const dotAlpha = Math.max(0, 1 - p / (DOT_PHASE * 1.5)) * 0.9;
+      oCtx.fillStyle = `rgba(${r},${g},${b},${dotAlpha.toFixed(3)})`;
+      [[-4,-4],[4,-4],[-4,4],[4,4]].forEach(([dx, dy]) => {
+        oCtx.beginPath();
+        oCtx.arc(px + dx * 0.6, pyWalker + dy * 0.6, 3, 0, Math.PI * 2);
+        oCtx.fill();
+      });
+    }
+
+    // Growing line (Walker → Bayview): starts slightly after dot phase begins
+    if (p > DOT_PHASE) {
+      const lineP      = Math.min(1, (p - DOT_PHASE) / (1 - DOT_PHASE));
+      const lineBottom = pyWalker + (pyBayview - pyWalker) * lineP;
+      const lineAlpha  = Math.min(1, (p - DOT_PHASE) / 0.04); // quick fade-in
+      oCtx.globalAlpha = lineAlpha;
+      oCtx.strokeStyle = `rgba(${r},${g},${b},0.92)`;
+      oCtx.lineWidth   = 10;
+      oCtx.lineCap     = 'round';
+      oCtx.beginPath();
+      oCtx.moveTo(px, pyWalker);
+      oCtx.lineTo(px, lineBottom);
+      oCtx.stroke();
+      oCtx.globalAlpha = 1;
+    }
+  }
+
   function updateLines() {
+    if (!tilesLoaded) return;
+
     const rect = section.getBoundingClientRect();
     if (rect.bottom < 0 || rect.top > window.innerHeight) return;
     const progress = Math.max(0, Math.min(1,
       -rect.top / (section.offsetHeight - window.innerHeight)
     ));
 
-    // Text step reveals — respects data-map-end for cross-fade hand-off
+    // Map fades in from dark body — scroll-driven, no CSS transition
+    mapEl.style.opacity = Math.min(1, progress / 0.08).toFixed(3);
+
+    // Text step reveals / un-reveals
     mapTextEls.forEach(el => {
       const step = parseFloat(el.dataset.mapStep);
       const end  = el.dataset.mapEnd ? parseFloat(el.dataset.mapEnd) : 1.01;
       el.classList.toggle('on', progress >= step && progress < end);
     });
 
-    if (!poly22 || !poly21) return;
+    if (!oCtx || px21 === null) return;
 
-    // 22nd Ave S: 0.05 → 0.45
-    const p22 = Math.max(0, Math.min(1, (progress - 0.05) / 0.40));
-    poly22.setPath(PATH_22.slice(0, Math.max(2, Math.round(p22 * PATH_22.length))));
+    // Clear overlay
+    oCtx.clearRect(0, 0, mapEl.offsetWidth, mapEl.offsetHeight);
 
-    // 21st Ave S: 0.50 → 0.90
-    const p21 = Math.max(0, Math.min(1, (progress - 0.50) / 0.40));
-    poly21.setPath(p21 > 0 ? PATH_21.slice(0, Math.max(2, Math.round(p21 * PATH_21.length))) : []);
+    // 22nd Ave S — dark ink — builds first (0.05 → 0.45)
+    drawStreet(px22, 24, 20, 14,       0.05, 0.45, progress);
+
+    // 21st Ave S — gold — builds second (0.48 → 0.88)
+    drawStreet(px21, 200, 169, 110,    0.48, 0.88, progress);
   }
 
   window.addEventListener('scroll', updateLines, { passive: true });
