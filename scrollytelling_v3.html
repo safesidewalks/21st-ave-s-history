@@ -1054,16 +1054,16 @@ body {
     <div id="street-map" class="street-map-wrap"></div>
     <div class="map-text-panel">
 
-      <div class="map-step-text" id="map-text-22" data-map-step="0.18">
-        <p class="map-street-label gold">22nd Ave S &middot; S Walker St to S Bayview St</p>
-        <p class="map-headline">The cautionary tale.</p>
-        <p class="map-sub">Residents reported crashes. Asked about timelines. Were told a sidewalk was coming. It wasn&rsquo;t.</p>
+      <div class="map-step-text" id="map-text-22" data-map-step="0.38" data-map-end="0.52">
+        <p class="map-street-label" style="color:rgba(24,20,14,0.65);font-weight:700;letter-spacing:0.15em;text-transform:uppercase">22nd Ave S &middot; S Walker St to S Bayview St</p>
+        <p class="map-headline" style="color:var(--ink)">The cautionary tale.</p>
+        <p class="map-sub" style="color:rgba(24,20,14,0.6)">Residents reported crashes. Asked about timelines. Were told a sidewalk was coming. It wasn&rsquo;t.</p>
       </div>
 
-      <div class="map-step-text" id="map-text-21" data-map-step="0.52">
-        <p class="map-street-label red">21st Ave S &middot; S Walker St to S Bayview St</p>
-        <p class="map-headline">The current fight.</p>
-        <p class="map-sub">No permanent sidewalk was ever promised here. The city went straight to cheap asphalt &mdash; and didn&rsquo;t tell the neighbors until the scope was already signed.</p>
+      <div class="map-step-text" id="map-text-21" data-map-step="0.85">
+        <p class="map-street-label gold">21st Ave S &middot; S Walker St to S Bayview St</p>
+        <p class="map-headline" style="color:var(--ink)">The current fight.</p>
+        <p class="map-sub" style="color:rgba(24,20,14,0.6)">No permanent sidewalk was ever promised here. The city went straight to cheap asphalt &mdash; and didn&rsquo;t tell the neighbors until the scope was already signed.</p>
       </div>
 
     </div>
@@ -1436,9 +1436,10 @@ revealEls.forEach(el => revealObs.observe(el));
   const CH_FLAT = 105 * STEP;     // 630px
 
   // District bands layout — two balanced columns with a visual gap
-  const COLS_B = 52, LH = 78, GH = 20;   // 52 dots per col; label & gap heights (78 = room for 2-line hoods)
-  const COL_W  = COLS_B * STEP;           // 312px per column
-  const COL_GAP = CW - 2 * COL_W;        // 36px gap between columns (660 - 624)
+  const COLS_B = 64, LH = 72, GH = 12;   // 64 dots per row saves rows → less vertical space
+  const STEP_B = 5;                        // tighter spacing in banded view (flat uses STEP=6)
+  const COL_W  = COLS_B * STEP_B;         // 320px per column
+  const COL_GAP = CW - 2 * COL_W;        // 20px gap between columns (660 - 640)
 
   // Canonical data: start/count index into B64 array (D1→D7 order)
   const DISTRICTS = [
@@ -1473,7 +1474,7 @@ revealEls.forEach(el => revealObs.observe(el));
     dist.rows_b     = Math.ceil(dist.count / COLS_B);
     dist.band_top_b = colH[dist.col];
     dist.dots_top_b = colH[dist.col] + LH;
-    colH[dist.col] += LH + dist.rows_b * STEP + GH;
+    colH[dist.col] += LH + dist.rows_b * STEP_B + GH;
   });
   colH[0] -= GH; colH[1] -= GH;   // trim trailing gap
   const CH_BAND = Math.max(colH[0], colH[1]);
@@ -1481,7 +1482,7 @@ revealEls.forEach(el => revealObs.observe(el));
   // D2 isolation constants (phase 11)
   const D2_DIST  = DIST_MAP[2];
   const D2_CX    = D2_DIST.col_x + COL_W / 2;
-  const D2_CY    = D2_DIST.band_top_b + (LH + D2_DIST.rows_b * STEP) / 2;
+  const D2_CY    = D2_DIST.band_top_b + (LH + D2_DIST.rows_b * STEP_B) / 2;
   const D2_START = D2_DIST.start;
   const D2_END   = D2_DIST.start + D2_DIST.count;
 
@@ -1505,11 +1506,15 @@ revealEls.forEach(el => revealObs.observe(el));
   // D2_22ND: first 4 non-bit6 D2 dots in original order (proxy for 22nd Ave S;
   //          in SORTED_POS[9] these rank immediately after the bit6 dots, so they
   //          appear visually adjacent to 21st Ave S at the top of the D2 band)
+  // The bit6 flag marks all 8 highlighted segments (both streets combined).
+  // Split them 4+4 in original data order: first 4 → 21st Ave S (gold), next 4 → 22nd Ave S (dark).
   const D2_21ST = [];
   const D2_22ND = [];
   for (let i = D2_START; i < D2_END; i++) {
-    if (flags[i] & 64) D2_21ST.push(i);
-    else if (D2_22ND.length < 4) D2_22ND.push(i);
+    if (flags[i] & 64) {
+      if (D2_21ST.length < 4) D2_21ST.push(i);
+      else if (D2_22ND.length < 4) D2_22ND.push(i);
+    }
   }
 
   // Flat positions (row-major, 110×105)
@@ -1525,8 +1530,8 @@ revealEls.forEach(el => revealObs.observe(el));
   const py_b = new Float32Array(N);
   DIST_DISPLAY.forEach(dist => {
     for (let j = 0; j < dist.count; j++) {
-      px_b[dist.start + j] = dist.col_x + (j % COLS_B) * STEP + STEP * 0.5;
-      py_b[dist.start + j] = dist.dots_top_b + Math.floor(j / COLS_B) * STEP + STEP * 0.5;
+      px_b[dist.start + j] = dist.col_x + (j % COLS_B) * STEP_B + STEP_B * 0.5;
+      py_b[dist.start + j] = dist.dots_top_b + Math.floor(j / COLS_B) * STEP_B + STEP_B * 0.5;
     }
   });
 
@@ -1544,8 +1549,8 @@ revealEls.forEach(el => revealObs.observe(el));
       for (let j = 0; j < dist.count; j++) {
         const match = !!(flags[dist.start+j] & mask);
         const rank  = match ? mRank++ : mCount + nmRank++;
-        pxs[dist.start+j] = dist.col_x + (rank % COLS_B) * STEP + STEP * 0.5;
-        pys[dist.start+j] = dist.dots_top_b + Math.floor(rank / COLS_B) * STEP + STEP * 0.5;
+        pxs[dist.start+j] = dist.col_x + (rank % COLS_B) * STEP_B + STEP_B * 0.5;
+        pys[dist.start+j] = dist.dots_top_b + Math.floor(rank / COLS_B) * STEP_B + STEP_B * 0.5;
       }
     });
     SORTED_POS[+ph] = [pxs, pys];
@@ -1878,9 +1883,8 @@ if (dgSteps.length) {
 
   let mapInited = false, gmap = null;
   let poly22 = null, poly21 = null;
-  let line22drawn = false, line21drawn = false;
 
-  // Interpolate N points along a vertical street segment for animated draw
+  // 80 interpolated points per street — finer resolution = smoother scroll draw
   function lerpPath(lat1, lng1, lat2, lng2, n) {
     const pts = [];
     for (let i = 0; i <= n; i++) {
@@ -1889,18 +1893,10 @@ if (dgSteps.length) {
     }
     return pts;
   }
-  const PATH_22 = lerpPath(47.5836616, -122.3043196, 47.5810366, -122.3043196, 40);
-  const PATH_21 = lerpPath(47.5836616, -122.3055831, 47.5810366, -122.3055831, 40);
-
-  function drawLine(polyline, pts, duration) {
-    const t0 = performance.now();
-    polyline.setPath([pts[0]]);
-    (function tick(now) {
-      const p = Math.min((now - t0) / duration, 1);
-      polyline.setPath(pts.slice(0, Math.max(2, Math.round(p * pts.length))));
-      if (p < 1) requestAnimationFrame(tick);
-    })(t0);
-  }
+  // 22nd Ave S: Walker → Bayview (one block east of 21st)
+  const PATH_22 = lerpPath(47.5836616, -122.3043196, 47.5810366, -122.3043196, 80);
+  // 21st Ave S: Walker → Bayview
+  const PATH_21 = lerpPath(47.5836616, -122.3055831, 47.5810366, -122.3055831, 80);
 
   function initMap() {
     if (mapInited) return;
@@ -1926,18 +1922,21 @@ if (dgSteps.length) {
       keyboardShortcuts:  false,
     });
 
+    // 22nd Ave S = dark ink (matches dot-grid phase 12 "22nd" color)
     poly22 = new google.maps.Polyline({
-      path: [], strokeColor: '#C8A96E', strokeOpacity: 0.92,
+      path: [], strokeColor: '#18140E', strokeOpacity: 0.85,
       strokeWeight: 10, map: gmap,
     });
+    // 21st Ave S = gold (matches dot-grid phase 12 "21st" color)
     poly21 = new google.maps.Polyline({
-      path: [], strokeColor: '#E24B4A', strokeOpacity: 0.9,
+      path: [], strokeColor: '#C8A96E', strokeOpacity: 0.95,
       strokeWeight: 10, map: gmap,
     });
 
-    // Fade map in once tiles load
+    // Fade map in once tiles load, then trigger an initial scroll update
     google.maps.event.addListenerOnce(gmap, 'tilesloaded', () => {
       mapEl.classList.add('visible');
+      updateLines();
     });
   }
 
@@ -1945,7 +1944,6 @@ if (dgSteps.length) {
   function loadMapsAPI() {
     if (window.google && window.google.maps) { initMap(); return; }
     if (document.querySelector('script[src*="maps.googleapis"]')) {
-      // API script already in DOM (e.g. from index.html) — wait for it
       const wait = setInterval(() => {
         if (window.google && window.google.maps) { clearInterval(wait); initMap(); }
       }, 80);
@@ -1964,28 +1962,43 @@ if (dgSteps.length) {
   }, { rootMargin: '200px' });
   obs.observe(section);
 
-  // Scroll: text reveals + line draw triggers
+  // ── Scroll-driven line growth ─────────────────────────────────────────
+  // Scroll progress 0→1 over the full map-reveal section (300vh).
+  //
+  //  0.00–0.05  map fades in, nothing drawn yet
+  //  0.05–0.45  22nd Ave S (dark) draws south, Walker → Bayview
+  //  0.38       22nd text label appears
+  //  0.50–0.90  21st Ave S (gold) draws south, Walker → Bayview
+  //  0.85       21st text label appears
+  //
   const mapTextEls = [...section.querySelectorAll('[data-map-step]')];
-  window.addEventListener('scroll', () => {
+
+  function updateLines() {
     const rect = section.getBoundingClientRect();
     if (rect.bottom < 0 || rect.top > window.innerHeight) return;
     const progress = Math.max(0, Math.min(1,
       -rect.top / (section.offsetHeight - window.innerHeight)
     ));
 
+    // Text step reveals — respects data-map-end for cross-fade hand-off
     mapTextEls.forEach(el => {
-      if (progress >= parseFloat(el.dataset.mapStep)) el.classList.add('on');
+      const step = parseFloat(el.dataset.mapStep);
+      const end  = el.dataset.mapEnd ? parseFloat(el.dataset.mapEnd) : 1.01;
+      el.classList.toggle('on', progress >= step && progress < end);
     });
 
-    if (poly22 && progress >= 0.15 && !line22drawn) {
-      line22drawn = true;
-      drawLine(poly22, PATH_22, 1000);
-    }
-    if (poly21 && progress >= 0.48 && !line21drawn) {
-      line21drawn = true;
-      drawLine(poly21, PATH_21, 1000);
-    }
-  }, { passive: true });
+    if (!poly22 || !poly21) return;
+
+    // 22nd Ave S: 0.05 → 0.45
+    const p22 = Math.max(0, Math.min(1, (progress - 0.05) / 0.40));
+    poly22.setPath(PATH_22.slice(0, Math.max(2, Math.round(p22 * PATH_22.length))));
+
+    // 21st Ave S: 0.50 → 0.90
+    const p21 = Math.max(0, Math.min(1, (progress - 0.50) / 0.40));
+    poly21.setPath(p21 > 0 ? PATH_21.slice(0, Math.max(2, Math.round(p21 * PATH_21.length))) : []);
+  }
+
+  window.addEventListener('scroll', updateLines, { passive: true });
 })();
 </script>
 </body>
