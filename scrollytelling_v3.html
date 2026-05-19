@@ -1822,6 +1822,21 @@ revealEls.forEach(el => revealObs.observe(el));
     if ((phase === 9 || phase === 10) && !ringActive) startRing();
     lastPhase = phase;
     updateCanvasScale(phase);
+    // When phase 12 becomes active, snapshot the 8 highlighted dot positions
+    // in screen coordinates so the map section can animate from them
+    if (phase === 12) setTimeout(window._snapPhase12Dots, 40);
+  };
+
+  // Expose snapshot function — map section calls this too on scroll
+  window._snapPhase12Dots = function() {
+    if (lastPhase !== 12 || !D2_21ST.length) return;
+    const [SX, SY] = SORTED_POS[9];
+    const wr = canvasWrap ? canvasWrap.getBoundingClientRect()
+                          : canvas.getBoundingClientRect();
+    window._phase12Dots = {
+      gold: D2_21ST.map(i => [wr.left + SX[i], wr.top + SY[i]]),
+      dark: D2_22ND.map(i => [wr.left + SX[i], wr.top + SY[i]]),
+    };
   };
 })();
 
@@ -1972,85 +1987,168 @@ if (dgSteps.length) {
   }, { rootMargin: '200px' });
   obs.observe(section);
 
-  // ── Scroll-driven animation ───────────────────────────────────────────
-  //
-  //  progress 0.00→0.08   map fades in from dark body background
-  //  progress 0.05→0.45   22nd Ave S: 4-dot cluster at Walker St → line grows south
-  //  progress 0.42        22nd text appears
-  //  progress 0.50        22nd text fades out
-  //  progress 0.48→0.88   21st Ave S: 4-dot cluster at Walker St → line grows south
-  //  progress 0.85        21st text appears
-  //
-  const mapTextEls = [...section.querySelectorAll('[data-map-step]')];
+  // ── Animation state ───────────────────────────────────────────────────
+  const mapTextEls  = [...section.querySelectorAll('[data-map-step]')];
+  const flightCanvas = document.getElementById('dot-flight-canvas');
+  let   fCtx = null, fW = 0, fH = 0;
+  let   startDots = null;   // captured phase-12 screen positions {gold:[[x,y]×4], dark:[[x,y]×4]}
 
-  // Draw one street: a cluster of 4 dots at Walker St that condenses into a growing line
-  function drawStreet(px, r, g, b, startP, endP, progress) {
-    const p = Math.max(0, Math.min(1, (progress - startP) / (endP - startP)));
-    if (p <= 0 || !oCtx) return;
-
-    const DOT_PHASE = 0.10;   // first 10% = dot cluster phase
-
-    // 4-dot cluster at Walker St (fades out as line takes over)
-    if (p < DOT_PHASE * 2.5) {
-      const dotAlpha = Math.max(0, 1 - p / (DOT_PHASE * 1.5)) * 0.9;
-      oCtx.fillStyle = `rgba(${r},${g},${b},${dotAlpha.toFixed(3)})`;
-      [[-4,-4],[4,-4],[-4,4],[4,4]].forEach(([dx, dy]) => {
-        oCtx.beginPath();
-        oCtx.arc(px + dx * 0.6, pyWalker + dy * 0.6, 3, 0, Math.PI * 2);
-        oCtx.fill();
-      });
-    }
-
-    // Growing line (Walker → Bayview): starts slightly after dot phase begins
-    if (p > DOT_PHASE) {
-      const lineP      = Math.min(1, (p - DOT_PHASE) / (1 - DOT_PHASE));
-      const lineBottom = pyWalker + (pyBayview - pyWalker) * lineP;
-      const lineAlpha  = Math.min(1, (p - DOT_PHASE) / 0.04); // quick fade-in
-      oCtx.globalAlpha = lineAlpha;
-      oCtx.strokeStyle = `rgba(${r},${g},${b},0.92)`;
-      oCtx.lineWidth   = 10;
-      oCtx.lineCap     = 'round';
-      oCtx.beginPath();
-      oCtx.moveTo(px, pyWalker);
-      oCtx.lineTo(px, lineBottom);
-      oCtx.stroke();
-      oCtx.globalAlpha = 1;
-    }
+  function initFlightCanvas() {
+    if (fCtx || !flightCanvas) return;
+    const DPR = Math.min(window.devicePixelRatio || 1, 2);
+    fW = window.innerWidth;  fH = window.innerHeight;
+    flightCanvas.width  = fW * DPR;
+    flightCanvas.height = fH * DPR;
+    flightCanvas.style.width  = fW + 'px';
+    flightCanvas.style.height = fH + 'px';
+    fCtx = flightCanvas.getContext('2d');
+    fCtx.scale(DPR, DPR);
   }
 
-  function updateLines() {
-    if (!tilesLoaded) return;
+  // Lerp helper
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function ease(t) { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; } // ease-in-out quad
 
+  function updateLines() {
     const rect = section.getBoundingClientRect();
     if (rect.bottom < 0 || rect.top > window.innerHeight) return;
     const progress = Math.max(0, Math.min(1,
       -rect.top / (section.offsetHeight - window.innerHeight)
     ));
 
-    // Map fades in from dark body — scroll-driven, no CSS transition
-    mapEl.style.opacity = Math.min(1, progress / 0.08).toFixed(3);
+    // ── Map fade in: scroll-driven ──────────────────────────────────────
+    mapEl.style.opacity = Math.min(1, progress / 0.12).toFixed(3);
 
-    // Text step reveals / un-reveals
+    // ── Text reveals ────────────────────────────────────────────────────
     mapTextEls.forEach(el => {
       const step = parseFloat(el.dataset.mapStep);
       const end  = el.dataset.mapEnd ? parseFloat(el.dataset.mapEnd) : 1.01;
       el.classList.toggle('on', progress >= step && progress < end);
     });
 
-    if (!oCtx || px21 === null) return;
+    // ── Phase 1: Dot flight (progress 0 → 0.30) ─────────────────────────
+    // The 8 highlighted dots from the dot-grid physically fly to their
+    // real-world positions on the map (Walker St on 21st / 22nd Ave S).
+    //
+    //   progress 0.00 → 0.30   dots fly from grid positions to map positions
+    //   progress 0.30 → 0.55   22nd (dark) line grows south Walker → Bayview
+    //   progress 0.42          22nd text appears, fades at 0.50
+    //   progress 0.52 → 0.90   21st (gold) line grows south Walker → Bayview
+    //   progress 0.85          21st text appears
+    //
+    const FLIGHT_END   = 0.30;
+    const LINE22_START = 0.30,  LINE22_END = 0.60;
+    const LINE21_START = 0.52,  LINE21_END = 0.90;
 
-    // Clear overlay
+    // Grab dot start positions on first scroll (while dot-grid is still accessible)
+    if (!startDots && progress < 0.05 && window._phase12Dots) {
+      startDots = window._phase12Dots;
+    } else if (!startDots && progress < 0.05 && window._snapPhase12Dots) {
+      window._snapPhase12Dots();
+      startDots = window._phase12Dots;
+    }
+
+    // ── Flight canvas (fixed overlay) ───────────────────────────────────
+    if (flightCanvas) {
+      const showFlight = progress < FLIGHT_END + 0.08 && tilesLoaded && px21 !== null;
+      flightCanvas.style.display = showFlight ? 'block' : 'none';
+
+      if (showFlight) {
+        if (!fCtx) initFlightCanvas();
+        fCtx.clearRect(0, 0, fW, fH);
+
+        const mapRect = mapEl.getBoundingClientRect();
+
+        // Destination positions (Walker St on each avenue in screen coords)
+        const dest21 = [mapRect.left + px21, mapRect.top + pyWalker];
+        const dest22 = [mapRect.left + px22, mapRect.top + pyWalker];
+
+        // Flight progress (0 → 1 over first FLIGHT_END of scroll)
+        const fp = Math.min(1, ease(progress / FLIGHT_END));
+
+        // Draw each dot group (gold = 21st, dark = 22nd)
+        function drawDotGroup(starts, dest, r, g, b) {
+          const alpha = fp < 0.85 ? 0.88 : Math.max(0, (1 - fp) / 0.15) * 0.88;
+          fCtx.fillStyle = `rgba(${r},${g},${b},${alpha.toFixed(3)})`;
+          // Each of the 4 dots fans out from clustered start toward a spread arrival,
+          // then converges to a single point at the destination
+          const SPREAD = 5; // max spread in px at midpoint
+          starts.forEach(([sx, sy], k) => {
+            const dx = lerp(sx, dest[0], fp);
+            const dy = lerp(sy, dest[1], fp);
+            // Mid-flight spread fans the dots apart, then they converge
+            const spread = Math.sin(fp * Math.PI) * SPREAD;
+            const offsets = [[-1,-1],[1,-1],[-1,1],[1,1]];
+            const [ox, oy] = offsets[k];
+            fCtx.beginPath();
+            fCtx.arc(dx + ox * spread, dy + oy * spread, 2.5, 0, Math.PI * 2);
+            fCtx.fill();
+          });
+        }
+
+        if (startDots) {
+          drawDotGroup(startDots.dark, dest22, 24, 20, 14);
+          drawDotGroup(startDots.gold, dest21, 200, 169, 110);
+        } else {
+          // No start positions captured — just show dots already at destination
+          [[dest22, 24, 20, 14], [dest21, 200, 169, 110]].forEach(([dest, r, g, b]) => {
+            fCtx.fillStyle = `rgba(${r},${g},${b},0.85)`;
+            [[-3,-3],[3,-3],[-3,3],[3,3]].forEach(([dx, dy]) => {
+              fCtx.beginPath();
+              fCtx.arc(dest[0]+dx*0.5, dest[1]+dy*0.5, 2.5, 0, Math.PI*2);
+              fCtx.fill();
+            });
+          });
+        }
+      }
+    }
+
+    // ── Phase 2 & 3: Lines grow on the map overlay canvas ────────────────
+    if (!tilesLoaded || !oCtx || px21 === null) return;
     oCtx.clearRect(0, 0, mapEl.offsetWidth, mapEl.offsetHeight);
 
-    // 22nd Ave S — dark ink — builds first (0.05 → 0.45)
-    drawStreet(px22, 24, 20, 14,       0.05, 0.45, progress);
+    function drawGrowingLine(px, r, g, b, lineStart, lineEnd) {
+      const p = Math.max(0, Math.min(1, (progress - lineStart) / (lineEnd - lineStart)));
+      if (p <= 0) return;
+      // Brief dot cluster at Walker St at the very start
+      if (p < 0.08) {
+        const dotAlpha = (1 - p / 0.08) * 0.85;
+        fCtx && (fCtx.fillStyle = `rgba(${r},${g},${b},${dotAlpha.toFixed(3)})`);
+        if (oCtx) {
+          oCtx.fillStyle = `rgba(${r},${g},${b},${dotAlpha.toFixed(3)})`;
+          [[-3,-3],[3,-3],[-3,3],[3,3]].forEach(([dx, dy]) => {
+            oCtx.beginPath();
+            oCtx.arc(px+dx*0.5, pyWalker+dy*0.5, 2.5, 0, Math.PI*2);
+            oCtx.fill();
+          });
+        }
+      }
+      // Growing line
+      const lineP = Math.min(1, Math.max(0, (p - 0.05) / 0.95));
+      if (lineP > 0) {
+        const lineBottom = pyWalker + (pyBayview - pyWalker) * lineP;
+        oCtx.strokeStyle  = `rgba(${r},${g},${b},0.92)`;
+        oCtx.lineWidth    = 10;
+        oCtx.lineCap      = 'round';
+        oCtx.beginPath();
+        oCtx.moveTo(px, pyWalker);
+        oCtx.lineTo(px, lineBottom);
+        oCtx.stroke();
+      }
+    }
 
-    // 21st Ave S — gold — builds second (0.48 → 0.88)
-    drawStreet(px21, 200, 169, 110,    0.48, 0.88, progress);
+    // 22nd Ave S — dark ink
+    drawGrowingLine(px22, 24, 20, 14,       LINE22_START, LINE22_END);
+    // 21st Ave S — gold
+    drawGrowingLine(px21, 200, 169, 110,    LINE21_START, LINE21_END);
   }
 
   window.addEventListener('scroll', updateLines, { passive: true });
 })();
 </script>
+
+<!-- Fixed overlay canvas for the dot→line flight animation (cross-section magic move) -->
+<canvas id="dot-flight-canvas"
+  style="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:300;display:none"></canvas>
 </body>
 </html>
