@@ -2016,28 +2016,36 @@ if (dgSteps.length) {
       -rect.top / (section.offsetHeight - window.innerHeight)
     ));
 
-    // ── Map fade in: scroll-driven ──────────────────────────────────────
-    mapEl.style.opacity = Math.min(1, progress / 0.12).toFixed(3);
+    // ── Animation timeline ────────────────────────────────────────────────
+    //
+    //   0.00 → 0.28   8 dots fly from dot-grid → Walker St on the map
+    //                 Map fades in concurrently (invisible → fully visible by 0.32)
+    //
+    //   0.28 → 0.64   Gold dots arrive → become the 21st Ave S line, growing south
+    //                 Dark dots sit at 22nd Ave S / Walker St as stationary dots
+    //
+    //   0.38 → 0.56   "The current fight" text (21st Ave S)
+    //
+    //   0.58 → 0.90   Dark dots become the 22nd Ave S line, growing south
+    //
+    //   0.68 → 0.82   "The cautionary tale" text (22nd Ave S)
+    //
+    const FLIGHT_END   = 0.28;
+    const LINE21_START = 0.28,  LINE21_END = 0.64;
+    const LINE22_START = 0.58,  LINE22_END = 0.90;
+    const DOT_R = 3; // constant dot radius throughout — flight, wait, and line cap
 
-    // ── Text reveals ────────────────────────────────────────────────────
+    // Map fades in during the flight so it's fully visible when dots land
+    mapEl.style.opacity = Math.min(1, progress / 0.32).toFixed(3);
+
+    // Text reveals
     mapTextEls.forEach(el => {
       const step = parseFloat(el.dataset.mapStep);
       const end  = el.dataset.mapEnd ? parseFloat(el.dataset.mapEnd) : 1.01;
       el.classList.toggle('on', progress >= step && progress < end);
     });
 
-    // ── Animation timeline ───────────────────────────────────────────────
-    //   0.00 → 0.25   8 dots fly from dot-grid to Walker St map positions
-    //   0.25 → 0.62   21st Ave S (GOLD) line grows south: Walker → Bayview
-    //   0.38 → 0.58   21st text fades in / out
-    //   0.55 → 0.88   22nd Ave S (DARK) line grows south: Walker → Bayview
-    //   0.68 → 0.82   22nd text fades in / out
-    //
-    const FLIGHT_END   = 0.25;
-    const LINE21_START = 0.25,  LINE21_END = 0.62;   // gold FIRST
-    const LINE22_START = 0.55,  LINE22_END = 0.88;   // dark SECOND
-
-    // Capture dot start positions on first scroll-into-view
+    // Capture dot start positions (grid positions, snapshotted when phase 12 was active)
     if (!startDots && progress < 0.05 && window._phase12Dots) {
       startDots = window._phase12Dots;
     } else if (!startDots && progress < 0.05 && window._snapPhase12Dots) {
@@ -2045,80 +2053,74 @@ if (dgSteps.length) {
       startDots = window._phase12Dots;
     }
 
-    // ── Flight canvas (fixed overlay, z-index 300) ───────────────────────
+    // ── Flight canvas: dots travel from dot-grid → Walker St ─────────────
+    // Visible only while dots are in flight. The moment they land, the
+    // overlay canvas takes over — the line's round cap IS the converged dot.
     if (flightCanvas) {
-      // Keep visible until the first line (gold) is slightly underway
-      const showFlight = progress < FLIGHT_END + 0.06 && tilesLoaded && px21 !== null;
-      flightCanvas.style.display = showFlight ? 'block' : 'none';
+      const inFlight = progress < FLIGHT_END && tilesLoaded && px21 !== null;
+      flightCanvas.style.display = inFlight ? 'block' : 'none';
 
-      if (showFlight) {
+      if (inFlight) {
         if (!fCtx) initFlightCanvas();
         fCtx.clearRect(0, 0, fW, fH);
 
         const mapRect = mapEl.getBoundingClientRect();
-        const dest21 = [mapRect.left + px21, mapRect.top + pyWalker];
-        const dest22 = [mapRect.left + px22, mapRect.top + pyWalker];
+        const dest21  = [mapRect.left + px21, mapRect.top + pyWalker];
+        const dest22  = [mapRect.left + px22, mapRect.top + pyWalker];
+        const fp      = ease(progress / FLIGHT_END); // 0→1, eased
 
-        // fp: eased flight progress 0→1 over the first FLIGHT_END scroll window
-        const fp = Math.min(1, ease(progress / FLIGHT_END));
-
-        // After flight lands, cross-fade out as the line's round cap takes over
-        const postFade = progress > FLIGHT_END
-          ? Math.max(0, 1 - (progress - FLIGHT_END) / 0.06)
-          : 1;
-
-        function drawDotGroup(starts, dest, r, g, b) {
-          const alpha = 0.9 * postFade;
-          if (alpha <= 0) return;
-          fCtx.fillStyle = `rgba(${r},${g},${b},${alpha.toFixed(3)})`;
-
-          // Spread: fans open mid-flight, converges tightly to dest point
-          // sin curve zeroed out before fp=1 so all 4 dots arrive at same pixel
-          const SPREAD = 6;
-          const spread = Math.sin(Math.min(fp, 0.80) / 0.80 * Math.PI) * SPREAD;
-          const offsets = [[-1,-1],[1,-1],[-1,1],[1,1]];
-
-          starts.forEach(([sx, sy], k) => {
-            const px = lerp(sx, dest[0], fp);
-            const py = lerp(sy, dest[1], fp);
-            const [ox, oy] = offsets[k];
+        function drawFlightGroup(starts, dest, r, g, b) {
+          fCtx.fillStyle = `rgba(${r},${g},${b},0.9)`;
+          // Each dot lerps straight to its destination at constant size.
+          // All 4 share the same dest, so they naturally converge to a point.
+          starts.forEach(([sx, sy]) => {
+            const dx = lerp(sx, dest[0], fp);
+            const dy = lerp(sy, dest[1], fp);
             fCtx.beginPath();
-            fCtx.arc(px + ox * spread, py + oy * spread, 3, 0, Math.PI * 2);
+            fCtx.arc(dx, dy, DOT_R, 0, Math.PI * 2);
             fCtx.fill();
           });
         }
 
         if (startDots) {
-          drawDotGroup(startDots.dark, dest22, 24, 20, 14);
-          drawDotGroup(startDots.gold, dest21, 200, 169, 110);
+          drawFlightGroup(startDots.dark, dest22, 24, 20, 14);
+          drawFlightGroup(startDots.gold, dest21, 200, 169, 110);
         } else {
-          // Fallback: paint dots already at destination if no capture
+          // No grid snapshot yet — show dots already at destination
           [[dest21, 200, 169, 110], [dest22, 24, 20, 14]].forEach(([d, r, g, b]) => {
-            fCtx.fillStyle = `rgba(${r},${g},${b},${(0.9 * postFade).toFixed(3)})`;
+            fCtx.fillStyle = `rgba(${r},${g},${b},0.9)`;
             fCtx.beginPath();
-            fCtx.arc(d[0], d[1], 3, 0, Math.PI * 2);
+            fCtx.arc(d[0], d[1], DOT_R, 0, Math.PI * 2);
             fCtx.fill();
           });
         }
       }
     }
 
-    // ── Overlay canvas: growing street lines ─────────────────────────────
+    // ── Overlay canvas (anchored to map): waiting dots + growing lines ────
     if (!tilesLoaded || !oCtx || px21 === null) return;
     oCtx.clearRect(0, 0, mapEl.offsetWidth, mapEl.offsetHeight);
 
+    // Dark dots sit at Walker St on 22nd Ave S after landing, until they
+    // become the line. Drawn on the overlay so they're pinned to the map.
+    if (progress >= FLIGHT_END && progress < LINE22_START) {
+      oCtx.fillStyle = 'rgba(24,20,14,0.9)';
+      oCtx.beginPath();
+      // 4 converged dots → single tight cluster, drawn as one circle
+      oCtx.arc(px22, pyWalker, DOT_R, 0, Math.PI * 2);
+      oCtx.fill();
+    }
+
     function drawGrowingLine(px, r, g, b, lineStart, lineEnd) {
-      const raw = (progress - lineStart) / (lineEnd - lineStart);
-      const p   = Math.max(0, Math.min(1, raw));
+      const p = Math.max(0, Math.min(1, (progress - lineStart) / (lineEnd - lineStart)));
       if (p <= 0) return;
 
-      // Eased growth — the round lineCap at pyWalker IS the converged dot
-      const lineP = ease(p);
-      // Minimum 1 px so the round cap is visible immediately (looks like a dot)
-      const lineBottom = pyWalker + Math.max(1, (pyBayview - pyWalker) * lineP);
-
+      // lineWidth = DOT_R * 2 so the round cap radius = DOT_R exactly.
+      // At p=0 the "line" is just a round cap — indistinguishable from the
+      // converged dot cluster that just landed. The dot becomes the line.
+      const lineBottom = pyWalker + Math.max(1, (pyBayview - pyWalker) * ease(p));
       oCtx.strokeStyle = `rgba(${r},${g},${b},0.92)`;
-      oCtx.lineWidth   = 10;
+      oCtx.lineWidth   = DOT_R * 2;  // = 6px, cap radius = 3px = DOT_R
       oCtx.lineCap     = 'round';
       oCtx.beginPath();
       oCtx.moveTo(px, pyWalker);
@@ -2126,10 +2128,10 @@ if (dgSteps.length) {
       oCtx.stroke();
     }
 
-    // 21st Ave S — gold — FIRST
-    drawGrowingLine(px21, 200, 169, 110,  LINE21_START, LINE21_END);
-    // 22nd Ave S — dark — SECOND
-    drawGrowingLine(px22, 24, 20, 14,     LINE22_START, LINE22_END);
+    // 21st Ave S — GOLD — first
+    drawGrowingLine(px21, 200, 169, 110, LINE21_START, LINE21_END);
+    // 22nd Ave S — DARK — second
+    drawGrowingLine(px22, 24, 20, 14,    LINE22_START, LINE22_END);
   }
 
   window.addEventListener('scroll', updateLines, { passive: true });
