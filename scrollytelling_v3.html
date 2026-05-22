@@ -507,6 +507,24 @@ body {
   letter-spacing: 0.02em; line-height: 1.5;
 }
 
+/* ── STRATEGIC MANAGEMENT BRIDGE ───────────────── */
+.strategic-bridge {
+  padding-top: 5rem; padding-bottom: 5rem;
+  border-top: 1px solid rgba(24,20,14,0.1);
+}
+.concept-label {
+  font-size: 9.5px; font-weight: 700; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--gold);
+  margin-bottom: 1.25rem;
+}
+.strategic-bridge .prose p + p {
+  margin-top: 0; /* the label + body flow as a unit */
+}
+.strategic-bridge .prose > p:last-child {
+  font-size: 1.05rem; line-height: 1.75;
+  color: var(--ink-soft);
+}
+
 /* ── CHAPTER 4 ─────────────────────────────────── */
 .pinned-ch4 { position: relative; height: 200vh; z-index: 10; }
 .ch4-divider {
@@ -762,52 +780,59 @@ body {
   color: var(--ink); margin: 3rem 0;
 }
 
-/* ── MAP REVEAL ─────────────────────────────────── */
+/* ── MAP REVEAL — mirrors dot-grid layout ───────── */
 .map-reveal-section {
-  position: relative; height: 300vh; z-index: 10;
-  background: var(--cream);
+  /* natural height comes from the .map-steps column, same as .dg-steps */
+  display: flex; align-items: flex-start;
+  position: relative; z-index: 10;
+  background: var(--cream); color: var(--ink);
 }
 .map-sticky-pane {
-  position: sticky; top: 0; height: 100vh; overflow: hidden;
+  position: sticky; top: 0;
+  height: 100vh; flex: 1; overflow: hidden;
   background: var(--cream);
 }
 .street-map-wrap {
   width: 100%; height: 100%;
-  opacity: 0;    /* scroll-driven via JS — no CSS transition */
+  opacity: 0;  /* scroll-driven via JS */
 }
 #map-dots-canvas {
   position: absolute; inset: 0;
   width: 100%; height: 100%;
   pointer-events: none; z-index: 5;
 }
-.map-text-panel {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  padding: 6rem 3rem 3.5rem;
-  background: linear-gradient(to top, rgba(24,20,14,0.9) 0%, rgba(24,20,14,0) 100%);
-  pointer-events: none; z-index: 10;
+/* Scrolling text steps — right column, mirrors .dg-steps */
+.map-steps {
+  flex: 0 0 280px;
+  padding: 0 2rem;
 }
-.map-step-text {
-  max-width: 540px;
-  opacity: 0; transform: translateY(14px);
-  transition: opacity 0.75s ease, transform 0.75s ease;
-  position: absolute; bottom: 3.5rem; left: 3rem;
+.map-step {
+  min-height: 80vh;
+  display: flex; align-items: center;
+  padding: 2rem 0;
 }
-.map-step-text.on { opacity: 1; transform: translateY(0); }
-.map-step-text + .map-step-text { transition-delay: 0.15s; }
+.map-step:first-child { min-height: 60vh; padding-top: 10vh; }
+.map-step-spacer { height: 50vh; }
+.map-step-content {
+  opacity: 0; transform: translateY(10px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.map-step.active .map-step-content { opacity: 1; transform: translateY(0); }
+/* Text styles within steps */
 .map-street-label {
   font-size: 10px; font-weight: 700; letter-spacing: 0.15em;
-  text-transform: uppercase; margin-bottom: 0.6rem;
+  text-transform: uppercase; margin-bottom: 0.5rem;
 }
 .map-street-label.red  { color: #E24B4A; }
-.map-street-label.gold { color: rgba(195,150,75,1); }
+.map-street-label.gold { color: var(--gold); }
 .map-headline {
   font-family: 'Public Sans', sans-serif; font-weight: 400;
-  font-size: clamp(1.5rem, 2.8vw, 2.1rem); line-height: 1.3;
-  color: var(--cream); margin-bottom: 0.75rem;
+  font-size: clamp(1.1rem, 1.8vw, 1.4rem); line-height: 1.35;
+  color: var(--ink); margin-bottom: 0.6rem;
 }
 .map-sub {
-  font-size: 14.5px; line-height: 1.8;
-  color: rgba(245,240,232,0.55); max-width: 460px;
+  font-size: 13px; line-height: 1.75;
+  color: var(--ink-soft);
 }
 
 /* ── RESPONSIVE ─────────────────────────────────── */
@@ -1056,26 +1081,54 @@ body {
 <!-- MAP REVEAL — Two streets, one story         -->
 <!-- ═══════════════════════════════════════════ -->
 <section id="map-reveal" class="map-reveal-section">
-  <div class="map-sticky-pane" id="map-sticky-pane">
-    <div id="street-map" class="street-map-wrap"></div>
-    <canvas id="map-dots-canvas"></canvas>
-    <div class="map-text-panel">
 
-      <div class="map-step-text" id="map-text-22" data-map-step="0.72" data-map-end="0.86">
-        <p class="map-street-label" style="color:rgba(245,240,232,0.5);font-weight:700;letter-spacing:0.15em;text-transform:uppercase">22nd Ave S &middot; S Walker St to S Bayview St</p>
-        <p class="map-headline">The cautionary tale.</p>
-        <p class="map-sub">Residents reported crashes. Asked about timelines. Were told a sidewalk was coming. It wasn&rsquo;t.</p>
+  <!-- Left: text steps scrolling past the pinned map -->
+  <div class="map-steps">
+
+    <div class="map-step" id="map-step-intro">
+      <div class="map-step-content">
+        <p class="dg-step-sentence">Two streets. One block apart.</p>
+        <p class="dg-step-caption">Watch where 21st and 22nd Ave S sit on the map.</p>
       </div>
+    </div>
 
-      <div class="map-step-text" id="map-text-21" data-map-step="0.45" data-map-end="0.62">
+    <div class="map-step" id="map-step-21">
+      <div class="map-step-content">
         <p class="map-street-label gold">21st Ave S &middot; S Walker St to S Bayview St</p>
         <p class="map-headline">The current fight.</p>
         <p class="map-sub">No permanent sidewalk was ever promised here. The city went straight to cheap asphalt &mdash; and didn&rsquo;t tell the neighbors until the scope was already signed.</p>
       </div>
-
     </div>
+
+    <div class="map-step" id="map-step-22">
+      <div class="map-step-content">
+        <p class="map-street-label" style="color:rgba(24,20,14,0.45);">22nd Ave S &middot; S Walker St to S Bayview St</p>
+        <p class="map-headline">The cautionary tale.</p>
+        <p class="map-sub">Residents reported crashes. Asked about timelines. Were told a sidewalk was coming. It wasn&rsquo;t.</p>
+      </div>
+    </div>
+
+    <div class="map-step-spacer"></div>
   </div>
+
+  <!-- Right: pinned map (sticky, like the dot canvas) -->
+  <div class="map-sticky-pane" id="map-sticky-pane">
+    <div id="street-map" class="street-map-wrap"></div>
+    <canvas id="map-dots-canvas"></canvas>
+  </div>
+
 </section>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- BRIDGE — Strategic Management              -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="cream-section strategic-bridge">
+  <div class="prose" data-reveal>
+    <p class="concept-label">Strategic management &mdash; what it looks like in practice</p>
+    <p>Strategic management is distinct from responsiveness. It is the use of the forms of engagement &mdash; replies, meetings, walks, letters &mdash; to satisfy the appearance of a process while the outcome is predetermined. Every communication arrives on time. Every meeting is scheduled. Every question receives an answer &mdash; except the ones that matter. The record shows not a failure of process, but a process working exactly as intended: to absorb community concern without altering the result.</p>
+  </div>
+</div>
 
 
 <!-- ═══════════════════════════════════════════ -->
@@ -1892,10 +1945,24 @@ const dgStepObs = new IntersectionObserver((entries) => {
 }, { threshold: 0, rootMargin: '-45% 0px -45% 0px' });
 dgSteps.forEach(s => dgStepObs.observe(s));
 
-// Activate first step immediately on load
+// Activate first dot-grid step immediately on load
 if (dgSteps.length) {
   dgSteps[0].classList.add('active');
 }
+
+// ── MAP STEP OBSERVER ─────────────────────────────
+// Identical model to dgStepObs: fires when a text step enters the
+// center 10% of the viewport. Deactivates all others, activates this one.
+const mapSteps = document.querySelectorAll('.map-step[id]');
+const mapStepObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      mapSteps.forEach(s => s.classList.remove('active'));
+      e.target.classList.add('active');
+    }
+  });
+}, { threshold: 0, rootMargin: '-45% 0px -45% 0px' });
+mapSteps.forEach(s => mapStepObs.observe(s));
 
 // ── GOOGLE MAPS — Two Streets ────────────────────
 (function() {
@@ -1990,7 +2057,7 @@ if (dgSteps.length) {
   obs.observe(section);
 
   // ── Animation state ───────────────────────────────────────────────────
-  const mapTextEls  = [...section.querySelectorAll('[data-map-step]')];
+  // (text steps are handled by mapStepObs IntersectionObserver below)
   const flightCanvas = document.getElementById('dot-flight-canvas');
   let   fCtx = null, fW = 0, fH = 0;
   let   startDots = null;   // captured phase-12 screen positions {gold:[[x,y]×4], dark:[[x,y]×4]}
@@ -2019,39 +2086,22 @@ if (dgSteps.length) {
     ));
 
     // ── Animation timeline ────────────────────────────────────────────────
+    // Section scrollable height ≈ 180vh (text column ~280vh − viewport 100vh).
+    // Text steps are handled by mapStepObs (IntersectionObserver) — not here.
     //
-    //   0.00 → 0.20   8 dots fly from dot-grid → Walker St on map
-    //                 Map fades in concurrently
+    //   0.00 → 0.08   dots fly from dot-grid → Walker St; map fades in
+    //   0.08 → 0.12   both dot groups sit at Walker St (waiting)
+    //   0.12 → 0.52   gold dot stretches into 21st Ave S line (step-21 visible)
+    //   0.52 → 0.92   dark dot stretches into 22nd Ave S line (step-22 visible)
     //
-    //   0.20 → 0.35   *** WAITING PHASE ***
-    //                 Both dot groups (gold + dark) sit visible on the map
-    //                 as stationary dots while the map finishes fading in.
-    //                 Map fully opaque by 0.35.
-    //
-    //   0.35 → 0.68   Gold dot becomes the 21st Ave S line, stretching south
-    //                 Dark dot still sits at 22nd Ave S / Walker St
-    //
-    //   0.45 → 0.62   "The current fight" text (21st Ave S)
-    //
-    //   0.65 → 0.92   Dark dot becomes the 22nd Ave S line, stretching south
-    //
-    //   0.72 → 0.86   "The cautionary tale" text (22nd Ave S)
-    //
-    const FLIGHT_END   = 0.20;   // dots land
-    const DOT_WAIT     = 0.35;   // both dot groups visible as dots until here
-    const LINE21_START = 0.35,  LINE21_END = 0.68;  // gold stretches first
-    const LINE22_START = 0.65,  LINE22_END = 0.92;  // dark stretches second
-    const DOT_R = 1.8;           // matches grid dot radius R throughout
+    const FLIGHT_END   = 0.08;
+    const DOT_WAIT     = 0.12;
+    const LINE21_START = 0.12,  LINE21_END = 0.52;
+    const LINE22_START = 0.52,  LINE22_END = 0.92;
+    const DOT_R = 1.8;
 
-    // Map fades in during flight + waiting phase, fully visible when lines start
-    mapEl.style.opacity = Math.min(1, progress / DOT_WAIT).toFixed(3);
-
-    // Text reveals
-    mapTextEls.forEach(el => {
-      const step = parseFloat(el.dataset.mapStep);
-      const end  = el.dataset.mapEnd ? parseFloat(el.dataset.mapEnd) : 1.01;
-      el.classList.toggle('on', progress >= step && progress < end);
-    });
+    // Map fades in during flight + waiting phase
+    mapEl.style.opacity = Math.min(1, progress / 0.14).toFixed(3);
 
     // Capture dot start positions — try every frame during flight so a
     // fast scroll to the map section doesn't miss the snapshot.
