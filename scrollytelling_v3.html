@@ -765,9 +765,11 @@ body {
 /* ── MAP REVEAL ─────────────────────────────────── */
 .map-reveal-section {
   position: relative; height: 300vh; z-index: 10;
+  background: var(--cream);
 }
 .map-sticky-pane {
   position: sticky; top: 0; height: 100vh; overflow: hidden;
+  background: var(--cream);
 }
 .street-map-wrap {
   width: 100%; height: 100%;
@@ -1684,13 +1686,13 @@ revealEls.forEach(el => revealObs.observe(el));
         if (!set21.has(i) && !set22.has(i)) { ctx.moveTo(SX[i]+R,SY[i]); ctx.arc(SX[i],SY[i],R,0,Math.PI*2); }
       }
       ctx.fill();
-      // 22nd Ave S proxy: dark ink
+      // 22nd Ave S: dark ink — same radius as every other dot
       ctx.fillStyle = 'rgba(24,20,14,0.88)'; ctx.beginPath();
-      for (const i of D2_22ND) { ctx.moveTo(SX[i]+R,SY[i]); ctx.arc(SX[i],SY[i],R+1,0,Math.PI*2); }
+      for (const i of D2_22ND) { ctx.moveTo(SX[i]+R,SY[i]); ctx.arc(SX[i],SY[i],R,0,Math.PI*2); }
       ctx.fill();
-      // 21st Ave S: gold
+      // 21st Ave S: gold — same radius as every other dot
       ctx.fillStyle = C_EQUITY; ctx.beginPath();
-      for (const i of D2_21ST) { ctx.moveTo(SX[i]+R,SY[i]); ctx.arc(SX[i],SY[i],R+1,0,Math.PI*2); }
+      for (const i of D2_21ST) { ctx.moveTo(SX[i]+R,SY[i]); ctx.arc(SX[i],SY[i],R,0,Math.PI*2); }
       ctx.fill();
       return;
     }
@@ -2033,7 +2035,9 @@ if (dgSteps.length) {
     const FLIGHT_END   = 0.28;
     const LINE21_START = 0.28,  LINE21_END = 0.64;
     const LINE22_START = 0.58,  LINE22_END = 0.90;
-    const DOT_R = 3; // constant dot radius throughout — flight, wait, and line cap
+    // DOT_R matches the grid dot radius (R=1.8 CSS px) so size is consistent
+    // from the grid view through flight through the line's round cap.
+    const DOT_R = 1.8;
 
     // Map fades in during the flight so it's fully visible when dots land
     mapEl.style.opacity = Math.min(1, progress / 0.32).toFixed(3);
@@ -2045,12 +2049,15 @@ if (dgSteps.length) {
       el.classList.toggle('on', progress >= step && progress < end);
     });
 
-    // Capture dot start positions (grid positions, snapshotted when phase 12 was active)
-    if (!startDots && progress < 0.05 && window._phase12Dots) {
-      startDots = window._phase12Dots;
-    } else if (!startDots && progress < 0.05 && window._snapPhase12Dots) {
-      window._snapPhase12Dots();
-      startDots = window._phase12Dots;
+    // Capture dot start positions — try every frame during the flight window
+    // (not just the first 5%) so a fast scroll doesn't miss the snapshot.
+    if (!startDots && progress < FLIGHT_END) {
+      if (window._phase12Dots) {
+        startDots = window._phase12Dots;
+      } else if (window._snapPhase12Dots) {
+        window._snapPhase12Dots();
+        if (window._phase12Dots) startDots = window._phase12Dots;
+      }
     }
 
     // ── Flight canvas: dots travel from dot-grid → Walker St ─────────────
@@ -2115,12 +2122,12 @@ if (dgSteps.length) {
       const p = Math.max(0, Math.min(1, (progress - lineStart) / (lineEnd - lineStart)));
       if (p <= 0) return;
 
-      // lineWidth = DOT_R * 2 so the round cap radius = DOT_R exactly.
-      // At p=0 the "line" is just a round cap — indistinguishable from the
-      // converged dot cluster that just landed. The dot becomes the line.
-      const lineBottom = pyWalker + Math.max(1, (pyBayview - pyWalker) * ease(p));
+      // lineWidth = DOT_R * 2 → cap radius = DOT_R exactly.
+      // At p=0 this is just a round cap sitting at Walker St —
+      // visually identical to the converged dot that just landed.
+      const lineBottom = pyWalker + Math.max(0.5, (pyBayview - pyWalker) * ease(p));
       oCtx.strokeStyle = `rgba(${r},${g},${b},0.92)`;
-      oCtx.lineWidth   = DOT_R * 2;  // = 6px, cap radius = 3px = DOT_R
+      oCtx.lineWidth   = DOT_R * 2;  // 3.6px stroke, cap radius = 1.8px = DOT_R
       oCtx.lineCap     = 'round';
       oCtx.beginPath();
       oCtx.moveTo(px, pyWalker);
