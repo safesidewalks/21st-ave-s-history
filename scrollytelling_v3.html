@@ -1886,11 +1886,13 @@ revealEls.forEach(el => revealObs.observe(el));
   window._snapPhase12Dots = function() {
     if (lastPhase !== 12 || !D2_21ST.length) return;
     const [SX, SY] = SORTED_POS[9];
-    const wr = canvasWrap ? canvasWrap.getBoundingClientRect()
-                          : canvas.getBoundingClientRect();
+    // Store canvas-local CSS-pixel coords + live element ref.
+    // The map section calls el.getBoundingClientRect() per flight frame
+    // so positions stay accurate regardless of when/where the page is scrolled.
     window._phase12Dots = {
-      gold: D2_21ST.map(i => [wr.left + SX[i], wr.top + SY[i]]),
-      dark: D2_22ND.map(i => [wr.left + SX[i], wr.top + SY[i]]),
+      el:   canvas,                                 // live ref — getBoundingClientRect each frame
+      gold: D2_21ST.map(i => [SX[i], SY[i]]),      // canvas-local CSS px
+      dark: D2_22ND.map(i => [SX[i], SY[i]]),
     };
   };
 })();
@@ -1974,8 +1976,48 @@ mapSteps.forEach(s => mapStepObs.observe(s));
   let mapInited = false, gmap = null;
   let tilesLoaded = false, oCtx = null;
 
-  // Canvas pixel positions for line endpoints (computed after tiles load)
+  // Canvas pixel positions for line endpoints
   let px21 = null, px22 = null, pyWalker = null, pyBayview = null;
+
+  // ── Mercator pre-compute — no Google Maps API needed ──────────────────
+  // Gives us dot positions immediately when the section enters view,
+  // so dots are visible BEFORE tiles load (map fades in around them).
+  function precomputePositions(W, H) {
+    if (px21 !== null) return; // already set — don't override
+    const zoom = 17;
+    const cLat = 47.5823491, cLng = -122.3049514; // must match gmap center
+    function worldY(lat) {
+      const r = lat * Math.PI / 180;
+      return 0.5 - Math.log(Math.tan(Math.PI / 4 + r / 2)) / (2 * Math.PI);
+    }
+    function worldX(lng) { return (lng + 180) / 360; }
+    const scale = 256 * Math.pow(2, zoom);
+    const cx = worldX(cLng) * scale, cy = worldY(cLat) * scale;
+    function toPx(lat, lng) {
+      return { x: worldX(lng) * scale - cx + W / 2,
+               y: worldY(lat) * scale - cy + H / 2 };
+    }
+    const w21 = toPx(47.5836616, -122.3055831); // 21st Ave S — Walker St
+    const b21 = toPx(47.5810366, -122.3055831); // 21st Ave S — Bayview St
+    const w22 = toPx(47.5836616, -122.3043196); // 22nd Ave S — Walker St
+    px21 = w21.x; px22 = w22.x;
+    pyWalker = w21.y; pyBayview = b21.y;
+  }
+
+  // ── Init overlay canvas (runs before tiles load if needed) ───────────
+  function initOverlayCanvas() {
+    if (oCtx || !overlayEl) return;
+    const W = mapEl.offsetWidth, H = mapEl.offsetHeight;
+    if (!W || !H) return;
+    const DPR = Math.min(window.devicePixelRatio || 1, 2);
+    overlayEl.width  = W * DPR;
+    overlayEl.height = H * DPR;
+    overlayEl.style.width  = W + 'px';
+    overlayEl.style.height = H + 'px';
+    oCtx = overlayEl.getContext('2d');
+    oCtx.scale(DPR, DPR);
+    precomputePositions(W, H); // dots positioned the moment canvas is ready
+  }
 
   function initMap() {
     if (mapInited) return;
@@ -2002,11 +2044,12 @@ mapSteps.forEach(s => mapStepObs.observe(s));
     });
 
     google.maps.event.addListenerOnce(gmap, 'tilesloaded', () => {
-      // ── Setup DPR-aware overlay canvas ──────────────────────────────
       const W   = mapEl.offsetWidth;
       const H   = mapEl.offsetHeight;
       const DPR = Math.min(window.devicePixelRatio || 1, 2);
-      if (overlayEl) {
+
+      // ── Set up canvas if not already done by initOverlayCanvas ──────
+      if (!oCtx && overlayEl) {
         overlayEl.width  = W * DPR;
         overlayEl.height = H * DPR;
         overlayEl.style.width  = W + 'px';
@@ -2015,7 +2058,8 @@ mapSteps.forEach(s => mapStepObs.observe(s));
         oCtx.scale(DPR, DPR);
       }
 
-      // ── Compute fixed pixel positions from Maps projection ───────────
+      // ── Refine positions with Google's own projection (sub-pixel) ───
+      // This overrides the Mercator pre-compute with exact values.
       const proj   = gmap.getProjection();
       const center = proj.fromLatLngToPoint(gmap.getCenter());
       const scale  = Math.pow(2, gmap.getZoom());
@@ -2081,129 +2125,122 @@ mapSteps.forEach(s => mapStepObs.observe(s));
   function updateLines() {
     const rect = section.getBoundingClientRect();
     if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+
+    // progress = 0 when section top is at viewport top; 1 when fully scrolled
     const progress = Math.max(0, Math.min(1,
       -rect.top / (section.offsetHeight - window.innerHeight)
     ));
 
-    // ── Animation timeline ────────────────────────────────────────────────
-    // Section scrollable height ≈ 180vh (text column ~280vh − viewport 100vh).
-    // Text steps are handled by mapStepObs (IntersectionObserver) — not here.
+    initOverlayCanvas();
+
+    // ── Timeline ────────────────────────────────────────────────────────────
+    //   section enters viewport  →  flight begins (dots lift off grid, visible)
+    //   section fully in view    →  flight nearly done, dots landing on map
+    //   progress 0.12            →  dots landed, gold line starts growing
+    //   progress 0.12 → 0.52     →  gold line grows south
+    //   progress 0.52 → 0.90     →  dark line grows south
+    //   progress 0.12 → 1.00     →  map blooms in on cubic curve
     //
-    //   0.00 → 0.08   dots fly from dot-grid → Walker St; map fades in
-    //   0.08 → 0.12   both dot groups sit at Walker St (waiting)
-    //   0.12 → 0.52   gold dot stretches into 21st Ave S line (step-21 visible)
-    //   0.52 → 0.92   dark dot stretches into 22nd Ave S line (step-22 visible)
-    //
-    const FLIGHT_END   = 0.08;
-    const DOT_WAIT     = 0.12;
+    const FLIGHT_END   = 0.12;
     const LINE21_START = 0.12,  LINE21_END = 0.52;
-    const LINE22_START = 0.52,  LINE22_END = 0.92;
-    const DOT_R = 1.8;
+    const LINE22_START = 0.52,  LINE22_END = 0.90;
+    const ANCHOR_R = 6;
+    const GRID_R   = 1.8;  // matches dot grid R constant
 
-    // Map fades in during flight + waiting phase
-    mapEl.style.opacity = Math.min(1, progress / 0.14).toFixed(3);
+    // Map: cubic bloom — barely a ghost while lines grow, fully opaque at end
+    const mapP = Math.max(0, (progress - FLIGHT_END) / (1 - FLIGHT_END));
+    mapEl.style.opacity = Math.min(1, mapP * mapP * mapP).toFixed(3);
 
-    // Capture dot start positions — try every frame during flight so a
-    // fast scroll to the map section doesn't miss the snapshot.
-    if (!startDots && progress < FLIGHT_END) {
-      if (window._phase12Dots) {
-        startDots = window._phase12Dots;
-      } else if (window._snapPhase12Dots) {
-        window._snapPhase12Dots();
-        if (window._phase12Dots) startDots = window._phase12Dots;
-      }
+    // ── Flight ────────────────────────────────────────────────────────────────
+    // The flight is driven by how far the section has scrolled into view,
+    // starting the moment the section's top edge crosses the viewport bottom.
+    // This means the animation is VISIBLE during the transition from the dot
+    // grid section into the map section (frame 2 in the storyboard).
+    //
+    // scrolledFromEntry: 0 when section top is at viewport bottom,
+    //                    window.innerHeight when section top reaches viewport top.
+    // FLIGHT_TOTAL: total scroll from entry until progress = FLIGHT_END.
+    const scrolledFromEntry  = Math.max(0, window.innerHeight - rect.top);
+    const FLIGHT_TOTAL       = window.innerHeight +
+                               (section.offsetHeight - window.innerHeight) * FLIGHT_END;
+    const flightRaw  = Math.min(1, scrolledFromEntry / FLIGHT_TOTAL);
+    const flightT    = ease(flightRaw);  // eased 0 → 1
+
+    // Snapshot source positions the FIRST time the section enters view.
+    // At that moment the dot grid sticky pane is still at the top of the
+    // viewport and the phase-12 dots are on screen — perfect lift-off origin.
+    if (!startDots && window._phase12Dots && window._phase12Dots.el) {
+      const cr = window._phase12Dots.el.getBoundingClientRect();
+      startDots = {
+        gold: window._phase12Dots.gold.map(([x, y]) => [cr.left + x, cr.top + y]),
+        dark: window._phase12Dots.dark.map(([x, y]) => [cr.left + x, cr.top + y]),
+      };
     }
 
-    // ── Phase 1: Flight canvas — fixed overlay, z-index 300 ──────────────
-    // Dots fly at constant size from the dot-grid to Walker St on the map.
-    // Flight canvas hides the moment dots land; overlay canvas takes over.
-    if (flightCanvas) {
-      const inFlight = progress < FLIGHT_END && tilesLoaded && px21 !== null;
-      flightCanvas.style.display = inFlight ? 'block' : 'none';
-
-      if (inFlight) {
-        if (!fCtx) initFlightCanvas();
+    if (startDots && flightRaw < 1 && px21 !== null) {
+      initFlightCanvas();
+      if (fCtx && flightCanvas) {
+        flightCanvas.style.display = 'block';
         fCtx.clearRect(0, 0, fW, fH);
 
-        const mapRect = mapEl.getBoundingClientRect();
-        const dest21  = [mapRect.left + px21, mapRect.top + pyWalker];
-        const dest22  = [mapRect.left + px22, mapRect.top + pyWalker];
-        const fp      = ease(progress / FLIGHT_END); // eased 0 → 1
+        // Target screen positions: overlay canvas is inside sticky pane (top:0)
+        const mapRect = overlayEl ? overlayEl.getBoundingClientRect()
+                                  : mapEl.getBoundingClientRect();
+        const tx21 = mapRect.left + px21,  ty = mapRect.top + pyWalker;
+        const tx22 = mapRect.left + px22;
+        const r    = GRID_R + (ANCHOR_R - GRID_R) * flightT;  // grows as dots land
 
-        function drawFlightGroup(starts, dest, r, g, b) {
-          fCtx.fillStyle = `rgba(${r},${g},${b},0.9)`;
-          starts.forEach(([sx, sy]) => {
-            // Each dot travels straight to dest at constant DOT_R.
-            // All 4 share the same destination so they converge naturally.
-            fCtx.beginPath();
-            fCtx.arc(lerp(sx, dest[0], fp), lerp(sy, dest[1], fp), DOT_R, 0, Math.PI * 2);
-            fCtx.fill();
-          });
+        // 4 gold dots → converge on Walker St / 21st Ave S
+        fCtx.fillStyle = 'rgba(200,169,110,0.95)';
+        fCtx.beginPath();
+        for (const [sx, sy] of startDots.gold) {
+          const x = lerp(sx, tx21, flightT),  y = lerp(sy, ty, flightT);
+          fCtx.moveTo(x + r, y);  fCtx.arc(x, y, r, 0, Math.PI * 2);
         }
+        fCtx.fill();
 
-        if (startDots) {
-          drawFlightGroup(startDots.dark, dest22, 24, 20, 14);
-          drawFlightGroup(startDots.gold, dest21, 200, 169, 110);
-        } else {
-          // No snapshot yet — show both dots already converged at destination
-          [[dest21, 200, 169, 110], [dest22, 24, 20, 14]].forEach(([d, r, g, b]) => {
-            fCtx.fillStyle = `rgba(${r},${g},${b},0.9)`;
-            fCtx.beginPath();
-            fCtx.arc(d[0], d[1], DOT_R, 0, Math.PI * 2);
-            fCtx.fill();
-          });
+        // 4 dark dots → converge on Walker St / 22nd Ave S
+        fCtx.fillStyle = 'rgba(24,20,14,0.95)';
+        fCtx.beginPath();
+        for (const [sx, sy] of startDots.dark) {
+          const x = lerp(sx, tx22, flightT),  y = lerp(sy, ty, flightT);
+          fCtx.moveTo(x + r, y);  fCtx.arc(x, y, r, 0, Math.PI * 2);
         }
+        fCtx.fill();
       }
+    } else {
+      // Flight done — hand off to overlay canvas
+      if (flightCanvas) flightCanvas.style.display = 'none';
     }
 
-    // ── Phase 2 & 3: Overlay canvas — anchored to map ────────────────────
-    if (!tilesLoaded || !oCtx || px21 === null) return;
+    // ── Overlay canvas (map-anchored) ─────────────────────────────────────────
+    if (!oCtx || px21 === null) return;
     oCtx.clearRect(0, 0, mapEl.offsetWidth, mapEl.offsetHeight);
+    if (progress < FLIGHT_END) return;  // nothing to draw until dots have landed
 
-    // WAITING PHASE: both dots visible as stationary circles on the map.
-    // Gold dot persists here and hands off seamlessly to the line's round cap.
-    // Dark dot persists until it too becomes a line.
-    if (progress >= FLIGHT_END && progress < DOT_WAIT) {
-      // Gold dot at 21st Ave / Walker St
-      oCtx.fillStyle = 'rgba(200,169,110,0.92)';
-      oCtx.beginPath();
-      oCtx.arc(px21, pyWalker, DOT_R, 0, Math.PI * 2);
-      oCtx.fill();
-      // Dark dot at 22nd Ave / Walker St
-      oCtx.fillStyle = 'rgba(24,20,14,0.92)';
-      oCtx.beginPath();
-      oCtx.arc(px22, pyWalker, DOT_R, 0, Math.PI * 2);
-      oCtx.fill();
-    }
-
-    // Dark dot continues sitting at Walker St while the gold line grows,
-    // until the dark dot itself starts becoming its own line.
-    if (progress >= DOT_WAIT && progress < LINE22_START) {
-      oCtx.fillStyle = 'rgba(24,20,14,0.92)';
-      oCtx.beginPath();
-      oCtx.arc(px22, pyWalker, DOT_R, 0, Math.PI * 2);
-      oCtx.fill();
-    }
-
+    // Lines grow from behind the anchor dots
     function drawGrowingLine(px, r, g, b, lineStart, lineEnd) {
       const p = Math.max(0, Math.min(1, (progress - lineStart) / (lineEnd - lineStart)));
       if (p <= 0) return;
-      // lineWidth = DOT_R × 2 → round cap radius = DOT_R.
-      // At p≈0 this is just the cap dot; it stretches into the full line.
-      const lineBottom = pyWalker + Math.max(0.5, (pyBayview - pyWalker) * ease(p));
-      oCtx.strokeStyle = `rgba(${r},${g},${b},0.92)`;
-      oCtx.lineWidth   = DOT_R * 2;  // cap radius = DOT_R, seamless with waiting dot
-      oCtx.lineCap     = 'round';
+      oCtx.strokeStyle = `rgba(${r},${g},${b},0.88)`;
+      oCtx.lineWidth = 5;  oCtx.lineCap = 'round';
       oCtx.beginPath();
       oCtx.moveTo(px, pyWalker);
-      oCtx.lineTo(px, lineBottom);
+      oCtx.lineTo(px, pyWalker + (pyBayview - pyWalker) * ease(p));
       oCtx.stroke();
     }
-
-    // 21st Ave S — GOLD — first
     drawGrowingLine(px21, 200, 169, 110, LINE21_START, LINE21_END);
-    // 22nd Ave S — DARK — second
-    drawGrowingLine(px22, 24, 20, 14,    LINE22_START, LINE22_END);
+    drawGrowingLine(px22, 24,  20,  14,  LINE22_START, LINE22_END);
+
+    // Anchor dots — always on top, always the foundation
+    oCtx.fillStyle = 'rgba(200,169,110,0.95)';
+    oCtx.beginPath();
+    oCtx.arc(px21, pyWalker, ANCHOR_R, 0, Math.PI * 2);
+    oCtx.fill();
+    oCtx.fillStyle = 'rgba(24,20,14,0.95)';
+    oCtx.beginPath();
+    oCtx.arc(px22, pyWalker, ANCHOR_R, 0, Math.PI * 2);
+    oCtx.fill();
   }
 
   window.addEventListener('scroll', updateLines, { passive: true });
