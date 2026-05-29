@@ -780,12 +780,12 @@ body {
   color: var(--ink); margin: 3rem 0;
 }
 
-/* ── MAP REVEAL — mirrors dot-grid layout ───────── */
+/* ── MAP REVEAL — mirrors dot-grid layout exactly ───────── */
 .map-reveal-section {
-  /* natural height comes from the .map-steps column, same as .dg-steps */
-  display: flex; align-items: flex-start;
+  display: flex; align-items: flex-start; justify-content: center;
   position: relative; z-index: 10;
   background: var(--cream); color: var(--ink);
+  padding: 0 2rem;   /* matches .dotgrid-section → text column at same x */
 }
 .map-sticky-pane {
   position: sticky; top: 0;
@@ -2149,31 +2149,31 @@ mapSteps.forEach(s => mapStepObs.observe(s));
     const FLIGHT_END   = 0.12;
     const LINE21_START = 0.12,  LINE21_END = 0.52;
     const LINE22_START = 0.52,  LINE22_END = 0.90;
-    const ANCHOR_R = 6;
-    const GRID_R   = 1.8;  // matches dot grid R constant
+    const LINE_W   = 5;               // stroke width
+    const ANCHOR_R = LINE_W / 2;      // dot radius = half stroke → diameter matches line weight
+    const GRID_R   = 1.8;             // matches dot grid R constant
+    const N_SEGS   = 4;               // 4 block-face segments per street
+
+    // Segment Y positions — evenly distributed Walker → Bayview
+    // Each dot is the foundation of one block-face sidewalk segment
+    const totalH = (pyBayview !== null && pyWalker !== null) ? pyBayview - pyWalker : 0;
+    const segH   = totalH / N_SEGS;
+    const segYs  = pyWalker !== null
+      ? Array.from({length: N_SEGS}, (_, i) => pyWalker + i * segH)
+      : [];
 
     // Map: cubic bloom — barely a ghost while lines grow, fully opaque at end
     const mapP = Math.max(0, (progress - FLIGHT_END) / (1 - FLIGHT_END));
     mapEl.style.opacity = Math.min(1, mapP * mapP * mapP).toFixed(3);
 
     // ── Flight ────────────────────────────────────────────────────────────────
-    // The flight is driven by how far the section has scrolled into view,
-    // starting the moment the section's top edge crosses the viewport bottom.
-    // This means the animation is VISIBLE during the transition from the dot
-    // grid section into the map section (frame 2 in the storyboard).
-    //
-    // scrolledFromEntry: 0 when section top is at viewport bottom,
-    //                    window.innerHeight when section top reaches viewport top.
-    // FLIGHT_TOTAL: total scroll from entry until progress = FLIGHT_END.
     const scrolledFromEntry  = Math.max(0, window.innerHeight - rect.top);
     const FLIGHT_TOTAL       = window.innerHeight +
                                (section.offsetHeight - window.innerHeight) * FLIGHT_END;
     const flightRaw  = Math.min(1, scrolledFromEntry / FLIGHT_TOTAL);
-    const flightT    = ease(flightRaw);  // eased 0 → 1
+    const flightT    = ease(flightRaw);
 
-    // Snapshot source positions the FIRST time the section enters view.
-    // At that moment the dot grid sticky pane is still at the top of the
-    // viewport and the phase-12 dots are on screen — perfect lift-off origin.
+    // Snapshot source positions the first time section enters view
     if (!startDots && window._phase12Dots && window._phase12Dots.el) {
       const cr = window._phase12Dots.el.getBoundingClientRect();
       startDots = {
@@ -2182,70 +2182,84 @@ mapSteps.forEach(s => mapStepObs.observe(s));
       };
     }
 
-    if (startDots && flightRaw < 1 && px21 !== null) {
+    if (startDots && flightRaw < 1 && px21 !== null && segYs.length) {
       initFlightCanvas();
       if (fCtx && flightCanvas) {
         flightCanvas.style.display = 'block';
         fCtx.clearRect(0, 0, fW, fH);
 
-        // Target screen positions: overlay canvas is inside sticky pane (top:0)
         const mapRect = overlayEl ? overlayEl.getBoundingClientRect()
                                   : mapEl.getBoundingClientRect();
-        const tx21 = mapRect.left + px21,  ty = mapRect.top + pyWalker;
-        const tx22 = mapRect.left + px22;
-        const r    = GRID_R + (ANCHOR_R - GRID_R) * flightT;  // grows as dots land
+        const r = GRID_R + (ANCHOR_R - GRID_R) * flightT;
 
-        // 4 gold dots → converge on Walker St / 21st Ave S
+        // Fade in the flight canvas over the first 25% of flight.
+        // At flightT=0 the dots are on top of the grid dots → double visual.
+        // Fading in means the flight dots only become visible once they've
+        // separated from the grid, hiding the overlap entirely.
+        fCtx.globalAlpha = Math.min(1, flightRaw / 0.25);
+
+        // 4 gold dots → each fans out to its own block-face on 21st Ave S
         fCtx.fillStyle = 'rgba(200,169,110,0.95)';
         fCtx.beginPath();
-        for (const [sx, sy] of startDots.gold) {
-          const x = lerp(sx, tx21, flightT),  y = lerp(sy, ty, flightT);
+        for (let i = 0; i < N_SEGS; i++) {
+          const [sx, sy] = startDots.gold[i] || startDots.gold[0];
+          const tx = mapRect.left + px21;
+          const ty = mapRect.top  + (segYs[i] !== undefined ? segYs[i] : pyWalker);
+          const x = lerp(sx, tx, flightT),  y = lerp(sy, ty, flightT);
           fCtx.moveTo(x + r, y);  fCtx.arc(x, y, r, 0, Math.PI * 2);
         }
         fCtx.fill();
 
-        // 4 dark dots → converge on Walker St / 22nd Ave S
+        // 4 dark dots → each fans out to its own block-face on 22nd Ave S
         fCtx.fillStyle = 'rgba(24,20,14,0.95)';
         fCtx.beginPath();
-        for (const [sx, sy] of startDots.dark) {
-          const x = lerp(sx, tx22, flightT),  y = lerp(sy, ty, flightT);
+        for (let i = 0; i < N_SEGS; i++) {
+          const [sx, sy] = startDots.dark[i] || startDots.dark[0];
+          const tx = mapRect.left + px22;
+          const ty = mapRect.top  + (segYs[i] !== undefined ? segYs[i] : pyWalker);
+          const x = lerp(sx, tx, flightT),  y = lerp(sy, ty, flightT);
           fCtx.moveTo(x + r, y);  fCtx.arc(x, y, r, 0, Math.PI * 2);
         }
         fCtx.fill();
+
+        fCtx.globalAlpha = 1;  // reset
       }
     } else {
-      // Flight done — hand off to overlay canvas
       if (flightCanvas) flightCanvas.style.display = 'none';
     }
 
     // ── Overlay canvas (map-anchored) ─────────────────────────────────────────
-    if (!oCtx || px21 === null) return;
+    if (!oCtx || px21 === null || !segYs.length) return;
     oCtx.clearRect(0, 0, mapEl.offsetWidth, mapEl.offsetHeight);
-    if (progress < FLIGHT_END) return;  // nothing to draw until dots have landed
+    if (progress < FLIGHT_END) return;
 
-    // Lines grow from behind the anchor dots
+    // Lines grow from Walker St to Bayview St — continuous, through the dots
     function drawGrowingLine(px, r, g, b, lineStart, lineEnd) {
       const p = Math.max(0, Math.min(1, (progress - lineStart) / (lineEnd - lineStart)));
       if (p <= 0) return;
       oCtx.strokeStyle = `rgba(${r},${g},${b},0.88)`;
-      oCtx.lineWidth = 5;  oCtx.lineCap = 'round';
+      oCtx.lineWidth = LINE_W;  oCtx.lineCap = 'round';
       oCtx.beginPath();
       oCtx.moveTo(px, pyWalker);
-      oCtx.lineTo(px, pyWalker + (pyBayview - pyWalker) * ease(p));
+      oCtx.lineTo(px, pyWalker + totalH * ease(p));
       oCtx.stroke();
     }
     drawGrowingLine(px21, 200, 169, 110, LINE21_START, LINE21_END);
     drawGrowingLine(px22, 24,  20,  14,  LINE22_START, LINE22_END);
 
-    // Anchor dots — always on top, always the foundation
-    oCtx.fillStyle = 'rgba(200,169,110,0.95)';
-    oCtx.beginPath();
-    oCtx.arc(px21, pyWalker, ANCHOR_R, 0, Math.PI * 2);
-    oCtx.fill();
-    oCtx.fillStyle = 'rgba(24,20,14,0.95)';
-    oCtx.beginPath();
-    oCtx.arc(px22, pyWalker, ANCHOR_R, 0, Math.PI * 2);
-    oCtx.fill();
+    // 4 anchor dots per street — each marks one block-face sidewalk segment
+    // Dot diameter = line stroke width: they read as the joints of the line
+    function drawSegmentDots(px, fillStyle) {
+      oCtx.fillStyle = fillStyle;
+      oCtx.beginPath();
+      for (const y of segYs) {
+        oCtx.moveTo(px + ANCHOR_R, y);
+        oCtx.arc(px, y, ANCHOR_R, 0, Math.PI * 2);
+      }
+      oCtx.fill();
+    }
+    drawSegmentDots(px21, 'rgba(200,169,110,0.95)');
+    drawSegmentDots(px22, 'rgba(24,20,14,0.95)');
   }
 
   window.addEventListener('scroll', updateLines, { passive: true });
