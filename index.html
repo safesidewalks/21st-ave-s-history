@@ -2319,9 +2319,9 @@ mapSteps.forEach(s => mapStepObs.observe(s));
       ? Array.from({length: N_SEGS}, (_, i) => pyWalker + i * segH)
       : [];
 
-    // Map: cubic bloom — barely a ghost while lines grow, fully opaque at end
+    // Map: sqrt curve — visible by the time text steps are active
     const mapP = Math.max(0, (progress - FLIGHT_END) / (1 - FLIGHT_END));
-    mapEl.style.opacity = Math.min(1, mapP * mapP * mapP).toFixed(3);
+    mapEl.style.opacity = Math.min(1, Math.sqrt(mapP)).toFixed(3);
 
     // ── Flight ────────────────────────────────────────────────────────────────
     const scrolledFromEntry  = Math.max(0, window.innerHeight - rect.top);
