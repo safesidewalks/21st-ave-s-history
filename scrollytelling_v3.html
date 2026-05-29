@@ -789,8 +789,8 @@ body {
 }
 .map-sticky-pane {
   position: sticky; top: 0;
-  height: 100vh; flex: 1; overflow: hidden;
-  background: var(--cream);
+  height: 100vh; width: 700px; flex-shrink: 0;  /* mirrors .dotgrid-sticky-pane */
+  overflow: hidden; background: var(--cream);
 }
 .street-map-wrap {
   width: 100%; height: 100%;
@@ -801,9 +801,9 @@ body {
   width: 100%; height: 100%;
   pointer-events: none; z-index: 5;
 }
-/* Scrolling text steps — right column, mirrors .dg-steps */
+/* Scrolling text steps — right column, same position as .dg-steps */
 .map-steps {
-  flex: 0 0 280px;
+  flex: 0 0 280px;   /* same as .dg-steps */
   padding: 0 2rem;
 }
 .map-step {
@@ -1082,7 +1082,13 @@ body {
 <!-- ═══════════════════════════════════════════ -->
 <section id="map-reveal" class="map-reveal-section">
 
-  <!-- Left: text steps scrolling past the pinned map -->
+  <!-- Left: pinned map (sticky, like the dot canvas pane) -->
+  <div class="map-sticky-pane" id="map-sticky-pane">
+    <div id="street-map" class="street-map-wrap"></div>
+    <canvas id="map-dots-canvas"></canvas>
+  </div>
+
+  <!-- Right: text steps scrolling past the pinned map (same column as dg-steps) -->
   <div class="map-steps">
 
     <div class="map-step" id="map-step-intro">
@@ -1109,12 +1115,6 @@ body {
     </div>
 
     <div class="map-step-spacer"></div>
-  </div>
-
-  <!-- Right: pinned map (sticky, like the dot canvas) -->
-  <div class="map-sticky-pane" id="map-sticky-pane">
-    <div id="street-map" class="street-map-wrap"></div>
-    <canvas id="map-dots-canvas"></canvas>
   </div>
 
 </section>
@@ -2101,13 +2101,18 @@ mapSteps.forEach(s => mapStepObs.observe(s));
   obs.observe(section);
 
   // ── Animation state ───────────────────────────────────────────────────
-  // (text steps are handled by mapStepObs IntersectionObserver below)
-  const flightCanvas = document.getElementById('dot-flight-canvas');
+  // flightCanvas is looked up LAZILY in initFlightCanvas() — the canvas element
+  // lives after the closing script tag in the HTML, so getElementById returns
+  // null at parse time and must be deferred until a scroll event fires.
+  let   flightCanvas = null;
   let   fCtx = null, fW = 0, fH = 0;
-  let   startDots = null;   // captured phase-12 screen positions {gold:[[x,y]×4], dark:[[x,y]×4]}
+  let   startDots = null;
 
   function initFlightCanvas() {
-    if (fCtx || !flightCanvas) return;
+    if (fCtx) return;
+    // Lazy lookup — safe to call repeatedly until the element is found
+    flightCanvas = flightCanvas || document.getElementById('dot-flight-canvas');
+    if (!flightCanvas) return;
     const DPR = Math.min(window.devicePixelRatio || 1, 2);
     fW = window.innerWidth;  fH = window.innerHeight;
     flightCanvas.width  = fW * DPR;
