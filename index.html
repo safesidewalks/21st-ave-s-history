@@ -754,6 +754,11 @@ body {
 }
 .lightbox-scroll { overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .lightbox-img { display: block; width: 100%; height: auto; }
+/* PDF viewer variant */
+.lightbox.is-pdf .lightbox-figure { max-width: 1000px; height: 92vh; max-height: 92vh; }
+.lightbox-pdf { display: none; width: 100%; flex: 1 1 auto; border: 0; }
+.lightbox.is-pdf .lightbox-scroll { display: none; }
+.lightbox.is-pdf .lightbox-pdf { display: block; }
 .lightbox-caption {
   font-size: 10.5px; font-weight: 500; letter-spacing: 0.07em;
   text-transform: uppercase; color: var(--ink-muted);
@@ -1446,7 +1451,7 @@ body {
       </div>
       <div class="record-row">
         <div class="record-date">Nov 22, 2021</div>
-        <div class="record-fact">Seattle City Council adopts the 2022 budget (Ordinance 126490). Included: CM Morales&rsquo; Council Budget Action SDOT-105-B-001 &mdash; $2 million of REET I funds added to SDOT&rsquo;s Pedestrian Master Plan &ndash; New Sidewalks project. The proviso legally restricts the $2 million solely to new sidewalk construction in District 2. The Council&rsquo;s stated intent is unambiguous: 22nd Ave S &mdash; between S College St and S Bayview St &mdash; is named first priority. SDOT will later argue the proviso doesn&rsquo;t require it. The SDOT promise to the resident came five weeks earlier. <em>(<a href="https://seattle.legistar.com/View.ashx?M=F&amp;ID=10237294&amp;GUID=01C34534-3400-4847-8B9F-452D159EFAB1" target="_blank" rel="noopener">C.F. 314488, pp. 334&ndash;335</a>)</em></div>
+        <div class="record-fact">Seattle City Council adopts the 2022 budget (Ordinance 126490). Included: CM Morales&rsquo; Council Budget Action SDOT-105-B-001 &mdash; $2 million of REET I funds added to SDOT&rsquo;s Pedestrian Master Plan &ndash; New Sidewalks project. The proviso legally restricts the $2 million solely to new sidewalk construction in District 2. The Council&rsquo;s stated intent is unambiguous: 22nd Ave S &mdash; between S College St and S Bayview St &mdash; is named first priority. SDOT will later argue the proviso doesn&rsquo;t require it. The SDOT promise to the resident came five weeks earlier. <em>(C.F. 314488, pp. 334&ndash;335 &mdash; <a href="https://seattle.legistar.com/View.ashx?M=F&amp;ID=10237294&amp;GUID=01C34534-3400-4847-8B9F-452D159EFAB1" target="_blank" rel="noopener">view the full clerk file</a>)</em><button class="record-evidence" data-pdf="imgs/CF-314488_pages-334-335.PDF" data-cap="Council Budget Action SDOT-105-B-001 &middot; C.F. 314488, pp. 334&ndash;335 &mdash; the proviso &amp; statement of legislative intent">View the proviso &rarr;</button></div>
       </div>
       <div class="record-row">
         <div class="record-date">Jun 6, 2023</div>
@@ -2639,6 +2644,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const lightbox = document.getElementById('evidence-lightbox');
   if (!lightbox) return;
   const imgEl    = lightbox.querySelector('.lightbox-img');
+  const pdfEl    = lightbox.querySelector('.lightbox-pdf');
   const capEl    = lightbox.querySelector('.lightbox-caption');
   const scrollEl = lightbox.querySelector('.lightbox-scroll');
   const closeBtn = lightbox.querySelector('.lightbox-close');
@@ -2646,6 +2652,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function openLightbox(src, cap, alt) {
     lastFocus = document.activeElement;
+    lightbox.classList.remove('is-pdf');
+    if (pdfEl) pdfEl.src = '';
     imgEl.src = src;
     imgEl.alt = alt || cap || 'Email evidence';
     capEl.innerHTML = cap || '';
@@ -2655,16 +2663,35 @@ document.addEventListener('DOMContentLoaded', () => {
     if (scrollEl) scrollEl.scrollTop = 0;
     closeBtn.focus();
   }
+  function openPdfLightbox(src, cap) {
+    lastFocus = document.activeElement;
+    lightbox.classList.add('is-pdf');
+    imgEl.src = '';
+    if (pdfEl) pdfEl.src = src;
+    capEl.innerHTML = cap || '';
+    lightbox.classList.add('open');
+    lightbox.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    closeBtn.focus();
+  }
   function closeLightbox() {
     lightbox.classList.remove('open');
     lightbox.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
     imgEl.src = '';
+    if (pdfEl) pdfEl.src = '';
+    lightbox.classList.remove('is-pdf');
     if (lastFocus && typeof lastFocus.focus === 'function') lastFocus.focus();
   }
 
   document.querySelectorAll('.record-evidence').forEach(btn => {
-    btn.addEventListener('click', () => openLightbox(btn.dataset.img, btn.dataset.cap, btn.dataset.alt));
+    btn.addEventListener('click', () => {
+      if (btn.dataset.pdf) {
+        openPdfLightbox(btn.dataset.pdf, btn.dataset.cap);
+      } else {
+        openLightbox(btn.dataset.img, btn.dataset.cap, btn.dataset.alt);
+      }
+    });
   });
   lightbox.addEventListener('click', e => {
     if (e.target === lightbox || e.target === closeBtn) closeLightbox();
@@ -2684,6 +2711,7 @@ document.addEventListener('DOMContentLoaded', () => {
   <button class="lightbox-close" type="button" aria-label="Close">&times;</button>
   <figure class="lightbox-figure">
     <div class="lightbox-scroll"><img class="lightbox-img" src="" alt=""></div>
+    <iframe class="lightbox-pdf" src="" title="Document viewer"></iframe>
     <figcaption class="lightbox-caption"></figcaption>
   </figure>
 </div>
