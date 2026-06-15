@@ -5,60 +5,60 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Long Wait — 21st Ave S, North Beacon Hill</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400;1,6..72,500&family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300;1,9..40,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Besley:wght@400;500;600&family=Fustat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+
+/* ── LOCAL FONT ────────────────────────────────── */
+@font-face {
+  font-family: 'VTC Martin';
+  src: url('font/MARTIN-Regular.otf') format('opentype'),
+       url('font/MARTIN-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
 
 /* ── RESET ─────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 body {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Fustat', sans-serif;
   background: #18140E;
-  color: #F5F0E8;
+  color: #FFFFFF;
   line-height: 1.7;
   overflow-x: hidden;
 }
 
 :root {
-  --cream:    #F5F0E8;
+  --surface:    #FFFFFF;
   --ink:      #18140E;
   --ink-soft: #433F38;
   --ink-muted:#8A837A;
-  --rule:     #D8D0C4;
-  --gold:     #C8A96E;
-  --red:      #9B1C1C;
-  --red-mid:  #7F1D1D;
+  --rule:     #eaeaea;
+  --red:      #E24B4A;   /* single accent red */
   --red-pale: #FEF2F2;
+  /* unified body copy scale */
+  --body-size: 15px;
+  --body-lh:   1.7;
+  /* unified micro-label system — two treatments share one size + tracking,
+     differing only by weight: 500 (eyebrow) vs 700 (label) */
+  --label-size:  10px;
+  --label-track: 0.12em;
+  /* serif testimony — Besley, single upright token (no italic) + shared size + lh */
+  --serif:           'Besley', Georgia, 'Times New Roman', serif;
+  --testimony-size:  24px;
+  --testimony-lh:    1.4;
 }
 
 /* ── PROGRESS BAR ──────────────────────────────── */
 .progress-bar {
   position: fixed; top: 0; left: 0; right: 0;
-  height: 2px; background: rgba(245,240,232,0.08); z-index: 300;
+  height: 2px; background: rgba(255,255,255,0.08); z-index: 300;
 }
 .progress-fill {
-  height: 100%; background: var(--gold); width: 0%;
+  height: 100%; background: var(--red); width: 0%;
   transition: width 0.1s linear;
 }
-
-/* ── CHAPTER NAV (top-right) ───────────────────── */
-.ch-nav {
-  position: fixed; top: 1.5rem; right: 1.5rem; z-index: 200;
-  text-align: right; opacity: 0;
-  transition: opacity 0.5s ease;
-  pointer-events: none;
-}
-.ch-nav.on { opacity: 1; }
-.ch-nav-label {
-  font-size: 9px; font-weight: 500; letter-spacing: 0.14em;
-  text-transform: uppercase; color: rgba(245,240,232,0.35);
-  margin-bottom: 2px;
-}
-.ch-nav-title {
-  font-family: 'Public Sans', sans-serif;
-  font-size: 13px; color: rgba(245,240,232,0.75);
-}
-
 
 /* ── SHARED SCROLL-REVEAL ──────────────────────── */
 [data-reveal] {
@@ -120,25 +120,33 @@ body {
   overflow: hidden;   /* clips text while it rides in from below */
 }
 .step-inner {
-  max-width: 600px; text-align: center;
+  max-width: 720px; text-align: center;
   will-change: transform;
   transform: translateY(80vh);   /* JS animates this to 0 on scroll */
 }
 
 .step-eyebrow {
-  font-size: 10px; font-weight: 500; letter-spacing: 0.16em;
-  text-transform: uppercase; color: rgba(245,240,232,0.8); margin-bottom: 1.25rem;
+  font-size: var(--label-size); font-weight: 500; letter-spacing: var(--label-track);
+  text-transform: uppercase; color: rgba(255,255,255,0.8); margin-bottom: 1.25rem;
 }
 .step-quote {
-  font-family: 'Public Sans', sans-serif; font-style: normal;
-  font-size: clamp(2.1rem, 4.6vw, 3.2rem); line-height: 1.3;
-  color: var(--cream);
+  font-family: 'VTC Martin', 'Fustat', sans-serif; font-style: normal;
+  font-size: clamp(3rem, 6.4vw, 5rem); line-height: 0.80;
+  text-transform: uppercase;
+  text-wrap: balance;
+  color: var(--surface);
   text-shadow: 0 2px 24px rgba(0,0,0,0.55);
   margin-bottom: 1rem;
 }
+.step-quote .hq {
+  display: block; line-height: 0.4;
+  font-size: 1.5em;
+}
+.step-quote .hq-open  { margin-bottom: -0.12em; }
+.step-quote .hq-close { margin-top: 0.14em; }
 .step-cite {
   font-size: 11px; font-weight: 500; letter-spacing: 0.09em;
-  text-transform: uppercase; color: rgba(245,240,232,0.55);
+  text-transform: uppercase; color: rgba(255,255,255,0.55);
 }
 
 .scroll-cue {
@@ -150,17 +158,17 @@ body {
 }
 .scroll-cue.hidden { opacity: 0; }
 .scroll-cue-label {
-  font-family: 'Public Sans', sans-serif; font-size: 10px;
-  font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase;
-  color: rgba(245,240,232,0.6); text-align: center;
+  font-family: 'Fustat', sans-serif; font-size: var(--label-size);
+  font-weight: 500; letter-spacing: var(--label-track); text-transform: uppercase;
+  color: rgba(255,255,255,0.6); text-align: center;
 }
 .scroll-cue-arrow-wrap {
   animation: cue-bounce 1.6s ease-in-out infinite;
 }
 .scroll-cue-arrow {
   width: 20px; height: 20px;
-  border-right: 1.5px solid rgba(245,240,232,0.5);
-  border-bottom: 1.5px solid rgba(245,240,232,0.5);
+  border-right: 1.5px solid rgba(255,255,255,0.5);
+  border-bottom: 1.5px solid rgba(255,255,255,0.5);
   transform: rotate(45deg);
 }
 @keyframes cue-bounce {
@@ -177,7 +185,7 @@ body {
 .full-img-cap {
   padding: 0.9rem 2rem;
   font-size: 12px; line-height: 1.65;
-  color: rgba(245,240,232,0.42); font-style: normal;
+  color: rgba(255,255,255,0.42); font-style: normal;
 }
 
 /* Dark stat panel — pinned */
@@ -197,12 +205,12 @@ body {
 .dp-inner { max-width: 680px; }
 .dp-eyebrow {
   font-size: 10px; font-weight: 500; letter-spacing: 0.15em;
-  text-transform: uppercase; color: rgba(245,240,232,0.8); margin-bottom: 1.5rem;
+  text-transform: uppercase; color: rgba(255,255,255,0.8); margin-bottom: 1.5rem;
 }
 .dp-statement {
-  font-family: 'Public Sans', sans-serif;
+  font-family: 'Fustat', sans-serif;
   font-size: clamp(2.1rem, 4.6vw, 3.2rem); line-height: 1.13;
-  color: var(--cream); max-width: 600px; margin-bottom: 3.5rem;
+  color: var(--surface); max-width: 600px; margin-bottom: 3.5rem;
 }
 .dp-statement em { font-style: normal; }
 .dp-follow {
@@ -234,13 +242,13 @@ body {
   opacity: 1; transform: translateY(0);
 }
 .stat-num {
-  font-family: 'Public Sans', sans-serif;
+  font-family: 'Fustat', sans-serif;
   font-size: clamp(3.6rem, 7vw, 5.5rem); line-height: 1;
-  color: var(--cream); margin-bottom: 0.4rem;
+  color: var(--surface); margin-bottom: 0.4rem;
 }
 .stat-num.red { color: #E24B4A; }
 .stat-label {
-  font-size: 13px; color: rgba(245,240,232,0.45);
+  font-size: 13px; color: rgba(255,255,255,0.45);
   max-width: 160px; line-height: 1.5;
 }
 
@@ -262,27 +270,69 @@ body {
 }
 .ch-divider-inner { max-width: min(900px, 88vw); text-align: center; margin: 0 auto; }
 .ch-eyebrow {
-  font-size: 10px; font-weight: 500; letter-spacing: 0.15em;
+  font-size: var(--label-size); font-weight: 500; letter-spacing: var(--label-track);
   text-transform: uppercase; color: var(--ink-muted); margin-bottom: 0.75rem;
 }
-.ch-divider .ch-eyebrow { color: rgba(255,255,255,0.75); }
+.ch-divider .ch-eyebrow { color: rgba(24,20,14,0.75); margin-bottom: 1.25rem; }
 .ch-divider h2 {
-  font-family: 'Public Sans', sans-serif; font-weight: 400;
-  font-size: clamp(2.1rem, 4.6vw, 3.2rem); line-height: 1.3;
-  color: #FFFFFF;
+  font-family: 'VTC Martin', 'Fustat', sans-serif; font-weight: 400;
+  font-size: clamp(3rem, 6.4vw, 5rem); line-height: 0.80;
+  text-transform: uppercase; letter-spacing: 0.005em;
+  color: #18140E;
 }
-.ch-divider h2 em { font-style: normal; color: rgba(255,255,255,0.75); }
+.ch-divider h2 em { font-style: normal; color: rgba(24,20,14,0.7); }
+.ch-divider h2 .hq {
+  display: block; line-height: 0.4;
+  font-size: 1.5em;
+}
+.ch-divider h2 .hq-open  { margin-bottom: -0.12em; }
+.ch-divider h2 .hq-close { margin-top: 0.14em; }
+
+/* Scattered covenant clippings behind the Ch2 headline */
+.ch-divider { overflow: hidden; }
+.ch-divider-inner { position: relative; z-index: 2; }
+.cov-scatter {
+  position: absolute; inset: 0; z-index: 1;
+  pointer-events: none;
+}
+.cov-item {
+  position: absolute;
+  opacity: 0; transition: opacity 1.1s ease;
+  will-change: transform;
+}
+.cov-item.vis { opacity: 1; }
+.cov-img {
+  display: block; width: 100%; height: auto;
+  background: #f1e9da;
+  box-shadow: 0 4px 14px rgba(60,8,8,0.08);
+  border-radius: 0;
+  animation: covBob 8s ease-in-out infinite;
+}
+.cov-item:nth-child(2n) .cov-img { animation-duration: 9.5s; animation-delay: -2.4s; }
+.cov-item:nth-child(3n) .cov-img { animation-duration: 11s;  animation-delay: -4.6s; }
+@keyframes covBob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-7px); }
+}
+@media (max-width: 760px) {
+  .cov-item:nth-child(3),
+  .cov-item:nth-child(5),
+  .cov-item:nth-child(6) { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cov-img { animation: none; }
+}
 
 /* Cream prose sections */
 .cream-section {
-  background: var(--cream); color: var(--ink);
+  background: #FFFFFF; color: var(--ink);
   padding: 5rem 2rem; position: relative; z-index: 10;
 }
 .cream-section + .cream-section { padding-top: 0; }
 
 .prose {
   max-width: 600px; margin: 0 auto;
-  font-size: 15.5px; line-height: 1.87; color: var(--ink-soft);
+  font-size: var(--body-size); line-height: var(--body-lh); color: var(--ink-soft);
 }
 .prose p { margin-bottom: 1.1rem; }
 .prose p:last-child { margin-bottom: 0; }
@@ -290,7 +340,7 @@ body {
 
 /* Covenant two-col grid */
 .cov-section {
-  background: var(--cream); padding: 0 2rem 5rem;
+  background: #FFFFFF; padding: 0 2rem 5rem;
   position: relative; z-index: 10;
 }
 .cov-grid {
@@ -300,11 +350,11 @@ body {
 .cov-col { border-radius: 8px; overflow: hidden; }
 .cov-hd {
   padding: 0.7rem 1.25rem;
-  font-size: 9.5px; font-weight: 500; letter-spacing: 0.13em;
+  font-size: var(--label-size); font-weight: 500; letter-spacing: var(--label-track);
   text-transform: uppercase;
 }
-.cov-hd.restricted { background: #E24B4A; color: rgba(245,240,232,0.9); }
-.cov-hd.available  { background: var(--ink-soft); color: rgba(245,240,232,0.9); }
+.cov-hd.restricted { background: #E24B4A; color: rgba(255,255,255,0.9); }
+.cov-hd.available  { background: var(--ink-soft); color: rgba(255,255,255,0.9); }
 .cov-body {
   padding: 0.85rem 1.25rem;
   border: 1px solid var(--rule); border-top: none;
@@ -324,12 +374,15 @@ body {
 
 /* Covenant doc quote */
 .cov-quote-section {
-  background: var(--cream); padding: 0 2rem 4.5rem;
+  background: #FFFFFF; padding: 0 2rem 4.5rem;
   position: relative; z-index: 10;
 }
 .cov-quote-inner {
   max-width: 600px; margin: 0 auto;
 }
+/* doc-receipt brings a 2rem top margin; cancel it here so it doesn't
+   collapse through the section top and reveal the dark body background */
+.cov-quote-section .doc-receipt { margin-top: 0; }
 .cov-quote-cite {
   font-size: 11px; font-weight: 400; letter-spacing: 0.06em;
   color: var(--ink-muted);
@@ -338,7 +391,7 @@ body {
 
 /* Sandi card */
 .sandi-section {
-  background: var(--cream); padding: 0 2rem 5rem;
+  background: #FFFFFF; padding: 0 2rem 5rem;
   position: relative; z-index: 10;
 }
 .sandi-card {
@@ -348,17 +401,17 @@ body {
 }
 .sandi-label {
   font-size: 9.5px; font-weight: 500; letter-spacing: 0.13em;
-  text-transform: uppercase; color: rgba(245,240,232,0.8); margin-bottom: 0.8rem;
+  text-transform: uppercase; color: rgba(255,255,255,0.8); margin-bottom: 0.8rem;
 }
 .sandi-text {
-  font-family: 'Newsreader', serif; font-style: normal;
-  font-size: 1.35rem; line-height: 1.55;
-  color: rgba(245,240,232,0.85); margin-bottom: 1rem;
+  font-family: var(--serif); font-style: normal;
+  font-size: var(--testimony-size); line-height: var(--testimony-lh);
+  color: rgba(255,255,255,0.85); margin-bottom: 1rem;
 }
 .sandi-sub {
   font-size: 13px; line-height: 1.75;
-  color: rgba(245,240,232,0.45);
-  border-top: 1px solid rgba(245,240,232,0.08);
+  color: rgba(255,255,255,0.45);
+  border-top: 1px solid rgba(255,255,255,0.08);
   padding-top: 1rem; margin-top: 0.25rem;
 }
 
@@ -370,7 +423,7 @@ body {
 .debt-inner { max-width: 600px; }
 .debt-label {
   font-size: 10px; font-weight: 500; letter-spacing: 0.15em;
-  text-transform: uppercase; color: rgba(245,240,232,0.8); margin-bottom: 1.25rem;
+  text-transform: uppercase; color: rgba(255,255,255,0.8); margin-bottom: 1.25rem;
 }
 .pinned-debt { position: relative; height: 200vh; z-index: 10; }
 .debt-divider {
@@ -381,15 +434,15 @@ body {
 }
 .debt-divider-inner { max-width: min(900px, 88vw); text-align: center; margin: 0 auto; }
 .debt-statement {
-  font-family: 'Public Sans', sans-serif; font-weight: 400;
+  font-family: 'Fustat', sans-serif; font-weight: 400;
   font-size: clamp(2.1rem, 4.6vw, 3.2rem); line-height: 1.3;
-  color: var(--cream); margin: 0;
+  color: var(--surface); margin: 0;
 }
-.debt-statement em { color: rgba(245,240,232,0.75); font-style: normal; }
+.debt-statement em { color: rgba(255,255,255,0.75); font-style: normal; }
 .debt-sub {
-  font-size: 15px; line-height: 1.85;
-  color: rgba(245,240,232,0.5); max-width: 500px;
-  border-top: 1px solid rgba(245,240,232,0.09);
+  font-size: var(--body-size); line-height: var(--body-lh);
+  color: rgba(255,255,255,0.5); max-width: 500px;
+  border-top: 1px solid rgba(255,255,255,0.09);
   padding-top: 1.5rem;
 }
 
@@ -400,16 +453,16 @@ body {
 }
 .chapters-coming-inner {
   max-width: 600px; margin: 0 auto;
-  border: 1px dashed rgba(245,240,232,0.1);
+  border: 1px dashed rgba(255,255,255,0.1);
   border-radius: 8px; padding: 2.5rem;
   text-align: center;
 }
 .chapters-coming-inner p {
-  font-size: 12px; color: rgba(245,240,232,0.25);
+  font-size: 12px; color: rgba(255,255,255,0.25);
   letter-spacing: 0.05em; line-height: 1.8;
 }
 .chapters-coming-inner strong {
-  color: rgba(245,240,232,0.45); font-weight: 500;
+  color: rgba(255,255,255,0.45); font-weight: 500;
 }
 
 /* ── CHAPTER 3 ─────────────────────────────────── */
@@ -438,23 +491,33 @@ body {
 }
 .ch3-divider .ch-eyebrow { color: rgba(255,255,255,0.9); margin-bottom: 1.25rem; }
 .ch3-divider h2 {
-  font-family: 'Public Sans', sans-serif; font-weight: 400;
+  font-family: 'Fustat', sans-serif; font-weight: 400;
   font-size: clamp(2.1rem, 4.6vw, 3.2rem); line-height: 1.3;
-  color: var(--cream);
+  color: var(--surface);
 }
 
 .pull-quote-block {
-  border-left: 2px solid rgba(24,20,14,0.25);
-  padding: 0.25rem 0 0.25rem 1.5rem;
-  margin: 2rem 0;
+  margin: 4.5rem 0 4rem;
+}
+.pull-quote-mark {
+  display: block;
+  font-family: 'VTC Martin', 'Fustat', sans-serif; font-weight: 400;
+  font-size: clamp(4.5rem, 9.6vw, 7.5rem); line-height: 0.4;
+  color: var(--ink);
+  margin-bottom: -0.05em;
+}
+/* When a pull quote stands alone in its section, its margins stack with the
+   section padding — pull them back so spacing matches inline pull quotes */
+.prose > .pull-quote-block:only-child {
+  margin: -3.5rem 0 0.5rem;
 }
 .pull-quote-block p {
-  font-family: 'Newsreader', serif; font-size: 1.35rem; line-height: 1.55;
+  font-family: var(--serif); font-size: var(--testimony-size); line-height: var(--testimony-lh);
   color: var(--ink);
 }
 .pull-quote-block cite {
   display: block; margin-top: 0.6rem;
-  font-size: 10px; font-weight: 500; letter-spacing: 0.12em;
+  font-size: var(--label-size); font-weight: 500; letter-spacing: var(--label-track);
   text-transform: uppercase; color: rgba(24,20,14,0.4);
   font-style: normal;
 }
@@ -465,13 +528,13 @@ body {
   padding: 2.5rem 0 3rem;
 }
 .stat-pull-num {
-  font-family: 'Public Sans', sans-serif;
+  font-family: 'Fustat', sans-serif;
   font-size: clamp(3.6rem, 7vw, 5.5rem); line-height: 1;
   color: var(--ink); margin-bottom: 0.5rem;
 }
 .stat-pull-num.red { color: #E24B4A; }
 .stat-pull-label {
-  font-size: 15px; color: var(--ink-soft); line-height: 1.6;
+  font-size: var(--body-size); color: var(--ink-soft); line-height: var(--body-lh);
 }
 .stat-pull-source {
   font-size: 10px; font-weight: 500; letter-spacing: 0.12em;
@@ -483,6 +546,14 @@ body {
   text-underline-offset: 2px; text-decoration-color: rgba(138,131,122,0.4);
 }
 .stat-pull-source a:hover { color: var(--ink-soft); }
+
+/* Inline external links — styled like the SDOT Vision Zero source link */
+.ext-link {
+  color: inherit; text-decoration: underline;
+  text-underline-offset: 2px; text-decoration-color: rgba(138,131,122,0.4);
+}
+.ext-link::after { content: "\00A0\2197"; }
+.ext-link:hover { color: var(--ink-soft); text-decoration-color: var(--ink-muted); }
 
 /* S Kenyon St before/after comparison */
 .kenyon-compare {
@@ -496,8 +567,8 @@ body {
 }
 .kenyon-compare-year {
   position: absolute; bottom: 0.45rem; left: 0.45rem;
-  font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
-  background: rgba(24,20,14,0.72); color: rgba(245,240,232,0.95);
+  font-size: var(--label-size); font-weight: 700; letter-spacing: var(--label-track); text-transform: uppercase;
+  background: rgba(24,20,14,0.72); color: rgba(255,255,255,0.95);
   padding: 0.18rem 0.45rem; border-radius: 2px;
 }
 .kenyon-compare-caption {
@@ -519,8 +590,8 @@ body {
 }
 .stat-trio-item:last-child { border-right: none; }
 .stat-trio-num {
-  font-family: 'Public Sans', sans-serif;
-  font-size: clamp(2rem, 3.5vw, 2.6rem); font-weight: 600;
+  font-family: 'Fustat', sans-serif;
+  font-size: 40px; font-weight: 400;
   line-height: 1; color: var(--ink); margin-bottom: 0.5rem;
 }
 .stat-trio-num.red { color: #E24B4A; }
@@ -528,7 +599,7 @@ body {
   font-size: 12px; color: var(--ink-muted); line-height: 1.55;
 }
 .stat-trio-source {
-  font-size: 10px; font-weight: 500; letter-spacing: 0.1em;
+  font-size: var(--label-size); font-weight: 500; letter-spacing: var(--label-track);
   text-transform: uppercase; color: var(--ink-muted);
   opacity: 0.55; margin-top: 0.6rem;
 }
@@ -536,7 +607,7 @@ body {
 /* ── SCROLL-DRIVEN DOT GRID — side-by-side layout ── */
 .dotgrid-section {
   display: flex; align-items: flex-start; justify-content: center;
-  position: relative; background: var(--cream); color: var(--ink);
+  position: relative; background: #FFFFFF; color: var(--ink);
   padding: 0 2rem;   /* match the 2rem side padding of every other .cream-section */
 }
 .dotgrid-sticky-pane {
@@ -570,9 +641,9 @@ body {
 }
 .dg-step.active .dg-step-content { opacity: 1; transform: translateY(0); }
 .dg-step-sentence {
-  font-family: 'Public Sans', sans-serif;
-  font-size: clamp(0.95rem, 1.6vw, 1.1rem); font-weight: 400;
-  line-height: 1.5; color: var(--ink); margin-bottom: 0.55rem;
+  font-family: 'Fustat', sans-serif;
+  font-size: 17.6px; font-weight: 400;
+  line-height: 1.2; color: var(--ink); margin-bottom: 0.55rem;
 }
 .dg-step-sentence strong { font-weight: 600; }
 .dg-step-caption {
@@ -592,13 +663,13 @@ body {
 }
 .strategic-label {
   font-size: 9.5px; font-weight: 500; letter-spacing: 0.13em;
-  text-transform: uppercase; color: rgba(245,240,232,0.8);
+  text-transform: uppercase; color: rgba(255,255,255,0.8);
   margin-bottom: 0.8rem;
 }
 .strategic-text {
-  font-family: 'Newsreader', serif; font-style: normal;
-  font-size: 1.35rem; line-height: 1.55;
-  color: rgba(245,240,232,0.85); margin: 0;
+  font-family: var(--serif); font-style: normal;
+  font-size: var(--testimony-size); line-height: var(--testimony-lh);
+  color: rgba(255,255,255,0.85); margin: 0;
 }
 
 /* ── CHAPTER 4 ─────────────────────────────────── */
@@ -610,11 +681,11 @@ body {
   padding: 0 2rem; z-index: 10;
 }
 .ch4-divider-inner { max-width: min(900px, 88vw); text-align: center; margin: 0 auto; }
-.ch4-divider .ch-eyebrow { color: rgba(245,240,232,0.5); margin-bottom: 1.25rem; }
+.ch4-divider .ch-eyebrow { color: rgba(255,255,255,0.5); margin-bottom: 1.25rem; }
 .ch4-divider h2 {
-  font-family: 'Public Sans', sans-serif; font-weight: 400;
+  font-family: 'Fustat', sans-serif; font-weight: 400;
   font-size: clamp(2.1rem, 4.6vw, 3.2rem); line-height: 1.3;
-  color: var(--cream);
+  color: var(--surface);
 }
 
 /* Timeline */
@@ -626,11 +697,11 @@ body {
 }
 .tl-item:last-child { border-bottom: 1px solid rgba(24,20,14,0.12); }
 .tl-year {
-  font-family: 'Public Sans', sans-serif;
+  font-family: 'Fustat', sans-serif;
   font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em;
   color: var(--ink-muted); padding-top: 0.2rem; line-height: 1.5;
 }
-.tl-body { font-size: 14.5px; line-height: 1.8; color: var(--ink-soft); }
+.tl-body { font-size: var(--body-size); line-height: var(--body-lh); color: var(--ink-soft); }
 
 /* Community voice cards */
 .voices-grid { max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem; }
@@ -639,24 +710,24 @@ body {
   padding: 1.75rem 2rem;
 }
 .voice-quote {
-  font-family: 'Newsreader', serif; font-style: italic;
-  font-size: 1.2rem; line-height: 1.55;
-  color: rgba(245,240,232,0.85); margin-bottom: 0.75rem;
+  font-family: var(--serif); font-style: normal;
+  font-size: var(--testimony-size); line-height: var(--testimony-lh);
+  color: rgba(255,255,255,0.85); margin-bottom: 0.75rem;
 }
 .voice-attr {
   font-size: 10px; font-weight: 500; letter-spacing: 0.13em;
-  text-transform: uppercase; color: rgba(245,240,232,0.4);
+  text-transform: uppercase; color: rgba(255,255,255,0.4);
 }
 
 /* Ch4 — Broken promise card */
 .betrayal-section {
   padding: 0 2rem 5rem;
-  background: var(--cream); color: var(--ink);
+  background: #FFFFFF; color: var(--ink);
   position: relative; z-index: 10;
 }
 .section-card-label {
   max-width: 600px; margin: 0 auto 0.75rem;
-  font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+  font-size: var(--label-size); font-weight: 700; letter-spacing: var(--label-track);
   text-transform: uppercase; color: var(--ink-muted);
 }
 .betrayal-card {
@@ -667,13 +738,13 @@ body {
   display: grid; grid-template-columns: 80px 1fr;
   gap: 1.5rem; padding: 1.75rem 2rem;
 }
-.betrayal-row + .betrayal-row { border-top: 1px solid rgba(245,240,232,0.07); }
+.betrayal-row + .betrayal-row { border-top: 1px solid rgba(255,255,255,0.07); }
 .betrayal-date {
   font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em;
-  text-transform: uppercase; color: rgba(245,240,232,0.35);
+  text-transform: uppercase; color: rgba(255,255,255,0.35);
   padding-top: 0.2rem; line-height: 1.5;
 }
-.betrayal-text { font-size: 15px; line-height: 1.7; color: rgba(245,240,232,0.82); }
+.betrayal-text { font-size: var(--body-size); line-height: var(--body-lh); color: rgba(255,255,255,0.82); }
 .betrayal-row.cancelled .betrayal-date { color: rgba(226,75,74,0.7); }
 .betrayal-row.cancelled .betrayal-text { color: rgba(226,75,74,0.9); }
 
@@ -691,12 +762,12 @@ body {
   font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em;
   text-transform: uppercase; color: var(--ink-muted); padding-top: 0.2rem; line-height: 1.5;
 }
-.consult-fact { font-size: 15px; line-height: 1.7; color: var(--ink-soft); }
+.consult-fact { font-size: var(--body-size); line-height: var(--body-lh); color: var(--ink-soft); }
 .consult-row.damning .consult-date { color: #E24B4A; }
 .consult-row.damning .consult-fact { color: var(--ink); font-weight: 500; }
 .consult-kicker {
   margin-top: 2rem;
-  font-family: 'Public Sans', sans-serif; font-weight: 400;
+  font-family: 'Fustat', sans-serif; font-weight: 400;
   font-size: clamp(1.3rem, 2.4vw, 1.7rem); line-height: 1.4;
   color: var(--ink);
 }
@@ -704,9 +775,17 @@ body {
 /* White timeline card (Ch4) */
 .record-timeline {
   max-width: 600px; margin: 0 auto;
+}
+.record-phase { margin-bottom: 1.85rem; }
+.record-phase:last-child { margin-bottom: 0; }
+.record-phase-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--ink);
+  margin: 0 0 0.7rem;
+}
+.record-card {
   border: 1px solid rgba(24,20,14,0.1);
-  border-radius: 8px; overflow: hidden;
-  background: #fff;
+  border-radius: 8px; overflow: hidden; background: #fff;
 }
 .record-row {
   display: grid; grid-template-columns: 100px 1fr;
@@ -715,25 +794,25 @@ body {
 }
 .record-row:last-child { border-bottom: none; }
 .record-date {
-  font-size: 10px; font-weight: 700; letter-spacing: 0.09em;
-  text-transform: uppercase; color: var(--gold);
+  font-size: var(--label-size); font-weight: 700; letter-spacing: var(--label-track);
+  text-transform: uppercase; color: var(--red);
   padding-top: 0.15rem; line-height: 1.5;
 }
-.record-fact { font-size: 14px; line-height: 1.7; color: var(--ink-soft); }
-.record-row.notable .record-date { color: #9B1C1C; }
+.record-fact { font-size: var(--body-size); line-height: var(--body-lh); color: var(--ink-soft); }
+.record-row.notable .record-date { color: var(--red); }
 .record-row.notable .record-fact { color: var(--ink); }
 
 /* Inline "view the email" evidence trigger */
 .record-evidence {
   display: block; width: fit-content; margin-top: 0.7rem;
-  font-family: inherit; font-size: 11px; font-weight: 600;
-  letter-spacing: 0.06em; text-transform: uppercase;
+  font-family: inherit; font-size: var(--label-size); font-weight: 700;
+  letter-spacing: var(--label-track); text-transform: uppercase;
   color: var(--red); background: none;
   border: none; border-bottom: 1px solid rgba(155,28,28,0.4);
   padding: 0 0 2px; cursor: pointer;
   transition: border-color 0.2s ease, color 0.2s ease;
 }
-.record-evidence:hover { color: var(--red-mid); border-color: var(--red); }
+.record-evidence:hover { color: var(--red); border-color: var(--red); }
 .record-evidence:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
 
 /* Evidence lightbox */
@@ -768,12 +847,12 @@ body {
 .lightbox-close {
   position: absolute; top: 1.25rem; right: 1.5rem;
   width: 40px; height: 40px; border-radius: 50%;
-  background: rgba(245,240,232,0.1); border: 1px solid rgba(245,240,232,0.25);
-  color: var(--cream); font-size: 24px; line-height: 1; cursor: pointer;
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.25);
+  color: var(--surface); font-size: 24px; line-height: 1; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   transition: background 0.2s ease;
 }
-.lightbox-close:hover { background: rgba(245,240,232,0.2); }
+.lightbox-close:hover { background: rgba(255,255,255,0.2); }
 
 /* Aug 11 managed card */
 .managed-card {
@@ -782,12 +861,12 @@ body {
   padding: 2rem 2.25rem;
 }
 .managed-text {
-  font-family: 'Newsreader', serif;
-  font-size: 1.05rem; line-height: 1.7;
-  color: rgba(245,240,232,0.82); margin-bottom: 1rem;
+  font-family: var(--serif); font-style: normal;
+  font-size: var(--testimony-size); line-height: var(--testimony-lh);
+  color: rgba(255,255,255,0.82); margin-bottom: 1rem;
 }
 .managed-kicker {
-  font-family: 'Public Sans', sans-serif;
+  font-family: 'Fustat', sans-serif;
   font-size: clamp(1.1rem, 2.2vw, 1.4rem);
   line-height: 1.4; font-weight: 600; color: var(--ink);
   border-top: 1px solid rgba(24,20,14,0.12);
@@ -803,17 +882,17 @@ body {
   padding: 0 2rem; z-index: 10;
 }
 .ch5-divider-inner { max-width: min(900px, 88vw); text-align: center; margin: 0 auto; }
-.ch5-divider .ch-eyebrow { color: rgba(245,240,232,0.5); margin-bottom: 1.25rem; }
+.ch5-divider .ch-eyebrow { color: rgba(255,255,255,0.5); margin-bottom: 1.25rem; }
 .ch5-divider h2 {
-  font-family: 'Public Sans', sans-serif; font-weight: 400;
+  font-family: 'Fustat', sans-serif; font-weight: 400;
   font-size: clamp(2.1rem, 4.6vw, 3.2rem); line-height: 1.3;
-  color: var(--cream);
+  color: var(--surface);
 }
 
 /* ── CHAPTER 6 ─────────────────────────────────── */
 .pinned-ch6 { position: relative; height: 200vh; z-index: 10; }
 .ch6-divider {
-  background: var(--cream);
+  background: #FFFFFF;
   position: sticky; top: 0; height: 100vh;
   display: flex; align-items: center;
   padding: 0 2rem; z-index: 10;
@@ -821,16 +900,24 @@ body {
 .ch6-divider-inner { max-width: min(900px, 88vw); text-align: center; margin: 0 auto; }
 .ch6-divider .ch-eyebrow { color: var(--ink-muted); margin-bottom: 1.25rem; }
 .ch6-divider h2 {
-  font-family: 'Public Sans', sans-serif; font-weight: 400;
+  font-family: 'Fustat', sans-serif; font-weight: 400;
   font-size: clamp(2.1rem, 4.6vw, 3.2rem); line-height: 1.3;
   color: var(--ink);
 }
 .ch6-divider h2 em { font-style: normal; color: var(--ink-soft); }
 
+/* VTC Martin marker face for chapter titles */
+.ch3-divider h2, .ch4-divider h2, .ch5-divider h2, .ch6-divider h2 {
+  font-family: 'VTC Martin', 'Fustat', sans-serif;
+  text-transform: uppercase;
+  line-height: 0.80;
+  font-size: clamp(3rem, 6.4vw, 5rem);
+}
+
 /* Equity comparison bars */
 .equity-bars { max-width: 600px; margin: 0 auto; padding: 1rem 0 3rem; }
 .eq-label {
-  font-size: 10px; font-weight: 500; letter-spacing: 0.13em;
+  font-size: var(--label-size); font-weight: 500; letter-spacing: var(--label-track);
   text-transform: uppercase; color: var(--ink-muted); margin-bottom: 1.5rem;
 }
 .eq-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.9rem; }
@@ -848,10 +935,10 @@ body {
   width: 0; transition: width 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.4s;
 }
 [data-reveal].on .eq-bar { width: var(--w, 0); }
-.eq-bar.d2 { background: var(--gold); }
+.eq-bar.d2 { background: var(--red); }
 .eq-bar.d5 { background: rgba(24,20,14,0.3); }
 .eq-pct {
-  font-family: 'Public Sans', sans-serif;
+  font-family: 'Fustat', sans-serif;
   font-size: 13px; font-weight: 600; color: var(--ink);
   white-space: nowrap; flex-shrink: 0; min-width: 82px;
 }
@@ -861,38 +948,38 @@ body {
   border-top: 1px solid rgba(24,20,14,0.1);
   padding-top: 1.25rem; margin-top: 1.5rem;
 }
-.eq-note em { font-style: italic; color: var(--ink-soft); }
+.eq-note em { font-style: normal; color: var(--ink-soft); }
 
 /* ── CHAPTER 7 ─────────────────────────────────── */
 .ask-dark { background: var(--ink); padding: 6rem 2rem; position: relative; z-index: 10; }
 .ask-inner { max-width: 660px; margin: 0 auto; }
 .ask-eyebrow {
   font-size: 10px; font-weight: 500; letter-spacing: 0.15em;
-  text-transform: uppercase; color: rgba(245,240,232,0.5);
+  text-transform: uppercase; color: rgba(255,255,255,0.5);
   display: block; margin-bottom: 2.5rem; text-align: center;
 }
 .survey-row { display: flex; gap: 3rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
 .survey-num {
-  font-family: 'Public Sans', sans-serif;
+  font-family: 'Fustat', sans-serif;
   font-size: clamp(3rem, 5.5vw, 4.2rem); line-height: 1;
-  color: var(--cream); margin-bottom: 0.5rem;
+  color: var(--surface); margin-bottom: 0.5rem;
 }
-.survey-of { font-size: 0.45em; vertical-align: super; color: rgba(245,240,232,0.45); }
-.survey-pct { font-size: 0.65em; vertical-align: middle; color: rgba(245,240,232,0.7); }
-.survey-label { font-size: 12px; color: rgba(245,240,232,0.4); max-width: 130px; line-height: 1.55; }
+.survey-of { font-size: 0.45em; vertical-align: super; color: rgba(255,255,255,0.45); }
+.survey-pct { font-size: 0.65em; vertical-align: middle; color: rgba(255,255,255,0.7); }
+.survey-label { font-size: 12px; color: rgba(255,255,255,0.4); max-width: 130px; line-height: 1.55; }
 .survey-source {
   display: block; font-size: 10px; font-weight: 500; letter-spacing: 0.12em;
-  text-transform: uppercase; color: rgba(245,240,232,0.22);
+  text-transform: uppercase; color: rgba(255,255,255,0.22);
 }
 .debt-close {
   max-width: 600px; margin: 4rem auto 0;
 }
 .debt-close-text {
-  font-family: 'Public Sans', sans-serif;
+  font-family: 'Fustat', sans-serif;
   font-size: clamp(2.2rem, 4.5vw, 3.2rem); line-height: 1.15;
-  color: rgba(245,240,232,0.2);
+  color: rgba(255,255,255,0.2);
 }
-.debt-close-em { color: var(--cream); }
+.debt-close-em { color: var(--surface); }
 
 /* Ch5 — Budget comparison */
 .budget-compare {
@@ -904,8 +991,8 @@ body {
 .budget-item:last-child { border-right: none; }
 .budget-item.current { background: rgba(226,75,74,0.05); }
 .budget-amt {
-  font-family: 'Public Sans', sans-serif;
-  font-size: clamp(1.4rem, 2.4vw, 1.9rem); font-weight: 600;
+  font-family: 'Fustat', sans-serif;
+  font-size: 40px; font-weight: 400;
   line-height: 1; color: var(--ink); margin-bottom: 0.6rem;
 }
 .budget-item.current .budget-amt { color: #E24B4A; }
@@ -946,8 +1033,8 @@ body {
   border-radius: 0 6px 6px 0;
 }
 .unanswered-q {
-  font-family: 'Newsreader', serif; font-style: italic;
-  font-size: 1.2rem; line-height: 1.6; color: var(--ink); margin-bottom: 0.75rem;
+  font-family: var(--serif); font-style: normal;
+  font-size: var(--testimony-size); line-height: var(--testimony-lh); color: var(--ink); margin-bottom: 0.75rem;
 }
 .unanswered-note { font-size: 11.5px; color: var(--ink-muted); line-height: 1.6; }
 
@@ -956,41 +1043,41 @@ body {
 .ask-item {
   display: grid; grid-template-columns: 48px 1fr;
   gap: 1.5rem; padding: 2rem 0;
-  border-top: 1px solid rgba(245,240,232,0.08);
+  border-top: 1px solid rgba(255,255,255,0.08);
 }
-.ask-item:last-child { border-bottom: 1px solid rgba(245,240,232,0.08); }
+.ask-item:last-child { border-bottom: 1px solid rgba(255,255,255,0.08); }
 .ask-num {
   font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
-  color: rgba(245,240,232,0.22); padding-top: 0.25rem;
+  color: rgba(255,255,255,0.22); padding-top: 0.25rem;
 }
-.ask-text { font-size: 16px; line-height: 1.75; color: rgba(245,240,232,0.82); }
-.ask-text strong { color: var(--cream); font-weight: 600; }
+.ask-text { font-size: var(--body-size); line-height: var(--body-lh); color: rgba(255,255,255,0.82); }
+.ask-text strong { color: var(--surface); font-weight: 600; }
 
 /* Ch7 — Timeline urgency */
-.timeline-urgent { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid rgba(245,240,232,0.08); }
+.timeline-urgent { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.08); }
 .timeline-urgent-label {
   font-size: 10px; font-weight: 700; letter-spacing: 0.15em;
   text-transform: uppercase; color: #E24B4A; margin-bottom: 0.75rem;
 }
 .timeline-urgent-text {
-  font-family: 'Public Sans', sans-serif;
+  font-family: 'Fustat', sans-serif;
   font-size: clamp(1.2rem, 2vw, 1.6rem); line-height: 1.45;
-  color: rgba(245,240,232,0.65);
+  color: rgba(255,255,255,0.65);
 }
-.timeline-urgent-text strong { color: var(--cream); }
+.timeline-urgent-text strong { color: var(--surface); }
 
 
 /* ── MAP REVEAL — mirrors dot-grid layout exactly ───────── */
 .map-reveal-section {
   display: flex; align-items: flex-start; justify-content: center;
   position: relative; z-index: 10;
-  background: var(--cream); color: var(--ink);
+  background: #FFFFFF; color: var(--ink);
   padding: 0 2rem;   /* matches .dotgrid-section → text column at same x */
 }
 .map-sticky-pane {
   position: sticky; top: 0;
   height: 100vh; width: 700px; flex-shrink: 0;  /* mirrors .dotgrid-sticky-pane */
-  overflow: hidden; background: var(--cream);
+  overflow: hidden; background: #FFFFFF;
 }
 .street-map-wrap {
   width: 100%; height: 100%;
@@ -1020,14 +1107,14 @@ body {
 .map-step.active .map-step-content { opacity: 1; transform: translateY(0); }
 /* Text styles within steps */
 .map-street-label {
-  font-size: 10px; font-weight: 700; letter-spacing: 0.15em;
+  font-size: var(--label-size); font-weight: 700; letter-spacing: var(--label-track);
   text-transform: uppercase; margin-bottom: 0.5rem;
 }
 .map-street-label.red  { color: #E24B4A; }
-.map-street-label.gold { color: var(--gold); }
+.map-street-label.gold { color: var(--red); }
 .map-headline {
-  font-family: 'Public Sans', sans-serif; font-weight: 400;
-  font-size: clamp(1.1rem, 1.8vw, 1.4rem); line-height: 1.35;
+  font-family: 'Fustat', sans-serif; font-weight: 400;
+  font-size: 17.6px; line-height: 1.2;
   color: var(--ink); margin-bottom: 0.6rem;
 }
 .map-sub {
@@ -1143,11 +1230,6 @@ body {
 
 <div class="progress-bar"><div class="progress-fill" id="prog"></div></div>
 
-<div class="ch-nav" id="ch-nav">
-  <div class="ch-nav-label" id="ch-nav-label">Chapter 1</div>
-  <div class="ch-nav-title" id="ch-nav-title">The Street</div>
-</div>
-
 
 
 <!-- ═══════════════════════════════════════════ -->
@@ -1171,7 +1253,7 @@ body {
       <div class="hero-text">
         <div class="step-inner" id="hero-step-block">
           <p class="step-eyebrow">21st Ave S &middot; North Beacon Hill &middot; Seattle &middot; 2026</p>
-          <p class="step-quote">&ldquo;Walking this street feels like a matter of when a pedestrian will be hit, not if.&rdquo;</p>
+          <p class="step-quote"><span class="hq hq-open">&ldquo;</span>Walking this street feels like a matter of when a pedestrian will be hit, not if.<span class="hq hq-close">&rdquo;</span></p>
           <p class="step-cite">&mdash; Letha, resident</p>
         </div>
       </div>
@@ -1206,9 +1288,18 @@ body {
 
   <div class="pinned-ch2" id="pinned-ch2">
     <div class="ch-divider" id="ch2-trigger">
+      <div class="cov-scatter" aria-hidden="true">
+        <div class="cov-item" data-float="-90" data-rot="0" style="left:1%;  top:4%;  width:clamp(200px,21vw,340px);"><img class="cov-img" src="imgs/racial-covenant_01.png" alt=""></div>
+        <div class="cov-item" data-float="74"  data-rot="0" style="left:64%; top:5%;  width:clamp(210px,22vw,350px);"><img class="cov-img" src="imgs/racial-covenant_02.png" alt=""></div>
+        <div class="cov-item" data-float="-58" data-rot="0" style="left:53%; top:26%; width:clamp(210px,23vw,360px);"><img class="cov-img" src="imgs/racial-covenant_03.png" alt=""></div>
+        <div class="cov-item" data-float="88"  data-rot="0" style="left:1%;  top:47%; width:clamp(210px,24vw,380px);"><img class="cov-img" src="imgs/racial-covenant_04.png" alt=""></div>
+        <div class="cov-item" data-float="-72" data-rot="0" style="left:82%; top:37%; width:clamp(130px,13vw,220px);"><img class="cov-img" src="imgs/racial-covenant_05.png" alt=""></div>
+        <div class="cov-item" data-float="64"  data-rot="0" style="left:10%; top:65%; width:clamp(175px,19vw,300px);"><img class="cov-img" src="imgs/racial-covenant_06.png" alt=""></div>
+        <div class="cov-item" data-float="-96" data-rot="0" style="left:61%; top:80%; width:clamp(180px,22vw,340px);"><img class="cov-img" src="imgs/racial-covenant_07.png" alt=""></div>
+      </div>
       <div class="ch-divider-inner">
         <p class="ch-eyebrow" data-ch-stat="0.25">Redlining &middot; 1889&ndash;1954</p>
-        <h2 data-ch-stat="0.55">&ldquo;No person other than<br>the Caucasian race.&rdquo;</h2>
+        <h2 data-ch-stat="0.55"><span class="hq hq-open">&ldquo;</span>No person other than<br>the Caucasian race.<span class="hq hq-close">&rdquo;</span></h2>
       </div>
     </div>
   </div>
@@ -1242,16 +1333,23 @@ body {
           <div class="cov-row"><div class="cov-dot" style="background:#433F38;opacity:.5"></div>Central District</div>
           <div class="cov-row"><div class="cov-dot" style="background:#433F38;opacity:.5"></div>International District</div>
           <div class="cov-row"><div class="cov-dot" style="background:#433F38;opacity:.5"></div>Rainier Valley</div>
-          <div class="cov-row here"><div class="cov-dot" style="background:#C8A96E"></div>Beacon Hill &larr; here</div>
+          <div class="cov-row here"><div class="cov-dot" style="background:#000000"></div>Beacon Hill &larr; here</div>
         </div>
       </div>
     </div>
   </div>
 
   <div class="cov-quote-section">
-    <div class="cov-quote-inner" data-reveal>
-      <img src="imgs/magnoliaCovenant.png" alt="Magnolia covenant document showing restrictive racial language" style="width:100%;display:block;border-radius:4px;">
-      <p class="cov-quote-cite" style="margin-top:0.75rem;">Restrictive covenant language in Seattle property deeds &mdash; Magnolia Community Council Racial Restrictive Covenants Project</p>
+    <div class="cov-quote-inner doc-receipt" data-reveal>
+      <img src="imgs/magnoliaCovenant.png" alt="Magnolia covenant document showing restrictive racial language" class="doc-receipt-img">
+      <p class="doc-receipt-caption">Restrictive covenant language in Seattle property deeds &mdash; Magnolia Community Council Racial Restrictive Covenants Project</p>
+    </div>
+  </div>
+
+  <div class="cream-section">
+    <div class="prose" data-reveal>
+      <p>None of this was ancient history. By the early 1960s, other states had begun outlawing housing discrimination; the first did so in 1959. Seattle had the same chance in 1964 and turned it down, rejecting an open-housing ordinance by nearly two to one. It took the federal government to override the result. The Fair Housing Act of 1968 finally barred discrimination in the sale, rental, and financing of housing based on race, color, religion, and national origin.</p>
+      <p>A law did not undo a culture of discrimination. When families of color moved into whiter neighborhoods, many were met with harassment and threats meant to drive them back out. The covenants were dead on paper, but what they taught the city outlived them.</p>
     </div>
   </div>
 
@@ -1300,7 +1398,8 @@ body {
     <div class="prose" data-reveal>
       <p>In 2015, Lauren borrowed a radar gun from SDOT, collected speed data on 21st Ave S herself &mdash; a city requirement before SDOT would conduct its own study &mdash; and turned in the results. A year later, having heard nothing, she wrote back asking when SDOT would conduct its follow-up study. There is no record anyone followed up. SDOT&rsquo;s own study came seven years later: 77% of drivers on S College St exceed the 25&nbsp;mph speed limit. The 85th percentile speed: 32.7&nbsp;mph. Seven years after Lauren turned in her data, SDOT confirmed what she had already measured.</p>
       <blockquote class="pull-quote-block">
-        <p>&ldquo;The firefighters are currently performing a rescue extrication. This is the intersection my neighbors and I cross every day taking our kids to and from school.&rdquo;</p>
+        <span class="pull-quote-mark" aria-hidden="true">&ldquo;</span>
+        <p>The firefighters are currently performing a rescue extrication. This is the intersection my neighbors and I cross every day taking our kids to and from school.</p>
         <cite>Letha, email to SDOT &mdash; June 6, 2023</cite>
       </blockquote>
     </div>
@@ -1350,20 +1449,20 @@ body {
       </div>
       <div class="dg-step" data-phase="6">
         <div class="dg-step-content">
-          <p class="dg-step-sentence"><strong style="color:rgba(195,150,75,1)">3,116</strong> are in communities SDOT scores highest for historical underinvestment.</p>
+          <p class="dg-step-sentence"><strong style="color:rgba(226,75,74,1)">3,116</strong> are in communities SDOT scores highest for historical underinvestment.</p>
           <p class="dg-step-caption">These are the neighborhoods that received the least infrastructure investment over the past century. The debt is not abstract &mdash; it is mapped.</p>
         </div>
       </div>
       <div class="dg-step" data-phase="11">
         <div class="dg-step-content">
-          <p class="dg-step-sentence">The neighborhoods families of color were steered into &mdash; Beacon Hill, Rainier Valley, Columbia City &mdash; now score among the highest for infrastructure underinvestment. <strong style="color:rgba(195,150,75,1)">District 2.</strong> 2,596 missing segments.</p>
-          <p class="dg-step-caption">Gold dots are segments SDOT scores highest for historical underinvestment. The rest of District 2&rsquo;s missing sidewalks are shown in grey.</p>
+          <p class="dg-step-sentence">The neighborhoods families of color were steered into &mdash; Beacon Hill, Rainier Valley, Columbia City &mdash; now score among the highest for infrastructure underinvestment. <strong style="color:rgba(226,75,74,1)">District 2.</strong> 2,596 missing segments.</p>
+          <p class="dg-step-caption">Red dots are segments SDOT scores highest for historical underinvestment. The rest of District 2&rsquo;s missing sidewalks are shown in grey.</p>
         </div>
       </div>
       <div class="dg-step" data-phase="12">
         <div class="dg-step-content">
-          <p class="dg-step-sentence">Among those 2,596 — <strong style="color:rgba(195,150,75,1)">4 segments are 21st Ave S.</strong> One block east, <strong style="color:rgba(24,20,14,0.88);background:rgba(245,240,232,0.85);padding:0 3px;border-radius:2px">4 more mark 22nd Ave S.</strong> Eight segments. Two streets.</p>
-          <p class="dg-step-caption">Gold = 21st Ave S · Dark = 22nd Ave S · Both run Walker St to Bayview St. Scroll to see them on the map.</p>
+          <p class="dg-step-sentence">Among those 2,596 — <strong style="color:rgba(226,75,74,1)">4 segments are 21st Ave S.</strong> One block east, <strong style="color:rgba(24,20,14,0.88);background:rgba(255,255,255,0.85);padding:0 3px;border-radius:2px">4 more mark 22nd Ave S.</strong> Eight segments. Two streets.</p>
+          <p class="dg-step-caption">Red = 21st Ave S · Dark = 22nd Ave S · Both run Walker St to Bayview St. Scroll to see them on the map.</p>
         </div>
       </div>
       <div class="dg-step-spacer"></div>
@@ -1441,50 +1540,14 @@ body {
     </div>
   </div>
 
-  <!-- White timeline: 22nd Ave S record -->
-  <div class="betrayal-section">
-    <div class="section-card-label">22nd Ave S &mdash; The promise, and what happened to it</div>
-    <div class="record-timeline" data-reveal>
-      <div class="record-row">
-        <div class="record-date">Oct 15, 2021</div>
-        <div class="record-fact">SDOT project manager Nicole Willis emails a resident directly with a written promise: the concrete sidewalk on 22nd Ave S will be complete &ldquo;by the time the new Judkins Park sound transit station opens in spring of 2023.&rdquo; That station opens in April 2023. No sidewalk is built.<button class="record-evidence" data-img="imgs/DOT_C247504_01_00014.png" data-cap="Nicole Willis (SDOT) to a resident &middot; Oct 15, 2021 &middot; Public records request C247504 &mdash; DOT_C247504_01_00014" data-alt="Email from SDOT project manager Nicole Willis to a resident, Oct 15, 2021, promising a new sidewalk on 22nd Ave S">View the email &rarr;</button></div>
-      </div>
-      <div class="record-row">
-        <div class="record-date">Nov 22, 2021</div>
-        <div class="record-fact">Seattle City Council adopts the 2022 budget (Ordinance 126490). Included: CM Morales&rsquo; Council Budget Action SDOT-105-B-001 &mdash; $2 million of REET I funds added to SDOT&rsquo;s Pedestrian Master Plan &ndash; New Sidewalks project. The proviso legally restricts the $2 million solely to new sidewalk construction in District 2. The Council&rsquo;s stated intent is unambiguous: 22nd Ave S &mdash; between S College St and S Bayview St &mdash; is named first priority. SDOT will later argue the proviso doesn&rsquo;t require it. The SDOT promise to the resident came five weeks earlier. <em>(C.F. 314488, pp. 334&ndash;335 &mdash; <a href="https://seattle.legistar.com/View.ashx?M=F&amp;ID=10237294&amp;GUID=01C34534-3400-4847-8B9F-452D159EFAB1" target="_blank" rel="noopener">view the full clerk file</a>)</em><button class="record-evidence" data-pdf="imgs/CF-314488_pages-334-335.PDF" data-cap="Council Budget Action SDOT-105-B-001 &middot; C.F. 314488, pp. 334&ndash;335 &mdash; the proviso &amp; statement of legislative intent">View the proviso &rarr;</button></div>
-      </div>
-      <div class="record-row">
-        <div class="record-date">Jun 6, 2023</div>
-        <div class="record-fact">A resident writes SDOT after witnessing a post-collision rescue extrication at 22nd and College, the intersection her children cross every school day. She is checking on the timeline.</div>
-      </div>
-      <div class="record-row notable">
-        <div class="record-date">Jul 3, 2023</div>
-        <div class="record-fact">Twenty-seven days later, Burgesser replies: the project is cancelled. Grades too steep. Too expensive. He does not mention the $2 million. He does not explain where the funds went.<button class="record-evidence" data-img="imgs/DOT_C247504_01_00013.png" data-cap="David Burgesser (SDOT) to a resident &middot; Jul 3, 2023 &middot; Public records request C247504 &mdash; DOT_C247504_01_00013" data-alt="Email from SDOT planner David Burgesser to a resident, July 3, 2023, cancelling the 22nd Ave S sidewalk project">View the email &rarr;</button></div>
-      </div>
-      <div class="record-row notable">
-        <div class="record-date">Jul 20, 2023</div>
-        <div class="record-fact">Another collision at 22nd and College involving children. That same morning, a resident and her son are nearly struck crossing College St. A neighbor is almost hit from her own driveway. She writes to Burgesser: &ldquo;I beg you to come do a walk through tour of these roads with us.&rdquo;</div>
-      </div>
-      <div class="record-row notable">
-        <div class="record-date">Jul 27, 2023</div>
-        <div class="record-fact">CM Morales&rsquo; policy director Devin Silvernail emails a neighbor to ask: &ldquo;Were those sidewalks ever installed?&rdquo; The councilmember&rsquo;s own office is learning from a neighbor &mdash; not from SDOT &mdash; that the project Morales championed and funded has been quietly cancelled.<button class="record-evidence" data-img="imgs/DOT_C247504_01_0008.png" data-cap="Devin Silvernail (Council) &amp; a resident &middot; Jul 27, 2023 &middot; Public records request C247504 &mdash; DOT_C247504_01_0008" data-alt="Email thread between CM Morales policy director Devin Silvernail and a resident, July 27, 2023">View the email &rarr;</button></div>
-      </div>
-      <div class="record-row notable">
-        <div class="record-date">Jul 31, 2023</div>
-        <div class="record-fact">CM Morales publishes a newsletter explicitly naming 22nd Ave S as the first priority for the $2 million proviso she secured. Her office had not been told the funds were redirected.</div>
-      </div>
-      <div class="record-row">
-        <div class="record-date">Sept 19, 2023</div>
-        <div class="record-fact">SDOT&rsquo;s Bill LaBorde emails Burgesser with legal cover: the streets named in CM Morales&rsquo; proviso were &ldquo;a reflection of Council&rsquo;s intent but were not line item appropriations.&rdquo; His opening line: &ldquo;Sorry about the tone of this response from [the resident].&rdquo; The email is copied to Deputy Division Director Brian Dougherty.<button class="record-evidence" data-img="imgs/DOT_C247504_01_0002.png" data-cap="Bill LaBorde to David Burgesser (internal SDOT) &middot; Sept 19, 2023 &middot; Public records request C247504 &mdash; DOT_C247504_01_0002" data-alt="Internal SDOT email from Bill LaBorde to David Burgesser, September 19, 2023, characterizing the proviso priority streets as Council intent rather than line-item appropriations">View the email &rarr;</button></div>
-      </div>
-      <div class="record-row">
-        <div class="record-date">Jun 24, 2024</div>
-        <div class="record-fact">An internal SDOT email reveals the substitute 21st Ave S walkway has stalled too &mdash; this time due to retaining wall costs. Staff ask whether future levy funds could cover the gap. No construction date is set. Residents have not been informed.<button class="record-evidence" data-img="imgs/DOT_C247504_01_00018.png" data-cap="Chris Kartheiser (internal SDOT) &middot; Jun 24, 2024 &middot; Public records request C247504 &mdash; DOT_C247504_01_00018" data-alt="Internal SDOT email, June 24, 2024, pausing the 21st Ave S walkway project due to retaining wall costs">View the email &rarr;</button></div>
-      </div>
-      <div class="record-row notable">
-        <div class="record-date">Aug 4, 2025</div>
-        <div class="record-fact">Nearly four years after the written promise, SDOT circulates 90% design plans &mdash; still only for the &ldquo;21st Ave S Low-Cost Walkway project&rdquo;: a &ldquo;new 6&ndash;8&prime; asphalt walkway with pre-cast concrete wheel stops.&rdquo; Not a sidewalk. Still not built. The downgrade chain is complete: sidewalk &rarr; walkway &rarr; paused walkway &rarr; 90% plans.<button class="record-evidence" data-img="imgs/DOT_C247504_01_00020.png" data-cap="SDOT 90% plans submittal, 21st Ave S Low-Cost Walkway &middot; Aug 4, 2025 &middot; Public records request C247504 &mdash; DOT_C247504_01_00020" data-alt="SDOT 90% design plans submittal for the 21st Ave S Low-Cost Walkway project, August 4, 2025">View the submittal &rarr;</button></div>
-      </div>
+  <!-- Pull quote (moved to where the timeline used to sit) -->
+  <div class="cream-section" style="padding-top: 3rem;">
+    <div class="prose">
+      <blockquote class="pull-quote-block" data-reveal>
+        <span class="pull-quote-mark" aria-hidden="true">&ldquo;</span>
+        <p>Hopefully we do not need to wait for another city councilmember, or another child, to be injured at 22nd and College before action is taken.</p>
+        <cite>Rachel &amp; Letha, letter to SDOT Director Spotts, September 19, 2023</cite>
+      </blockquote>
     </div>
   </div>
 
@@ -1520,13 +1583,113 @@ body {
     </div>
   </div>
 
-  <!-- Pull quote -->
-  <div class="cream-section" style="padding-top: 3rem;">
-    <div class="prose">
-      <blockquote class="pull-quote-block" data-reveal>
-        <p>&ldquo;Hopefully we do not need to wait for another city councilmember, or another child, to be injured at 22nd and College before action is taken.&rdquo;</p>
-        <cite>&mdash; Rachel &amp; Letha, letter to SDOT Director Spotts, September 19, 2023</cite>
-      </blockquote>
+  <!-- White timeline: 22nd Ave S record (moved below the strategic management card) -->
+  <div class="betrayal-section">
+    <div class="section-card-label">From 22nd Ave S to 21st: the record of a broken promise</div>
+    <div class="record-timeline" data-reveal>
+
+      <div class="record-phase">
+        <p class="record-phase-label">The Promise</p>
+        <div class="record-card">
+          <div class="record-row">
+            <div class="record-date">Oct 15, 2021</div>
+            <div class="record-fact">SDOT project manager Nicole Willis emails a resident directly with a written promise: the concrete sidewalk on 22nd Ave S will be complete &ldquo;by the time the new Judkins Park sound transit station opens in spring of 2023.&rdquo; That station opens in April 2023. No sidewalk is built.<button class="record-evidence" data-img="imgs/DOT_C247504_01_00014.png" data-cap="Nicole Willis (SDOT) to a resident &middot; Oct 15, 2021 &middot; Public records request C247504 &mdash; DOT_C247504_01_00014" data-alt="Email from SDOT project manager Nicole Willis to a resident, Oct 15, 2021, promising a new sidewalk on 22nd Ave S">View the email &rarr;</button></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="record-phase">
+        <p class="record-phase-label">The Funding</p>
+        <div class="record-card">
+          <div class="record-row">
+            <div class="record-date">Nov 22, 2021</div>
+            <div class="record-fact">Seattle City Council adopts the 2022 budget (Ordinance 126490). Included: CM Morales&rsquo; Council Budget Action SDOT-105-B-001 &mdash; $2 million of REET I funds added to SDOT&rsquo;s Pedestrian Master Plan &ndash; New Sidewalks project. The proviso legally restricts the $2 million solely to new sidewalk construction in District 2. The Council&rsquo;s stated intent is unambiguous: 22nd Ave S &mdash; between S College St and S Bayview St &mdash; is named first priority. SDOT will later argue the proviso doesn&rsquo;t require it. The SDOT promise to the resident came five weeks earlier. <em style="font-style:normal;text-decoration:underline;">(C.F. 314488, pp. 334&ndash;335 &mdash; <a class="ext-link" href="https://seattle.legistar.com/View.ashx?M=F&amp;ID=10237294&amp;GUID=01C34534-3400-4847-8B9F-452D159EFAB1" target="_blank" rel="noopener">view the full clerk file</a>)</em><button class="record-evidence" data-pdf="imgs/CF-314488_pages-334-335.PDF" data-cap="Council Budget Action SDOT-105-B-001 &middot; C.F. 314488, pp. 334&ndash;335 &mdash; the proviso &amp; statement of legislative intent">View the proviso &rarr;</button></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="record-phase">
+        <p class="record-phase-label">The First Retreat</p>
+        <div class="record-card">
+          <div class="record-row">
+            <div class="record-date">Jun 6, 2023</div>
+            <div class="record-fact">A resident writes SDOT after witnessing a post-collision rescue extrication at 22nd and College, the intersection her children cross every school day. She is checking on the timeline.</div>
+          </div>
+          <div class="record-row">
+            <div class="record-date">Jul 3, 2023</div>
+            <div class="record-fact">Twenty-seven days later, Burgesser replies: the project is cancelled. Grades too steep. Too expensive. He does not mention the $2 million. He does not explain where the funds went.<button class="record-evidence" data-img="imgs/DOT_C247504_01_00013.png" data-cap="David Burgesser (SDOT) to a resident &middot; Jul 3, 2023 &middot; Public records request C247504 &mdash; DOT_C247504_01_00013" data-alt="Email from SDOT planner David Burgesser to a resident, July 3, 2023, cancelling the 22nd Ave S sidewalk project">View the email &rarr;</button></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="record-phase">
+        <p class="record-phase-label">The Confrontation</p>
+        <div class="record-card">
+          <div class="record-row">
+            <div class="record-date">Jul 20, 2023</div>
+            <div class="record-fact">Another collision at 22nd and College involving children. That same morning, a resident and her son are nearly struck crossing College St. A neighbor is almost hit from her own driveway. She writes to Burgesser: &ldquo;I beg you to come do a walk through tour of these roads with us.&rdquo;</div>
+          </div>
+          <div class="record-row">
+            <div class="record-date">Jul 27, 2023</div>
+            <div class="record-fact">CM Morales&rsquo; policy director Devin Silvernail emails a neighbor to ask: &ldquo;Were those sidewalks ever installed?&rdquo; The councilmember&rsquo;s own office is learning from a neighbor &mdash; not from SDOT &mdash; that the project Morales championed and funded has been quietly cancelled.<button class="record-evidence" data-img="imgs/DOT_C247504_01_0008.png" data-cap="Devin Silvernail (Council) &amp; a resident &middot; Jul 27, 2023 &middot; Public records request C247504 &mdash; DOT_C247504_01_0008" data-alt="Email thread between CM Morales policy director Devin Silvernail and a resident, July 27, 2023">View the email &rarr;</button></div>
+          </div>
+          <div class="record-row">
+            <div class="record-date">Jul 31, 2023</div>
+            <div class="record-fact">CM Morales publishes a newsletter explicitly naming 22nd Ave S as the first priority for the $2 million proviso she secured. Her office had not been told the funds were redirected.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="record-phase">
+        <p class="record-phase-label">The Deflection</p>
+        <div class="record-card">
+          <div class="record-row">
+            <div class="record-date">Sept 19, 2023</div>
+            <div class="record-fact">SDOT&rsquo;s Bill LaBorde emails Burgesser with legal cover: the streets named in CM Morales&rsquo; proviso were &ldquo;a reflection of Council&rsquo;s intent but were not line item appropriations.&rdquo; His opening line: &ldquo;Sorry about the tone of this response from [the resident].&rdquo; The email is copied to Deputy Division Director Brian Dougherty.<button class="record-evidence" data-img="imgs/DOT_C247504_01_0002.png" data-cap="Bill LaBorde to David Burgesser (internal SDOT) &middot; Sept 19, 2023 &middot; Public records request C247504 &mdash; DOT_C247504_01_0002" data-alt="Internal SDOT email from Bill LaBorde to David Burgesser, September 19, 2023, characterizing the proviso priority streets as Council intent rather than line-item appropriations">View the email &rarr;</button></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="record-phase">
+        <p class="record-phase-label">The Substitute Stalls Too</p>
+        <div class="record-card">
+          <div class="record-row">
+            <div class="record-date">Jun 24, 2024</div>
+            <div class="record-fact">An internal SDOT email reveals the substitute 21st Ave S walkway has stalled too &mdash; this time due to retaining wall costs. Staff ask whether future levy funds could cover the gap. No construction date is set. Residents have not been informed.<button class="record-evidence" data-img="imgs/DOT_C247504_01_00018.png" data-cap="Chris Kartheiser (internal SDOT) &middot; Jun 24, 2024 &middot; Public records request C247504 &mdash; DOT_C247504_01_00018" data-alt="Internal SDOT email, June 24, 2024, pausing the 21st Ave S walkway project due to retaining wall costs">View the email &rarr;</button></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="record-phase">
+        <p class="record-phase-label">Still Waiting</p>
+        <div class="record-card">
+          <div class="record-row">
+            <div class="record-date">Aug 4, 2025</div>
+            <div class="record-fact">Nearly four years after the written promise, SDOT circulates 90% design plans &mdash; still only for the &ldquo;21st Ave S Low-Cost Walkway project&rdquo;: a &ldquo;new 6&ndash;8&prime; asphalt walkway with pre-cast concrete wheel stops.&rdquo; Not a sidewalk. Still not built. The downgrade chain is complete: sidewalk &rarr; walkway &rarr; paused walkway &rarr; 90% plans.<button class="record-evidence" data-img="imgs/DOT_C247504_01_00020.png" data-cap="SDOT 90% plans submittal, 21st Ave S Low-Cost Walkway &middot; Aug 4, 2025 &middot; Public records request C247504 &mdash; DOT_C247504_01_00020" data-alt="SDOT 90% design plans submittal for the 21st Ave S Low-Cost Walkway project, August 4, 2025">View the submittal &rarr;</button></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="record-phase">
+        <p class="record-phase-label">The Quiet Concession</p>
+        <div class="record-card">
+          <div class="record-row">
+            <div class="record-date">Nov 7, 2025</div>
+            <div class="record-fact">In a phone call, SDOT Deputy Division Director Brian Dougherty tells a 21st Ave S resident that SDOT would not oppose permanent concrete sidewalks if the community escalates the request to City Council. The cost and engineering reasons SDOT had cited on the record were not, in the end, the obstacle.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="record-phase">
+        <p class="record-phase-label">The Money Moved On</p>
+        <div class="record-card">
+          <div class="record-row">
+            <div class="record-date">FY 2026</div>
+            <div class="record-fact">The $2 million in REET I funds no longer appears in the project&rsquo;s 2026 budget for Pedestrian Master Plan &ndash; New Sidewalks (MC-TR-C058). The project now runs on other sources, including a separate $2 million Transportation Fund allocation &mdash; a different fund from the REET I dollars the Council restricted to District 2 sidewalks. The city has not explained, on the record, where the original $2 million went. <em style="font-style:normal;text-decoration:underline;">(<a class="ext-link" href="https://openbudget.seattle.gov/#!/year/2026/capital/0/projecttitle/MC-TR-C058/0/fundname?vis=barChart" target="_blank" rel="noopener">Seattle Open Budget &mdash; MC-TR-C058, FY2026 fund breakdown</a>)</em></div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -1549,7 +1712,8 @@ body {
 
   <div class="cream-section">
     <div class="prose" data-reveal>
-      <p>The community&rsquo;s first official notice of any project on 21st Ave S arrived in May 2025 &mdash; a construction notice, printed in five languages, announcing what had been decided.</p>
+      <p>Residents asked first. In January 2023, neighbors near 21st Ave S and S College St contacted SDOT about sidewalk improvements. An SDOT planner logged their information and decided to wait: the agency would reach out, he wrote, once it was &ldquo;ready to share information about the project.&rdquo;</p>
+      <p>The community&rsquo;s first official notice came more than two years later, in May 2025: a construction notice, printed in five languages, announcing what had already been decided.</p>
       <p>The scope had been locked 22 months earlier.</p>
     </div>
 
@@ -1560,7 +1724,7 @@ body {
       </div>
       <div class="budget-item">
         <div class="budget-amt">$1.5M</div>
-        <div class="budget-label">SDOT&rsquo;s own estimate for a concrete sidewalk on 22nd Ave S &mdash; deemed too large a share of the proviso for a single project</div>
+        <div class="budget-label">SDOT&rsquo;s own estimate for a concrete sidewalk on 22nd Ave S, which the agency called too large a share of the proviso for one project</div>
       </div>
       <div class="budget-item current">
         <div class="budget-amt">$350K</div>
@@ -1571,7 +1735,7 @@ body {
     <div class="prose" data-reveal>
       <p>What $350,000 builds: a 6-foot asphalt path on the west side of the street only. Precast concrete wheel stops in place of curbs. No concrete. No coverage on the east side, where many students approach from Rainier Ave.</p>
       <p>Internally, SDOT calls this project &ldquo;Low-Cost Walkway.&rdquo; The community has not called it that.</p>
-      <p>There is a nearby precedent that worries residents. S Kenyon St in South Beacon Hill received a similar asphalt quick-build in 2021. It is already deteriorating. Wheel stops are being swallowed by weeds.</p>
+      <p>Residents point to a nearby precedent. S Kenyon St in South Beacon Hill got the same kind of asphalt quick-build in 2016, and it&rsquo;s already failing. The wheel stops are disappearing into the weeds.</p>
     </div>
 
     <div class="kenyon-compare" data-reveal>
@@ -1594,7 +1758,7 @@ body {
       </div>
       <div class="stat-trio-item">
         <div class="stat-trio-num">88%</div>
-        <div class="stat-trio-label">feel unsafe or very unsafe walking the street today &mdash; 51 of 58 residents</div>
+        <div class="stat-trio-label">feel unsafe or very unsafe walking the street today (51 of 58 residents)</div>
         <div class="stat-trio-source">Community survey &middot; Feb 2026</div>
       </div>
       <div class="stat-trio-item">
@@ -1612,7 +1776,7 @@ body {
     <div class="unanswered" data-reveal>
       <p class="unanswered-q">Once this project is complete, will SDOT consider the pedestrian infrastructure need for this block permanently solved?</p>
       <p class="unanswered-note">SDOT project lead Madeline McCort was asked this directly in writing on April 29, 2026. The question was not answered.</p>
-      <p class="unanswered-note" style="margin-top:0.65rem;">The same question had appeared internally a year earlier &mdash; flagged by SDOT&rsquo;s own design reviewers in comments on the 90% engineering plans, summer 2025. There is no record of a response.</p>
+      <p class="unanswered-note" style="margin-top:0.65rem;">The same question had come up internally a year earlier. SDOT&rsquo;s own design reviewers flagged it in comments on the 90% engineering plans, summer 2025. There is no record of a response.</p>
     </div>
   </div>
 
@@ -1663,7 +1827,7 @@ body {
     </div>
 
     <div class="stat-pull" data-reveal>
-      <div class="stat-pull-num">20<span style="font-size:0.45em;vertical-align:super;opacity:0.4">/24</span></div>
+      <div class="stat-pull-num">20<span style="font-size:40px;font-weight:400;vertical-align:super;opacity:0.4">/24</span></div>
       <div class="stat-pull-label">priority score &mdash; nearly double the citywide average of 10.4. Equity score: 12 of 12.</div>
       <div class="stat-pull-source">SDOT sidewalk prioritization data</div>
     </div>
@@ -1679,7 +1843,7 @@ body {
 <div class="pinned-debt" id="pinned-debt">
   <div class="debt-divider">
     <div class="debt-divider-inner">
-      <p class="ch-eyebrow" style="color:rgba(245,240,232,0.5); margin-bottom:1.25rem;">Construction scheduled</p>
+      <p class="ch-eyebrow" style="color:rgba(255,255,255,0.5); margin-bottom:1.25rem;">Construction scheduled</p>
       <p class="debt-statement"><span class="hl">August 2026.</span> The window to change what gets built is closing.</p>
     </div>
   </div>
@@ -1694,33 +1858,11 @@ body {
   <div class="ask-dark">
     <div class="ask-inner">
 
-      <span class="ask-eyebrow">The Ask &middot; 2026</span>
+      <span class="ask-eyebrow">Beyond One Block &middot; 2026</span>
 
       <div class="prose" data-reveal>
-        <p style="font-family:'Public Sans',sans-serif; font-size:clamp(1.4rem,2.6vw,2rem); line-height:1.4; color:var(--cream); font-weight:400; margin:0 0 2.5rem">In November 2025, SDOT Deputy Division Director Brian Dougherty told a 21st Ave S resident by phone on November 7, 2025, that SDOT would not oppose permanent concrete sidewalks if the community escalated to City Council.</p>
-      </div>
-
-      <div class="ask-items" data-reveal>
-        <div class="ask-item">
-          <div class="ask-num">01</div>
-          <div class="ask-text">
-            <strong>CM Eddie Lin should go on record</strong> that the city&rsquo;s obligation is permanent concrete sidewalks on both sides of 21st Ave S &mdash; and require SDOT to demonstrate in writing how the asphalt plan builds toward that goal, or acknowledge that it does not.
-          </div>
-        </div>
-        <div class="ask-item">
-          <div class="ask-num">02</div>
-          <div class="ask-text">
-            <strong>Keep 21st Ave S on the city&rsquo;s active infrastructure agenda.</strong> When asphalt is poured, this block should not be filed as complete. The east side has no solution. The community has not accepted the west side plan.
-          </div>
-        </div>
-      </div>
-
-      <div class="debt-close" data-reveal>
-        <p class="debt-close-text">
-          <span class="debt-close-em">This is not a subsidy.</span><br>
-          <span class="debt-close-em">It is a debt.</span><br><br>
-          <span class="debt-close-em">130 years.</span> One block. Half a street.
-        </p>
+        <p style="font-family:'Fustat',sans-serif; font-size:clamp(1.4rem,2.6vw,2rem); line-height:1.4; color:var(--surface); font-weight:400; margin:0 0 2.5rem">This is one block, and it sits inside a citywide pattern of disinvestment. Across south Seattle, the streets still missing sidewalks line up with the areas the city redlined in the 1930s. What makes 21st Ave S worth a closer look is that the paper trail survived. The budget line names the street. A written promise went to a resident. An internal SDOT email later walked it back.</p>
+        <p style="font-family:'Fustat',sans-serif; font-size:clamp(1.4rem,2.6vw,2rem); line-height:1.4; color:var(--surface); font-weight:400; margin:0">The city has never answered the question that record raises. The Council named this street in the 2022 budget and set aside $2 million for it. By 2026 that money is no longer in the project&rsquo;s budget, and no one at the city has explained where it went. The councilmember who wrote the proviso backed it. Four years later it still isn&rsquo;t built. So what is happening on the blocks where no one kept the emails?</p>
       </div>
 
     </div>
@@ -1746,6 +1888,8 @@ const ch3Stats      = [...document.querySelectorAll('[data-ch3-stat]')];
 const ch4Stats      = [...document.querySelectorAll('[data-ch4-stat]')];
 const ch5Stats      = [...document.querySelectorAll('[data-ch5-stat]')];
 const ch6Stats      = [...document.querySelectorAll('[data-ch6-stat]')];
+const covItems      = [...document.querySelectorAll('.cov-item')];
+const reduceMotion  = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const scrollCue     = document.getElementById('scroll-cue');
 const heroScrim     = document.getElementById('hero-scrim');
 const heroStepBlock = document.getElementById('hero-step-block');
@@ -1788,6 +1932,14 @@ window.addEventListener('scroll', () => {
   chStats.forEach(el => {
     const threshold = parseFloat(el.dataset.chStat);
     if (ch2Progress >= threshold && !el.classList.contains('on')) el.classList.add('on');
+  });
+  // ch2 scattered covenant clippings — subtle scroll-driven float
+  covItems.forEach(it => {
+    if (ch2Progress > 0.01) it.classList.add('vis');
+    if (reduceMotion) return;
+    const f = parseFloat(it.dataset.float) || 0;
+    const r = parseFloat(it.dataset.rot) || 0;
+    it.style.transform = `translate3d(0, ${(ch2Progress - 0.5) * f * 0.4}px, 0) rotate(${r}deg)`;
   });
 
   // ch3 pinned header
@@ -1991,7 +2143,7 @@ revealEls.forEach(el => revealObs.observe(el));
   }
 
   const C_MUTED   = 'rgba(24,20,14,0.12)';
-  const C_EQUITY  = 'rgba(195,150,75,0.9)';
+  const C_EQUITY  = 'rgba(226,75,74,0.9)';
   const C_SCHOOL  = 'rgba(45,145,120,0.9)';
   const C_DENSE   = 'rgba(110,85,170,0.9)';
   const C_TRANSIT = 'rgba(55,125,200,0.9)';
@@ -2046,10 +2198,10 @@ revealEls.forEach(el => revealObs.observe(el));
     DIST_DISPLAY.forEach(dist => {
       const dimmed = focusD && dist.d !== focusD;
       ctx.globalAlpha = dimmed ? 0.1 : (alpha != null ? alpha : 1);
-      ctx.font = '600 12px "Public Sans",system-ui,sans-serif';
+      ctx.font = '600 12px "Fustat",system-ui,sans-serif';
       ctx.fillStyle = 'rgba(24,20,14,0.75)';
       ctx.fillText(dist.name, dist.col_x, dist.band_top_b + 18);
-      ctx.font = '400 12px "Public Sans",system-ui,sans-serif';
+      ctx.font = '400 12px "Fustat",system-ui,sans-serif';
       ctx.fillStyle = 'rgba(24,20,14,0.38)';
       wrapText(ctx, dist.hoods, dist.col_x, dist.band_top_b + 36, COL_W - 4, 14);
     });
@@ -2270,38 +2422,6 @@ revealEls.forEach(el => revealObs.observe(el));
     };
   };
 })();
-
-// ── CHAPTER NAV ──────────────────────────────────
-const chNav      = document.getElementById('ch-nav');
-const chNavLabel = document.getElementById('ch-nav-label');
-const chNavTitle = document.getElementById('ch-nav-title');
-
-const chapters = [
-  { id: 'ch1',     label: 'Chapter 1', title: 'The Street' },
-  { id: 'ch2',     label: 'Chapter 2', title: 'How They Got Here' },
-  { id: 'ch3',     label: 'Chapter 3', title: 'What the Gap Costs' },
-  { id: 'dotgrid',    label: '',          title: '' },
-  { id: 'map-reveal', label: '',          title: '' },
-  { id: 'ch4',     label: 'Chapter 4', title: 'The Community That Kept the Record' },
-  { id: 'ch5',     label: 'Chapter 5', title: 'What $350,000 Buys' },
-  { id: 'ch6',     label: 'Chapter 6', title: 'The Levy' },
-  { id: 'ch7',     label: 'Chapter 7', title: 'The Ask' },
-];
-
-const chObs = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      const meta = chapters.find(c => c.id === e.target.id);
-      if (meta && meta.label) {
-        chNavLabel.textContent = meta.label;
-        chNavTitle.textContent = meta.title;
-        chNav.classList.add('on');
-      }
-    }
-  });
-}, { threshold: 0.15, rootMargin: '-15% 0px -70% 0px' });
-
-document.querySelectorAll('section[id]').forEach(el => chObs.observe(el));
 
 // ── DOT GRID STEP OBSERVER ────────────────────────
 // (Hero text entrance is scroll-driven — see heroStepBlock in scroll handler)
@@ -2573,7 +2693,7 @@ mapSteps.forEach(s => mapStepObs.observe(s));
         fCtx.globalAlpha = Math.min(1, flightRaw / 0.25);
 
         // 4 gold dots → each fans out to its own block-face on 21st Ave S
-        fCtx.fillStyle = 'rgba(200,169,110,0.95)';
+        fCtx.fillStyle = 'rgba(226,75,74,0.95)';
         fCtx.beginPath();
         for (let i = 0; i < N_SEGS; i++) {
           const [sx, sy] = startDots.gold[i] || startDots.gold[0];
@@ -2618,7 +2738,7 @@ mapSteps.forEach(s => mapStepObs.observe(s));
       oCtx.lineTo(px, pyWalker + totalH * ease(p));
       oCtx.stroke();
     }
-    drawGrowingLine(px21, 200, 169, 110, LINE21_START, LINE21_END);
+    drawGrowingLine(px21, 226, 75, 74, LINE21_START, LINE21_END);
     drawGrowingLine(px22, 24,  20,  14,  LINE22_START, LINE22_END);
 
     // 4 anchor dots per street — each marks one block-face sidewalk segment
@@ -2632,7 +2752,7 @@ mapSteps.forEach(s => mapStepObs.observe(s));
       }
       oCtx.fill();
     }
-    drawSegmentDots(px21, 'rgba(200,169,110,0.95)');
+    drawSegmentDots(px21, 'rgba(226,75,74,0.95)');
     drawSegmentDots(px22, 'rgba(24,20,14,0.95)');
   }
 
@@ -2715,5 +2835,187 @@ document.addEventListener('DOMContentLoaded', () => {
     <figcaption class="lightbox-caption"></figcaption>
   </figure>
 </div>
+
+<!-- ============================================================= -->
+<!-- HIDDEN STYLE GUIDE — open by visiting  index.html#styleguide  -->
+<!-- Pulls colors + body scale live from :root tokens.             -->
+<!-- ============================================================= -->
+<style>
+  #styleguide { display:none; position:fixed; inset:0; z-index:9999; overflow-y:auto;
+    background:var(--surface); color:var(--ink); font-family:'Fustat',sans-serif;
+    padding:4rem 2rem 6rem; }
+  #styleguide .sg-wrap { max-width:920px; margin:0 auto; }
+  #styleguide .sg-title { font-family:'VTC Martin','Fustat',sans-serif; text-transform:uppercase;
+    font-size:clamp(3rem,6.4vw,5rem); line-height:0.80; margin:0 0 0.4rem; }
+  #styleguide .sg-lead { color:var(--ink-muted); font-size:13px; line-height:1.6; max-width:46ch; margin:0 0 2rem; }
+  #styleguide .sg-lead code { background:rgba(0,0,0,0.06); padding:1px 5px; border-radius:4px; }
+  #styleguide .sg-h { font-size:10px; font-weight:700; letter-spacing:0.16em; text-transform:uppercase;
+    color:var(--ink-muted); border-top:1px solid var(--rule); padding-top:1rem; margin:2.75rem 0 1.25rem; }
+  #styleguide .sg-row { display:grid; grid-template-columns:1fr 240px; gap:2rem; align-items:baseline;
+    padding:1.1rem 0; border-bottom:1px solid var(--rule); }
+  #styleguide .sg-spec { font-size:11px; line-height:1.65; color:var(--ink-muted); font-variant-numeric:tabular-nums; }
+  #styleguide .sg-spec b { color:var(--ink); font-weight:600; }
+  #styleguide .sg-spec i { color:var(--ink-soft); font-style:normal; }
+  #styleguide .sg-swatches { display:flex; flex-wrap:wrap; gap:0.9rem; }
+  #styleguide .sg-sw { width:118px; }
+  #styleguide .sg-chip { height:56px; border-radius:6px; border:1px solid rgba(0,0,0,0.10); }
+  #styleguide .sg-sw .n { font-size:11px; font-weight:600; margin-top:0.45rem; }
+  #styleguide .sg-sw .v { font-size:10px; color:var(--ink-muted); letter-spacing:0.04em; text-transform:uppercase; }
+  /* live specimens — reuse the real tiers so the guide can't drift */
+  #styleguide .s-display { font-family:'VTC Martin','Fustat',sans-serif; text-transform:uppercase;
+    font-size:clamp(3rem,6.4vw,5rem); line-height:0.80; margin:0; }
+  #styleguide .s-statement { font-family:'Fustat',sans-serif; font-weight:400;
+    font-size:clamp(2.1rem,4.6vw,3.2rem); line-height:1.3; margin:0; }
+  #styleguide .s-stat { font-family:'Fustat',sans-serif; font-weight:400; font-size:3rem; line-height:1; margin:0; }
+  #styleguide .s-body { font-size:var(--body-size); line-height:var(--body-lh); color:var(--ink-soft); max-width:44ch; margin:0; }
+  #styleguide .s-serif { font-family:var(--serif); font-size:var(--testimony-size); line-height:var(--testimony-lh); max-width:44ch; margin:0; }
+  #styleguide .s-support { font-size:12px; line-height:1.6; color:var(--ink-muted); max-width:44ch; margin:0; }
+  #styleguide .s-eyebrow { font-size:10px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink-muted); margin:0; }
+  #styleguide .sg-close { position:fixed; top:1.25rem; right:1.5rem; font-size:11px; letter-spacing:0.12em;
+    text-transform:uppercase; color:var(--ink-muted); text-decoration:none; border:1px solid var(--rule);
+    padding:0.55rem 0.95rem; border-radius:999px; background:var(--surface); }
+  /* consolidation callout */
+  #styleguide .sg-note { font-size:12px; line-height:1.55; color:var(--red); border-left:2px solid var(--red);
+    padding:0.15rem 0 0.15rem 0.85rem; margin:0.25rem 0 1.5rem; max-width:62ch; }
+  #styleguide .sg-note b { font-weight:600; }
+  /* compact comparison table for label/caption clusters */
+  #styleguide .sg-tbl { width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums; }
+  #styleguide .sg-tbl th { text-align:left; font-size:9px; font-weight:700; letter-spacing:0.12em;
+    text-transform:uppercase; color:var(--ink-muted); padding:0 1rem 0.6rem 0; border-bottom:1px solid var(--rule); }
+  #styleguide .sg-tbl td { padding:0.7rem 1rem 0.7rem 0; border-bottom:1px solid var(--rule); vertical-align:baseline; }
+  #styleguide .sg-tbl .c-spec { font-size:11px; color:var(--ink-muted); white-space:nowrap; }
+  #styleguide .sg-tbl .c-spec b { color:var(--ink); font-weight:600; }
+  #styleguide .sg-tbl .c-cls { font-size:10.5px; color:var(--ink-soft); font-family:ui-monospace,Menlo,monospace; }
+  @media (max-width:680px){ #styleguide .sg-row{ grid-template-columns:1fr; gap:0.75rem; }
+    #styleguide .sg-tbl .c-cls{ display:none; } }
+</style>
+<section id="styleguide" aria-label="Style guide">
+  <a class="sg-close" href="#">Close &times;</a>
+  <div class="sg-wrap">
+    <h1 class="sg-title">Style&nbsp;Guide</h1>
+    <p class="sg-lead">21st&nbsp;Ave&nbsp;S — living type &amp; color reference. Open any time at <code>#styleguide</code>. Colors and the body scale are read live from the page&rsquo;s <code>:root</code> tokens, so this stays in sync.</p>
+
+    <h2 class="sg-h">Color tokens</h2>
+    <div class="sg-swatches" id="sg-swatches"></div>
+
+    <p class="sg-lead" style="margin-top:0.5rem;">Full type inventory &mdash; every distinct treatment currently on the page, grouped so near-duplicates sit together. Clusters flagged in <span style="color:var(--red)">red</span> are consolidation candidates.</p>
+
+    <!-- 1 ─ DISPLAY ───────────────────────────────── -->
+    <h2 class="sg-h">1 &middot; Display &middot; VTC Martin</h2>
+    <div class="sg-row">
+      <p style="font-family:'VTC Martin','Fustat',sans-serif;text-transform:uppercase;font-size:clamp(3rem,6.4vw,5rem);line-height:0.80;margin:0;">What&nbsp;$350,000&nbsp;buys</p>
+      <p class="sg-spec"><b>VTC Martin</b> &middot; 400<br>clamp(3rem, 6.4vw, 5rem)<br>48&ndash;80px &middot; line-height 0.80<br>uppercase<br><i>.step-quote, .ch-divider h2 &amp; all chapter dividers</i></p>
+    </div>
+
+    <!-- 2 ─ STATEMENTS ────────────────────────────── -->
+    <h2 class="sg-h">2 &middot; Large statements &middot; Fustat 400</h2>
+    <p class="sg-note">Three treatments, all Fustat&nbsp;400. <b>.dp-statement</b> and <b>.debt-statement</b> are the same 41px and differ only in line-height (1.13 vs 1.30) &mdash; collapse to one. <b>.prose&nbsp;(large)</b> at 23px is a distinct mid-tier.</p>
+    <div class="sg-row">
+      <p style="font-family:'Fustat',sans-serif;font-weight:400;font-size:41px;line-height:1.13;margin:0;">In August 2026, Seattle plans to pour asphalt on a street it promised concrete.</p>
+      <p class="sg-spec"><b>Fustat</b> &middot; 400<br>41px &middot; line-height 1.13<br><i>.dp-statement</i></p>
+    </div>
+    <div class="sg-row">
+      <p style="font-family:'Fustat',sans-serif;font-weight:400;font-size:41px;line-height:1.30;margin:0;">The window to change what gets built is closing.</p>
+      <p class="sg-spec"><b>Fustat</b> &middot; 400<br>41px &middot; line-height 1.30<br><i>.debt-statement</i></p>
+    </div>
+    <div class="sg-row">
+      <p style="font-family:'Fustat',sans-serif;font-weight:400;font-size:23px;line-height:1.4;margin:0;">This is one block, and it sits inside a city that has redlined, divided, and underbuilt for a century.</p>
+      <p class="sg-spec"><b>Fustat</b> &middot; 400<br>&asymp;23px (fluid) &middot; line-height 1.4<br><i>.prose p (lead size)</i></p>
+    </div>
+
+    <!-- 3 ─ DATA ──────────────────────────────────── -->
+    <h2 class="sg-h">3 &middot; Data numbers &middot; Fustat</h2>
+    <p class="sg-note"><b>Collapsed:</b> the <b>/24</b> denominator, <b>.stat-trio-num</b> and <b>.budget-amt</b> &mdash; three prior sizes across two weights &mdash; now share one step: <b>400 &middot; 40px</b>. Remaining one-offs: <code>.stat-num</code> (display) and <code>.eq-pct</code> (inline).</p>
+    <table class="sg-tbl">
+      <thead><tr><th>Specimen</th><th>Spec</th><th>Class</th></tr></thead>
+      <tbody>
+        <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:400;font-size:48px;line-height:1;">130+</span></td><td class="c-spec"><b>400</b> &middot; &asymp;63px &middot; lh&nbsp;1.0</td><td class="c-cls">.stat-num</td></tr>
+        <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:400;font-size:40px;line-height:1;">/24</span></td><td class="c-spec"><b>400</b> &middot; 40px</td><td class="c-cls">stat denominator</td></tr>
+        <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:400;font-size:40px;line-height:1;">88%</span></td><td class="c-spec"><b>400</b> &middot; 40px</td><td class="c-cls">.stat-trio-num</td></tr>
+        <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:400;font-size:40px;line-height:1;">$2M</span></td><td class="c-spec"><b>400</b> &middot; 40px</td><td class="c-cls">.budget-amt</td></tr>
+        <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:600;font-size:13px;line-height:1.7;">17%</span></td><td class="c-spec"><b>600</b> &middot; 13px</td><td class="c-cls">.eq-pct</td></tr>
+      </tbody>
+    </table>
+
+    <!-- 4 ─ BODY ──────────────────────────────────── -->
+    <h2 class="sg-h">4 &middot; Body &middot; Fustat &middot; unified 15px / 1.7</h2>
+    <div class="sg-row">
+      <p style="font-family:'Fustat',sans-serif;font-size:var(--body-size);line-height:var(--body-lh);color:var(--ink-soft);max-width:48ch;margin:0;">Seattle&rsquo;s neighborhoods were not shaped by accident. For decades, racial covenants and redlining steered families of color into a handful of districts. <strong style="font-weight:500;">Weight 500 emphasis</strong> and <strong style="font-weight:600;">weight 600 emphasis</strong> share the same size and line-height.</p>
+      <p class="sg-spec"><b>Fustat</b> &middot; 400 / 500 / 600<br>var(--body-size) = <b id="sg-bodysize"></b><br>var(--body-lh) = <b id="sg-bodylh"></b><br><i>.prose, .record-fact, .tl-body, .stat-pull-label</i></p>
+    </div>
+
+    <!-- 5 ─ SERIF ─────────────────────────────────── -->
+    <h2 class="sg-h">5 &middot; Serif testimony &middot; Besley</h2>
+    <p class="sg-note" style="color:var(--ink-soft);border-color:var(--ink-muted);"><b>Collapsed:</b> 6 prior treatments &rarr; <b>one</b>. A single upright Besley token &mdash; no italic anywhere. Shares <code>--serif</code>, <code>--testimony-size</code> (24px), <code>--testimony-lh</code> (1.4). Covers <code>.sandi-text, .strategic-text, .pull-quote-block p, .unanswered-q</code>. (<code>.managed-text</code> / <code>.voice-quote</code> are defined but unused &mdash; dead CSS.)</p>
+    <div class="sg-row">
+      <p style="font-family:var(--serif);font-size:var(--testimony-size);line-height:var(--testimony-lh);max-width:46ch;margin:0;">In the decades after her family moved in, the neighborhood changed around them &mdash; but the sidewalk never came.</p>
+      <p class="sg-spec"><b>Besley</b> &middot; 400 (upright only)<br>var(--testimony-size) = 24px<br>var(--testimony-lh) = 1.4<br><i>serif testimony</i></p>
+    </div>
+
+    <!-- 6 ─ SECONDARY TEXT ────────────────────────── -->
+    <h2 class="sg-h">6 &middot; Secondary text &middot; Fustat 11.5&ndash;19.7px</h2>
+    <p class="sg-note">Seven treatments between body and caption sizes. <b>.stat-label</b>, <b>.cov-row</b>, <b>.sandi-sub</b> are all 13px and differ only in line-height; <b>.budget-label</b> and <b>.unanswered-note</b> are both 11.5px/400. Strong candidate to collapse to ~2 sub-body sizes.</p>
+    <table class="sg-tbl">
+      <thead><tr><th>Specimen</th><th>Spec</th><th>Class</th></tr></thead>
+      <tbody>
+        <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:600;font-size:19.7px;line-height:1.4;">They were managed, not consulted.</span></td><td class="c-spec"><b>600</b> &middot; 19.7px &middot; lh&nbsp;1.4</td><td class="c-cls">.managed-kicker</td></tr>
+        <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:400;font-size:17.6px;line-height:1.2;">The current fight.</span></td><td class="c-spec"><b>400</b> &middot; 17.6px &middot; lh&nbsp;1.2</td><td class="c-cls">.map-headline, .dg-step-sentence</td></tr>
+        <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:400;font-size:13px;line-height:1.5;">years this block has waited</span></td><td class="c-spec"><b>400</b> &middot; 13px &middot; lh&nbsp;1.5</td><td class="c-cls">.stat-label</td></tr>
+        <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:400;font-size:13px;line-height:1.7;">North Seattle</span></td><td class="c-spec"><b>400/500</b> &middot; 13px &middot; lh&nbsp;1.7</td><td class="c-cls">.cov-row</td></tr>
+        <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:400;font-size:13px;line-height:1.75;">When public investment is withheld&hellip;</span></td><td class="c-spec"><b>400</b> &middot; 13px &middot; lh&nbsp;1.75</td><td class="c-cls">.sandi-sub</td></tr>
+        <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:400;font-size:12px;line-height:1.55;">A 2016 low-cost sidewalk project&hellip;</span></td><td class="c-spec"><b>400</b> &middot; 12px</td><td class="c-cls">.kenyon-compare-caption, .eq-approx</td></tr>
+        <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:400;font-size:11.5px;line-height:1.55;">2022 Council proviso, restricted to D2&hellip;</span></td><td class="c-spec"><b>400</b> &middot; 11.5px</td><td class="c-cls">.budget-label, .unanswered-note</td></tr>
+      </tbody>
+    </table>
+
+    <!-- 7 ─ CAPTIONS & CITES ──────────────────────── -->
+    <h2 class="sg-h">7 &middot; Captions &amp; cites &middot; Fustat 10&ndash;11px</h2>
+    <p class="sg-note"><b>.step-cite</b> and <b>.doc-receipt-caption</b> are uppercase; <b>.dg-step-caption</b> is sentence-case. Three near-identical small captions.</p>
+    <table class="sg-tbl">
+      <thead><tr><th>Specimen</th><th>Spec</th><th>Class</th></tr></thead>
+      <tbody>
+        <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:500;font-size:11px;line-height:1.7;letter-spacing:0.09em;text-transform:uppercase;">&mdash; Letha, resident</span></td><td class="c-spec"><b>500</b> &middot; 11px &middot; 0.09em &middot; UC</td><td class="c-cls">.step-cite</td></tr>
+        <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:400;font-size:11px;line-height:1.5;letter-spacing:0.02em;">Each dot is one missing segment.</span></td><td class="c-spec"><b>400</b> &middot; 11px &middot; 0.02em</td><td class="c-cls">.dg-step-caption</td></tr>
+        <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:500;font-size:10.5px;line-height:1.7;letter-spacing:0.08em;text-transform:uppercase;">Restrictive covenant language</span></td><td class="c-spec"><b>500</b> &middot; 10.5px &middot; 0.08em &middot; UC</td><td class="c-cls">.doc-receipt-caption</td></tr>
+      </tbody>
+    </table>
+
+    <!-- 8 ─ MICRO LABELS / EYEBROWS ───────────────── -->
+    <h2 class="sg-h">8 &middot; Micro labels / eyebrows &middot; Fustat uppercase</h2>
+    <p class="sg-note" style="color:var(--ink-soft);border-color:var(--ink-muted);"><b>Collapsed:</b> 11 prior treatments &rarr; <b>two</b>. Both share <code>--label-size</code> (10px) and <code>--label-track</code> (0.12em); the only difference is weight. 500 covers <code>.step-eyebrow, .ch-eyebrow, .scroll-cue-label, .eq-label, .stat-trio-source, .cov-hd, .pull-quote cite</code>; 700 covers <code>.section-card-label, .map-street-label, .record-date, .kenyon-compare-year</code>.</p>
+    <table class="sg-tbl">
+      <thead><tr><th>Specimen</th><th>Spec</th><th>Role</th></tr></thead>
+      <tbody>
+        <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:500;font-size:var(--label-size);letter-spacing:var(--label-track);text-transform:uppercase;">21st Ave S &middot; North Beacon Hill</span></td><td class="c-spec"><b>500</b> &middot; 10px &middot; 0.12em</td><td class="c-cls">eyebrow</td></tr>
+        <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:700;font-size:var(--label-size);letter-spacing:var(--label-track);text-transform:uppercase;">The record of a broken promise</span></td><td class="c-spec"><b>700</b> &middot; 10px &middot; 0.12em</td><td class="c-cls">label</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+<script>
+(function () {
+  var sg = document.getElementById('styleguide');
+  if (!sg) return;
+  function sync() { sg.style.display = (location.hash === '#styleguide') ? 'block' : 'none'; }
+  window.addEventListener('hashchange', sync);
+
+  // Color swatches built from the live :root tokens
+  var tokens = ['--surface','--ink','--ink-soft','--ink-muted','--rule','--red','--red-pale'];
+  var cs = getComputedStyle(document.documentElement);
+  var wrap = document.getElementById('sg-swatches');
+  tokens.forEach(function (t) {
+    var v = cs.getPropertyValue(t).trim();
+    var d = document.createElement('div');
+    d.className = 'sg-sw';
+    d.innerHTML = '<div class="sg-chip" style="background:' + v + '"></div>' +
+                  '<div class="n">' + t + '</div><div class="v">' + v + '</div>';
+    wrap.appendChild(d);
+  });
+  document.getElementById('sg-bodysize').textContent = cs.getPropertyValue('--body-size').trim();
+  document.getElementById('sg-bodylh').textContent = cs.getPropertyValue('--body-lh').trim();
+
+  sync();
+})();
+</script>
 </body>
 </html>
