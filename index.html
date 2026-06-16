@@ -145,7 +145,7 @@ body {
 .step-quote .hq-open  { margin-bottom: -0.12em; }
 .step-quote .hq-close { margin-top: 0.14em; }
 .step-cite {
-  font-size: 11px; font-weight: 500; letter-spacing: 0.09em;
+  font-size: var(--label-size); font-weight: 500; letter-spacing: var(--label-track);
   text-transform: uppercase; color: rgba(255,255,255,0.55);
 }
 
@@ -247,9 +247,11 @@ body {
   color: var(--surface); margin-bottom: 0.4rem;
 }
 .stat-num.red { color: #E24B4A; }
+/* Shared sub-body type — 13px · 400 · lh 1.7 (stat-label, cov-row, sandi-sub) */
+.stat-label, .cov-row, .sandi-sub, .dg-step-caption, .kenyon-compare-caption, .eq-approx, .unanswered-note { font-size: 13px; font-weight: 400; line-height: 1.7; }
 .stat-label {
-  font-size: 13px; color: rgba(255,255,255,0.45);
-  max-width: 160px; line-height: 1.5;
+  color: rgba(255,255,255,0.45);
+  max-width: 160px;
 }
 
 /* ── CHAPTER 2 ─────────────────────────────────── */
@@ -344,7 +346,7 @@ body {
   position: relative; z-index: 10;
 }
 .cov-grid {
-  max-width: 620px; margin: 0 auto;
+  max-width: 600px; margin: 0 auto;
   display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
 }
 .cov-col { border-radius: 8px; overflow: hidden; }
@@ -363,7 +365,7 @@ body {
 }
 .cov-row {
   display: flex; align-items: center; gap: 8px;
-  font-size: 13px; color: var(--ink-soft);
+  color: var(--ink-soft);
   padding: 0.3rem 0; border-bottom: 1px solid var(--rule);
 }
 .cov-row:last-child { border-bottom: none; }
@@ -374,7 +376,7 @@ body {
 
 /* Covenant doc quote */
 .cov-quote-section {
-  background: #FFFFFF; padding: 0 2rem 4.5rem;
+  background: #FFFFFF; padding: 0 2rem 5rem;
   position: relative; z-index: 10;
 }
 .cov-quote-inner {
@@ -409,9 +411,7 @@ body {
   color: rgba(255,255,255,0.85); margin-bottom: 1rem;
 }
 .sandi-sub {
-  font-size: 13px; line-height: 1.75;
   color: rgba(255,255,255,0.45);
-  border-top: 1px solid rgba(255,255,255,0.08);
   padding-top: 1rem; margin-top: 0.25rem;
 }
 
@@ -434,11 +434,13 @@ body {
 }
 .debt-divider-inner { max-width: min(900px, 88vw); text-align: center; margin: 0 auto; }
 .debt-statement {
-  font-family: 'Fustat', sans-serif; font-weight: 400;
-  font-size: clamp(2.1rem, 4.6vw, 3.2rem); line-height: 1.3;
-  color: var(--surface); margin: 0;
+  font-family: 'VTC Martin', 'Fustat', sans-serif; font-weight: 400;
+  font-size: clamp(3rem, 6.4vw, 5rem); line-height: 0.80;
+  text-transform: uppercase; letter-spacing: 0.005em;
+  color: var(--surface); margin: 0 auto;
+  max-width: 21.5ch; text-wrap: balance;
 }
-.debt-statement em { color: rgba(255,255,255,0.75); font-style: normal; }
+.debt-statement em { color: rgba(255,255,255,0.6); font-style: normal; }
 .debt-sub {
   font-size: var(--body-size); line-height: var(--body-lh);
   color: rgba(255,255,255,0.5); max-width: 500px;
@@ -573,9 +575,8 @@ body {
 }
 .kenyon-compare-caption {
   grid-column: 1 / -1;
-  font-size: 0.75rem; line-height: 1.55; color: var(--ink-muted);
-  border-top: 1px solid rgba(24,20,14,0.1); padding-top: 0.5rem;
-  margin-top: 0.1rem;
+  color: var(--ink-muted);
+  margin-top: 0.75rem;
 }
 
 /* ── SURVEY STAT TRIO ───────────────────────────── */
@@ -589,12 +590,13 @@ body {
   border-right: 1px solid rgba(24,20,14,0.1);
 }
 .stat-trio-item:last-child { border-right: none; }
-.stat-trio-num {
+/* Unified data figure — 400 · 40px (trio numbers, budget amounts, stat denominator) */
+.stat-figure {
   font-family: 'Fustat', sans-serif;
   font-size: 40px; font-weight: 400;
   line-height: 1; color: var(--ink); margin-bottom: 0.5rem;
 }
-.stat-trio-num.red { color: #E24B4A; }
+.stat-figure.red { color: #E24B4A; }
 .stat-trio-label {
   font-size: 12px; color: var(--ink-muted); line-height: 1.55;
 }
@@ -647,8 +649,7 @@ body {
 }
 .dg-step-sentence strong { font-weight: 600; }
 .dg-step-caption {
-  font-size: 11px; color: var(--ink-muted);
-  letter-spacing: 0.02em; line-height: 1.5;
+  color: var(--ink-muted);
 }
 
 /* ── STRATEGIC MANAGEMENT BRIDGE ───────────────── */
@@ -669,7 +670,7 @@ body {
 .strategic-text {
   font-family: var(--serif); font-style: normal;
   font-size: var(--testimony-size); line-height: var(--testimony-lh);
-  color: rgba(255,255,255,0.85); margin: 0;
+  color: #ffffff; margin: 0;
 }
 
 /* ── CHAPTER 4 ─────────────────────────────────── */
@@ -865,14 +866,6 @@ body {
   font-size: var(--testimony-size); line-height: var(--testimony-lh);
   color: rgba(255,255,255,0.82); margin-bottom: 1rem;
 }
-.managed-kicker {
-  font-family: 'Fustat', sans-serif;
-  font-size: clamp(1.1rem, 2.2vw, 1.4rem);
-  line-height: 1.4; font-weight: 600; color: var(--ink);
-  border-top: 1px solid rgba(24,20,14,0.12);
-  padding-top: 1.25rem; margin-top: 0.5rem;
-}
-
 /* ── CHAPTER 5 ─────────────────────────────────── */
 .pinned-ch5 { position: relative; height: 200vh; z-index: 10; }
 .ch5-divider {
@@ -904,7 +897,7 @@ body {
   font-size: clamp(2.1rem, 4.6vw, 3.2rem); line-height: 1.3;
   color: var(--ink);
 }
-.ch6-divider h2 em { font-style: normal; color: var(--ink-soft); }
+.ch6-divider h2 em { font-style: normal; color: rgba(24,20,14,0.42); }
 
 /* VTC Martin marker face for chapter titles */
 .ch3-divider h2, .ch4-divider h2, .ch5-divider h2, .ch6-divider h2 {
@@ -915,7 +908,11 @@ body {
 }
 
 /* Equity comparison bars */
-.equity-bars { max-width: 600px; margin: 0 auto; padding: 1rem 0 3rem; }
+.equity-bars {
+  max-width: 600px; margin: 2.5rem auto;
+  border: 1px solid rgba(24,20,14,0.1); border-radius: 8px;
+  padding: 1.75rem;
+}
 .eq-label {
   font-size: var(--label-size); font-weight: 500; letter-spacing: var(--label-track);
   text-transform: uppercase; color: var(--ink-muted); margin-bottom: 1.5rem;
@@ -942,11 +939,11 @@ body {
   font-size: 13px; font-weight: 600; color: var(--ink);
   white-space: nowrap; flex-shrink: 0; min-width: 82px;
 }
-.eq-approx { font-weight: 400; font-size: 12px; color: var(--ink-muted); }
+.eq-approx { color: var(--ink-muted); }
 .eq-note {
   font-size: 13px; line-height: 1.75; color: var(--ink-muted);
   border-top: 1px solid rgba(24,20,14,0.1);
-  padding-top: 1.25rem; margin-top: 1.5rem;
+  padding-top: 1.5rem; margin-top: 1.5rem;
 }
 .eq-note em { font-style: normal; color: var(--ink-soft); }
 
@@ -990,12 +987,7 @@ body {
 .budget-item { flex: 1; padding: 1.75rem 1.5rem; border-right: 1px solid rgba(24,20,14,0.12); }
 .budget-item:last-child { border-right: none; }
 .budget-item.current { background: rgba(226,75,74,0.05); }
-.budget-amt {
-  font-family: 'Fustat', sans-serif;
-  font-size: 40px; font-weight: 400;
-  line-height: 1; color: var(--ink); margin-bottom: 0.6rem;
-}
-.budget-item.current .budget-amt { color: #E24B4A; }
+.budget-item.current .stat-figure { color: #E24B4A; }
 .budget-label { font-size: 11.5px; color: var(--ink-muted); line-height: 1.55; }
 .budget-source {
   font-size: 10px; font-weight: 500; letter-spacing: 0.1em;
@@ -1018,7 +1010,7 @@ body {
   display: block; width: 100%; height: auto;
 }
 .doc-receipt-caption {
-  font-size: 10.5px; font-weight: 500; letter-spacing: 0.08em;
+  font-size: var(--label-size); font-weight: 500; letter-spacing: var(--label-track);
   text-transform: uppercase; color: var(--ink-muted);
   padding: 0.75rem 1.25rem; background: rgba(24,20,14,0.03);
   border-top: 1px solid rgba(24,20,14,0.08); margin: 0;
@@ -1027,16 +1019,14 @@ body {
 /* Ch5 — Unanswered question */
 .unanswered {
   max-width: 600px; margin: 2.5rem auto;
-  padding: 1.75rem 2rem;
-  background: rgba(24,20,14,0.04);
-  border-left: 3px solid rgba(24,20,14,0.18);
-  border-radius: 0 6px 6px 0;
+  border: 1px solid rgba(24,20,14,0.1); border-radius: 8px;
+  padding: 1.75rem 1.5rem;
 }
 .unanswered-q {
   font-family: var(--serif); font-style: normal;
   font-size: var(--testimony-size); line-height: var(--testimony-lh); color: var(--ink); margin-bottom: 0.75rem;
 }
-.unanswered-note { font-size: 11.5px; color: var(--ink-muted); line-height: 1.6; }
+.unanswered-note { color: var(--ink-muted); }
 
 /* Ch7 — Ask items */
 .ask-items { margin: 2.5rem 0; }
@@ -1298,7 +1288,7 @@ body {
         <div class="cov-item" data-float="-96" data-rot="0" style="left:61%; top:80%; width:clamp(180px,22vw,340px);"><img class="cov-img" src="imgs/racial-covenant_07.png" alt=""></div>
       </div>
       <div class="ch-divider-inner">
-        <p class="ch-eyebrow" data-ch-stat="0.25">Redlining &middot; 1889&ndash;1954</p>
+        <p class="ch-eyebrow" data-ch-stat="0.25">Redlining &middot; 1889&ndash;1968</p>
         <h2 data-ch-stat="0.55"><span class="hq hq-open">&ldquo;</span>No person other than<br>the Caucasian race.<span class="hq hq-close">&rdquo;</span></h2>
       </div>
     </div>
@@ -1306,7 +1296,7 @@ body {
 
   <div class="cream-section">
     <div class="prose" data-reveal>
-      <p>Seattle&rsquo;s neighborhoods were not shaped by preference. By 1889, property deeds named who could live where &mdash; most of the city legally closed to Chinese, Japanese, Filipino, Black, and Jewish families. Beacon Hill was not.</p>
+      <p>Seattle&rsquo;s neighborhoods were not shaped by preference. By 1889, property deeds were already naming who could live where, and most of the city was legally closed to Chinese, Japanese, Filipino, Black, and Jewish families. Beacon Hill was one of the few places left open to them.</p>
     </div>
   </div>
 
@@ -1346,16 +1336,11 @@ body {
     </div>
   </div>
 
-  <div class="cream-section">
-    <div class="prose" data-reveal>
-      <p>None of this was ancient history. By the early 1960s, other states had begun outlawing housing discrimination; the first did so in 1959. Seattle had the same chance in 1964 and turned it down, rejecting an open-housing ordinance by nearly two to one. It took the federal government to override the result. The Fair Housing Act of 1968 finally barred discrimination in the sale, rental, and financing of housing based on race, color, religion, and national origin.</p>
-      <p>A law did not undo a culture of discrimination. When families of color moved into whiter neighborhoods, many were met with harassment and threats meant to drive them back out. The covenants were dead on paper, but what they taught the city outlived them.</p>
-    </div>
-  </div>
-
   <div class="cream-section" style="padding-top:0">
     <div class="prose" data-reveal>
-      <p>The neighborhoods that were off-limits were being built out in the 1950s with FHA-backed mortgages and promised sidewalks. The families on 21st Ave S received neither. <strong>In 1967, Sandi&rsquo;s family moved here. There was no sidewalk. There had never been one. There still isn&rsquo;t one today.</strong></p>
+      <p>The covenants were not a brief experiment. They held for generations, and the city defended them. By the early 1960s, other states had begun outlawing housing discrimination; the first did so in 1959. Seattle had the same chance in 1964 and voted it down, rejecting an open-housing ordinance by nearly two to one. The change came only when the federal government forced it. The Fair Housing Act of 1968 barred discrimination in the sale, rental, and financing of housing on the basis of race, color, religion, and national origin.</p>
+      <p>The law could not undo the culture it inherited. When families of color moved into whiter neighborhoods, many met harassment and threats meant to drive them out. The covenants were dead on paper, but what they had taught the city outlived them.</p>
+      <p>Money and concrete followed the same lines the deeds had drawn. Through the 1950s, the neighborhoods that had been off-limits filled in with FHA-backed mortgages and new sidewalks. The families on 21st Ave S got neither. <strong>In 1967, Sandi&rsquo;s family moved here. There was no sidewalk. There had never been one. There still isn&rsquo;t one today.</strong></p>
     </div>
   </div>
 
@@ -1364,7 +1349,7 @@ body {
     <div class="sandi-card" data-reveal>
       <div class="sandi-label">Neighbor record &middot; 1967&ndash;present</div>
       <p class="sandi-text">In the decades after her family moved in, Sandi&rsquo;s father did what the city would not: he tried to organize the neighbors to fund sidewalk construction themselves. He couldn&rsquo;t get enough buy-in. The sidewalk didn&rsquo;t get built.</p>
-      <p class="sandi-sub">When public infrastructure investment is withheld from communities of color, the burden of filling that gap falls on residents themselves &mdash; through self-organized funding drives, advocacy labor, and decades of effort that change nothing. The families on 21st Ave S have paid property taxes for 40 to 60 years. Those taxes funded sidewalks in other Seattle neighborhoods &mdash; neighborhoods that were, by legal design, more accessible to white families.</p>
+      <p class="sandi-sub">When public infrastructure investment is withheld from communities of color, the burden of filling that gap falls on residents themselves: self-organized funding drives, advocacy labor, decades of effort that changed nothing. The families on 21st Ave S have paid property taxes for 40 to 60 years. Those taxes built sidewalks in other Seattle neighborhoods, the ones that were, by legal design, more open to white families.</p>
     </div>
   </div>
 
@@ -1395,7 +1380,7 @@ body {
       <p>The families on 21st Ave S have been running those calculations for decades.</p>
     </div>
 
-    <div class="prose" data-reveal>
+    <div class="prose" data-reveal style="margin-top:1.1rem">
       <p>In 2015, Lauren borrowed a radar gun from SDOT, collected speed data on 21st Ave S herself &mdash; a city requirement before SDOT would conduct its own study &mdash; and turned in the results. A year later, having heard nothing, she wrote back asking when SDOT would conduct its follow-up study. There is no record anyone followed up. SDOT&rsquo;s own study came seven years later: 77% of drivers on S College St exceed the 25&nbsp;mph speed limit. The 85th percentile speed: 32.7&nbsp;mph. Seven years after Lauren turned in her data, SDOT confirmed what she had already measured.</p>
       <blockquote class="pull-quote-block">
         <span class="pull-quote-mark" aria-hidden="true">&ldquo;</span>
@@ -1535,8 +1520,11 @@ body {
       <p>To understand what is being built on 21st Ave S, you have to start one block east.</p>
       <p>22nd Ave S runs north toward Rainier Ave S, one of the neighborhood&rsquo;s main arterials. Without sidewalks, the roadway is effectively wider than it needs to be, and drivers treat it accordingly. In the words of a resident who wrote to SDOT in July 2023: &ldquo;Drivers treat 22nd Ave S as an overflow street when the pedestrians-be-damned arterial of Rainier is busy and alternative route 23rd Ave is busy. &hellip; The very grade that makes sidewalk installation challenging also makes drivers go too fast.&rdquo;</p>
       <p>Parents crossing with children in strollers stepped off the curb into moving traffic. Residents coming in and out of their driveways shared the same narrow lane with cars at speed.</p>
-      <p>Letha had been documenting this for over a decade &mdash; submitting crash reports, writing to the city, asking for infrastructure. In February 2020, a classmate of her daughter&rsquo;s was struck by a truck turning from eastbound College onto northbound 22nd Ave S. The mother and child were heading west on College and the truck didn&rsquo;t see them coming. A totaled car, a broken arm, an emergency room visit at the start of a pandemic. Her neighbor Rachel was making that same crossing with her own child every day.</p>
+      <p>Letha had spent more than a decade documenting this, filing crash reports and writing to a city that didn&rsquo;t act. In February 2020, a classmate of her daughter&rsquo;s was struck by a truck turning from eastbound College onto northbound 22nd Ave S. The mother and child were heading west on College and the truck didn&rsquo;t see them coming. A totaled car, a broken arm, an emergency room visit at the start of a pandemic. Her neighbor Rachel was making that same crossing with her own child every day.</p>
       <p>When SDOT&rsquo;s email arrived in October 2021 promising a concrete sidewalk, they had reason to believe it.</p>
+      <p>So they eased off. The October 2021 email had tied the sidewalk to a date: finished by the time the Judkins Park light rail station opened, then expected in spring 2023. When the station&rsquo;s opening slipped, residents assumed the sidewalk had slipped with it. The delay looked ordinary, a small project waiting on a bigger one. They had a written promise, and no reason to keep pressing the city for it.</p>
+      <p>The promise didn&rsquo;t hold. On June 6, 2023, a resident wrote SDOT to check on the timeline, days after watching a rescue crew cut someone out of a car at 22nd and College. Burgesser took twenty-seven days to answer. When the reply came, the project was cancelled: the grades were too steep, the cost too high. He never mentioned the $2 million the Council had set aside for it, or where the money had gone.</p>
+      <p>The money behind that promise had a name on it. In the 2022 city budget, Councilmember Morales secured a $2 million proviso that named 22nd Ave S as the first street to get sidewalks. By the summer of 2023 the project was dead, and her own office learned it from a neighbor rather than from SDOT. Around the same time, her car was struck at 22nd and College, the intersection the proviso was meant to fix.</p>
     </div>
   </div>
 
@@ -1555,7 +1543,7 @@ body {
   <div class="cream-section" style="padding-top:0; overflow:hidden">
     <div class="doc-receipt" data-reveal>
       <img src="imgs/morales-newsletter-jul2023.png" alt="CM Morales July 2023 newsletter naming 22nd Ave S as the reason she secured the $2M proviso" class="doc-receipt-img">
-      <p class="doc-receipt-caption">CM Morales&rsquo; July 31, 2023 newsletter &mdash; explicitly names 22nd Ave S as the reason she secured the $2 million proviso. Four days earlier, her own policy director had emailed a neighbor to ask whether the sidewalks had been installed. Her office had not been told the funds were redirected.</p>
+      <p class="doc-receipt-caption">CM Morales&rsquo; July 31, 2023 newsletter explicitly names 22nd Ave S as the reason she secured the $2 million proviso. Four days earlier, her own policy director had emailed a neighbor to ask whether the sidewalks had been installed. Her office had not been told the funds were redirected.</p>
     </div>
   </div>
 
@@ -1563,23 +1551,23 @@ body {
   <div class="cream-section">
     <div class="prose" data-reveal>
       <p>The cancellation was not the end of the story. It was a substitution.</p>
-      <p>Rachel had asked Burgesser to walk the street on July 20 &mdash; the morning she was almost struck from her own driveway. He didn&rsquo;t reply for 15 days. On August 4, he agreed to schedule a walk and wrote that he expected to have &ldquo;new information to share on safety improvements we&rsquo;re planning for this area as soon as next week.&rdquo;</p>
-      <p>He was already holding it.</p>
+      <p>Rachel had asked Burgesser to walk the street on July 20, the morning she was almost struck from her own driveway. He didn&rsquo;t reply for 15 days. On August 4, he agreed to schedule a walk and wrote that he expected to have &ldquo;new information to share on safety improvements we&rsquo;re planning for this area as soon as next week.&rdquo;</p>
+      <p>The information already existed.</p>
       <p>Between August 4 and 7, 2023, SDOT&rsquo;s Project Initiation Summary for 21st Ave S was signed by four reviewers. Scope: a 6-foot asphalt walkway with precast concrete wheel stops, west side only, $350,000. In SDOT&rsquo;s internal finance system, the project was entered under the name &ldquo;Low-Cost Walkway,&rdquo; as documented in SDOT&rsquo;s own project records obtained through a May 2026 public records request. That label never appeared in any materials shared with residents.</p>
       <p>On August 7, Burgesser proposed August 11. Rachel said yes.</p>
     </div>
     <div class="prose" style="margin-top: 1.5rem;" data-reveal>
       <p>On August 11, Letha and Rachel brought SDOT officials to 22nd Ave S. They walked the intersection where a child had been struck three years earlier, where CM Morales&rsquo;s car had been hit eleven days before. They showed them what was still missing.</p>
       <p>What they didn&rsquo;t know, what neither of them had been told, was that the scope for 21st Ave S had been signed before Burgesser proposed the meeting.</p>
-      <p class="managed-kicker">They were not being consulted. They were being managed.</p>
+      <p><strong>They were not being consulted. They were being managed.</strong></p>
     </div>
   </div>
 
   <!-- Strategic management coda -->
   <div class="cream-section strategic-bridge">
     <div class="strategic-card" data-reveal>
-      <div class="strategic-label">Strategic management &mdash; what it looks like in practice</div>
-      <p class="strategic-text">Strategic management is distinct from responsiveness. It is the use of the forms of engagement &mdash; replies, meetings, walks, letters &mdash; to satisfy the appearance of a process while the outcome is predetermined. Every communication arrives on time. Every meeting is scheduled. Every question receives an answer &mdash; except the ones that matter. The record shows not a failure of process, but a process working exactly as intended: to absorb community concern without altering the result.</p>
+      <div class="strategic-label">Strategic management: what it looks like in practice</div>
+      <p class="strategic-text">Strategic management is distinct from responsiveness. It uses the visible forms of engagement, the replies and meetings and walks and letters, to satisfy the appearance of process while the outcome stays fixed. Every communication arrives on time. Every meeting is scheduled. Every question gets an answer, except the ones that matter. The record shows not a failure of process, but a process working exactly as intended: to absorb community concern without altering the result.</p>
     </div>
   </div>
 
@@ -1593,7 +1581,7 @@ body {
         <div class="record-card">
           <div class="record-row">
             <div class="record-date">Oct 15, 2021</div>
-            <div class="record-fact">SDOT project manager Nicole Willis emails a resident directly with a written promise: the concrete sidewalk on 22nd Ave S will be complete &ldquo;by the time the new Judkins Park sound transit station opens in spring of 2023.&rdquo; That station opens in April 2023. No sidewalk is built.<button class="record-evidence" data-img="imgs/DOT_C247504_01_00014.png" data-cap="Nicole Willis (SDOT) to a resident &middot; Oct 15, 2021 &middot; Public records request C247504 &mdash; DOT_C247504_01_00014" data-alt="Email from SDOT project manager Nicole Willis to a resident, Oct 15, 2021, promising a new sidewalk on 22nd Ave S">View the email &rarr;</button></div>
+            <div class="record-fact">SDOT project manager Nicole Willis emails a resident directly with a written promise: the concrete sidewalk on 22nd Ave S will be complete &ldquo;by the time the new Judkins Park sound transit station opens in spring of 2023.&rdquo; The station&rsquo;s opening then slipped repeatedly; it would not open until March 2026. No sidewalk is built.<button class="record-evidence" data-img="imgs/DOT_C247504_01_00014.png" data-cap="Nicole Willis (SDOT) to a resident &middot; Oct 15, 2021 &middot; Public records request C247504 &mdash; DOT_C247504_01_00014" data-alt="Email from SDOT project manager Nicole Willis to a resident, Oct 15, 2021, promising a new sidewalk on 22nd Ave S">View the email &rarr;</button></div>
           </div>
         </div>
       </div>
@@ -1603,7 +1591,7 @@ body {
         <div class="record-card">
           <div class="record-row">
             <div class="record-date">Nov 22, 2021</div>
-            <div class="record-fact">Seattle City Council adopts the 2022 budget (Ordinance 126490). Included: CM Morales&rsquo; Council Budget Action SDOT-105-B-001 &mdash; $2 million of REET I funds added to SDOT&rsquo;s Pedestrian Master Plan &ndash; New Sidewalks project. The proviso legally restricts the $2 million solely to new sidewalk construction in District 2. The Council&rsquo;s stated intent is unambiguous: 22nd Ave S &mdash; between S College St and S Bayview St &mdash; is named first priority. SDOT will later argue the proviso doesn&rsquo;t require it. The SDOT promise to the resident came five weeks earlier. <em style="font-style:normal;text-decoration:underline;">(C.F. 314488, pp. 334&ndash;335 &mdash; <a class="ext-link" href="https://seattle.legistar.com/View.ashx?M=F&amp;ID=10237294&amp;GUID=01C34534-3400-4847-8B9F-452D159EFAB1" target="_blank" rel="noopener">view the full clerk file</a>)</em><button class="record-evidence" data-pdf="imgs/CF-314488_pages-334-335.PDF" data-cap="Council Budget Action SDOT-105-B-001 &middot; C.F. 314488, pp. 334&ndash;335 &mdash; the proviso &amp; statement of legislative intent">View the proviso &rarr;</button></div>
+            <div class="record-fact">Seattle City Council adopts the 2022 budget (Ordinance 126490). Included: CM Morales&rsquo; Council Budget Action SDOT-105-B-001, which adds $2 million of REET I funds to SDOT&rsquo;s Pedestrian Master Plan &ndash; New Sidewalks project. The proviso legally restricts the $2 million solely to new sidewalk construction in District 2. The Council&rsquo;s stated intent is unambiguous: 22nd Ave S, between S College St and S Bayview St, is named first priority. SDOT will later argue the proviso doesn&rsquo;t require it. The SDOT promise to the resident came five weeks earlier. <em style="font-style:normal;text-decoration:underline;">(C.F. 314488, pp. 334&ndash;335 &mdash; <a class="ext-link" href="https://seattle.legistar.com/View.ashx?M=F&amp;ID=10237294&amp;GUID=01C34534-3400-4847-8B9F-452D159EFAB1" target="_blank" rel="noopener">view the full clerk file</a>)</em><button class="record-evidence" data-pdf="imgs/CF-314488_pages-334-335.PDF" data-cap="Council Budget Action SDOT-105-B-001 &middot; C.F. 314488, pp. 334&ndash;335 &mdash; the proviso &amp; statement of legislative intent">View the proviso &rarr;</button></div>
           </div>
         </div>
       </div>
@@ -1631,7 +1619,7 @@ body {
           </div>
           <div class="record-row">
             <div class="record-date">Jul 27, 2023</div>
-            <div class="record-fact">CM Morales&rsquo; policy director Devin Silvernail emails a neighbor to ask: &ldquo;Were those sidewalks ever installed?&rdquo; The councilmember&rsquo;s own office is learning from a neighbor &mdash; not from SDOT &mdash; that the project Morales championed and funded has been quietly cancelled.<button class="record-evidence" data-img="imgs/DOT_C247504_01_0008.png" data-cap="Devin Silvernail (Council) &amp; a resident &middot; Jul 27, 2023 &middot; Public records request C247504 &mdash; DOT_C247504_01_0008" data-alt="Email thread between CM Morales policy director Devin Silvernail and a resident, July 27, 2023">View the email &rarr;</button></div>
+            <div class="record-fact">CM Morales&rsquo; policy director Devin Silvernail emails a neighbor to ask: &ldquo;Were those sidewalks ever installed?&rdquo; The councilmember&rsquo;s own office is learning from a neighbor, not from SDOT, that the project Morales championed and funded has been quietly cancelled.<button class="record-evidence" data-img="imgs/DOT_C247504_01_0008.png" data-cap="Devin Silvernail (Council) &amp; a resident &middot; Jul 27, 2023 &middot; Public records request C247504 &mdash; DOT_C247504_01_0008" data-alt="Email thread between CM Morales policy director Devin Silvernail and a resident, July 27, 2023">View the email &rarr;</button></div>
           </div>
           <div class="record-row">
             <div class="record-date">Jul 31, 2023</div>
@@ -1655,7 +1643,7 @@ body {
         <div class="record-card">
           <div class="record-row">
             <div class="record-date">Jun 24, 2024</div>
-            <div class="record-fact">An internal SDOT email reveals the substitute 21st Ave S walkway has stalled too &mdash; this time due to retaining wall costs. Staff ask whether future levy funds could cover the gap. No construction date is set. Residents have not been informed.<button class="record-evidence" data-img="imgs/DOT_C247504_01_00018.png" data-cap="Chris Kartheiser (internal SDOT) &middot; Jun 24, 2024 &middot; Public records request C247504 &mdash; DOT_C247504_01_00018" data-alt="Internal SDOT email, June 24, 2024, pausing the 21st Ave S walkway project due to retaining wall costs">View the email &rarr;</button></div>
+            <div class="record-fact">An internal SDOT email reveals the substitute 21st Ave S walkway has stalled too, this time over retaining wall costs. Staff ask whether future levy funds could cover the gap. No construction date is set. Residents have not been informed.<button class="record-evidence" data-img="imgs/DOT_C247504_01_00018.png" data-cap="Chris Kartheiser (internal SDOT) &middot; Jun 24, 2024 &middot; Public records request C247504 &mdash; DOT_C247504_01_00018" data-alt="Internal SDOT email, June 24, 2024, pausing the 21st Ave S walkway project due to retaining wall costs">View the email &rarr;</button></div>
           </div>
         </div>
       </div>
@@ -1665,7 +1653,7 @@ body {
         <div class="record-card">
           <div class="record-row">
             <div class="record-date">Aug 4, 2025</div>
-            <div class="record-fact">Nearly four years after the written promise, SDOT circulates 90% design plans &mdash; still only for the &ldquo;21st Ave S Low-Cost Walkway project&rdquo;: a &ldquo;new 6&ndash;8&prime; asphalt walkway with pre-cast concrete wheel stops.&rdquo; Not a sidewalk. Still not built. The downgrade chain is complete: sidewalk &rarr; walkway &rarr; paused walkway &rarr; 90% plans.<button class="record-evidence" data-img="imgs/DOT_C247504_01_00020.png" data-cap="SDOT 90% plans submittal, 21st Ave S Low-Cost Walkway &middot; Aug 4, 2025 &middot; Public records request C247504 &mdash; DOT_C247504_01_00020" data-alt="SDOT 90% design plans submittal for the 21st Ave S Low-Cost Walkway project, August 4, 2025">View the submittal &rarr;</button></div>
+            <div class="record-fact">Nearly four years after the written promise, SDOT circulates 90% design plans, still only for the &ldquo;21st Ave S Low-Cost Walkway project&rdquo;: a &ldquo;new 6&ndash;8&prime; asphalt walkway with pre-cast concrete wheel stops.&rdquo; Not a sidewalk. Still not built. The downgrade chain is complete: sidewalk &rarr; walkway &rarr; paused walkway &rarr; 90% plans.<button class="record-evidence" data-img="imgs/DOT_C247504_01_00020.png" data-cap="SDOT 90% plans submittal, 21st Ave S Low-Cost Walkway &middot; Aug 4, 2025 &middot; Public records request C247504 &mdash; DOT_C247504_01_00020" data-alt="SDOT 90% design plans submittal for the 21st Ave S Low-Cost Walkway project, August 4, 2025">View the submittal &rarr;</button></div>
           </div>
         </div>
       </div>
@@ -1685,7 +1673,7 @@ body {
         <div class="record-card">
           <div class="record-row">
             <div class="record-date">FY 2026</div>
-            <div class="record-fact">The $2 million in REET I funds no longer appears in the project&rsquo;s 2026 budget for Pedestrian Master Plan &ndash; New Sidewalks (MC-TR-C058). The project now runs on other sources, including a separate $2 million Transportation Fund allocation &mdash; a different fund from the REET I dollars the Council restricted to District 2 sidewalks. The city has not explained, on the record, where the original $2 million went. <em style="font-style:normal;text-decoration:underline;">(<a class="ext-link" href="https://openbudget.seattle.gov/#!/year/2026/capital/0/projecttitle/MC-TR-C058/0/fundname?vis=barChart" target="_blank" rel="noopener">Seattle Open Budget &mdash; MC-TR-C058, FY2026 fund breakdown</a>)</em></div>
+            <div class="record-fact">The $2 million in REET I funds no longer appears in the project&rsquo;s 2026 budget for Pedestrian Master Plan &ndash; New Sidewalks (MC-TR-C058). The project now runs on other sources, including a separate $2 million Transportation Fund allocation, a different fund from the REET I dollars the Council restricted to District 2 sidewalks. The city has not explained, on the record, where the original $2 million went. <em style="font-style:normal;text-decoration:underline;">(<a class="ext-link" href="https://openbudget.seattle.gov/#!/year/2026/capital/0/projecttitle/MC-TR-C058/0/fundname?vis=barChart" target="_blank" rel="noopener">Seattle Open Budget &mdash; MC-TR-C058, FY2026 fund breakdown</a>)</em></div>
           </div>
         </div>
       </div>
@@ -1719,15 +1707,15 @@ body {
 
     <div class="budget-compare" data-reveal>
       <div class="budget-item">
-        <div class="budget-amt">$2M</div>
+        <div class="stat-figure">$2M</div>
         <div class="budget-label">2022 Council proviso, restricted to D2 sidewalks, with 22nd Ave S named as first priority</div>
       </div>
       <div class="budget-item">
-        <div class="budget-amt">$1.5M</div>
+        <div class="stat-figure">$1.5M</div>
         <div class="budget-label">SDOT&rsquo;s own estimate for a concrete sidewalk on 22nd Ave S, which the agency called too large a share of the proviso for one project</div>
       </div>
       <div class="budget-item current">
-        <div class="budget-amt">$350K</div>
+        <div class="stat-figure">$350K</div>
         <div class="budget-label">Budget for the asphalt walkway on 21st Ave S</div>
       </div>
     </div>
@@ -1752,17 +1740,17 @@ body {
 
     <div class="stat-trio" data-reveal>
       <div class="stat-trio-item">
-        <div class="stat-trio-num red">0</div>
+        <div class="stat-figure red">0</div>
         <div class="stat-trio-label">of 58 residents prefer the asphalt plan</div>
         <div class="stat-trio-source">Community survey &middot; Feb 2026</div>
       </div>
       <div class="stat-trio-item">
-        <div class="stat-trio-num">88%</div>
+        <div class="stat-figure">88%</div>
         <div class="stat-trio-label">feel unsafe or very unsafe walking the street today (51 of 58 residents)</div>
         <div class="stat-trio-source">Community survey &middot; Feb 2026</div>
       </div>
       <div class="stat-trio-item">
-        <div class="stat-trio-num">100%</div>
+        <div class="stat-figure">100%</div>
         <div class="stat-trio-label">would support a community effort to advocate for true sidewalks</div>
         <div class="stat-trio-source">Community survey &middot; Feb 2026</div>
       </div>
@@ -1799,7 +1787,7 @@ body {
 
   <div class="cream-section">
     <div class="prose" data-reveal>
-      <p>In November 2024, Seattle voters approved a $1.55 billion transportation levy. Of that, $111 million is designated for new sidewalks over eight years. Each council district received a minimum funding floor &mdash; and those floors are not equal.</p>
+      <p>In November 2024, Seattle voters approved a $1.55 billion transportation levy. Of that, $111 million is designated for new sidewalks over eight years. Each council district received a minimum funding floor. Those floors are not equal.</p>
     </div>
 
     <div class="equity-bars" data-reveal>
@@ -1819,17 +1807,21 @@ body {
         <div class="eq-bar-wrap"><div class="eq-bar d5" style="--w:100%"></div></div>
         <div class="eq-pct">36% <span class="eq-approx">~$40M</span></div>
       </div>
-      <p class="eq-note">District 5&rsquo;s higher floor reflects a 1954 annexation commitment &mdash; North Seattle neighborhoods were promised sidewalks when they joined the city. District 2 received no such promise. <em>Racial restrictive covenants had already decided who could live there.</em></p>
+      <p class="eq-note">District 5&rsquo;s higher floor reflects a 1954 annexation commitment. North Seattle neighborhoods were promised sidewalks when they joined the city. District 2 received no such promise.</p>
     </div>
 
     <div class="prose" data-reveal>
-      <p>The families on 21st Ave S could not move to those North Seattle neighborhoods. Covenants barred them. Now, decades later, those same neighborhoods receive two dollars of levy funding for every one dollar that goes to District 2 &mdash; justified by a promise the families on 21st Ave S were never allowed to benefit from.</p>
+      <p>The families on 21st Ave S could not move to those North Seattle neighborhoods. Covenants barred them by deed. Now, decades later, those same neighborhoods receive two dollars of levy funding for every one dollar that goes to District 2. District 5 has more missing sidewalk than District 2, so a larger share might look fair. It isn&rsquo;t. Per stretch of missing sidewalk, District 5 still draws about $10,300 in levy money to District 2&rsquo;s $7,300, nearly 40% more. The reason is a 1954 promise made to neighborhoods that had legally locked these families out, a promise they were never allowed to benefit from.</p>
     </div>
 
     <div class="stat-pull" data-reveal>
-      <div class="stat-pull-num">20<span style="font-size:40px;font-weight:400;vertical-align:super;opacity:0.4">/24</span></div>
-      <div class="stat-pull-label">priority score &mdash; nearly double the citywide average of 10.4. Equity score: 12 of 12.</div>
+      <div class="stat-pull-num">20<span class="stat-figure" style="vertical-align:super;opacity:0.4">/24</span></div>
+      <div class="stat-pull-label">priority score, nearly double the citywide average of 10.4. Equity score: 12 of 12.</div>
       <div class="stat-pull-source">SDOT sidewalk prioritization data</div>
+    </div>
+
+    <div class="prose" data-reveal>
+      <p>Top priority on paper. On the ground, a 6-foot asphalt path on one side of the street.</p>
     </div>
 
   </div>
@@ -1844,7 +1836,7 @@ body {
   <div class="debt-divider">
     <div class="debt-divider-inner">
       <p class="ch-eyebrow" style="color:rgba(255,255,255,0.5); margin-bottom:1.25rem;">Construction scheduled</p>
-      <p class="debt-statement"><span class="hl">August 2026.</span> The window to change what gets built is closing.</p>
+      <p class="debt-statement">August 2026.<br><em>The window to change what gets built is closing.</em></p>
     </div>
   </div>
 </div>
@@ -1861,8 +1853,8 @@ body {
       <span class="ask-eyebrow">Beyond One Block &middot; 2026</span>
 
       <div class="prose" data-reveal>
-        <p style="font-family:'Fustat',sans-serif; font-size:clamp(1.4rem,2.6vw,2rem); line-height:1.4; color:var(--surface); font-weight:400; margin:0 0 2.5rem">This is one block, and it sits inside a citywide pattern of disinvestment. Across south Seattle, the streets still missing sidewalks line up with the areas the city redlined in the 1930s. What makes 21st Ave S worth a closer look is that the paper trail survived. The budget line names the street. A written promise went to a resident. An internal SDOT email later walked it back.</p>
-        <p style="font-family:'Fustat',sans-serif; font-size:clamp(1.4rem,2.6vw,2rem); line-height:1.4; color:var(--surface); font-weight:400; margin:0">The city has never answered the question that record raises. The Council named this street in the 2022 budget and set aside $2 million for it. By 2026 that money is no longer in the project&rsquo;s budget, and no one at the city has explained where it went. The councilmember who wrote the proviso backed it. Four years later it still isn&rsquo;t built. So what is happening on the blocks where no one kept the emails?</p>
+        <p style="font-family:'Fustat',sans-serif; font-size:clamp(1.4rem,2.6vw,2rem); line-height:1.4; color:var(--surface); font-weight:400; margin:0 0 2.5rem">This is one block, and it sits inside a citywide pattern of disinvestment. Across south Seattle, the streets still missing sidewalks line up with the areas the city redlined in the 1930s. What makes 21st and 22nd Ave S worth a closer look is that the paper trail survived. The budget line names the street. A written promise went to a resident. An internal SDOT email later walked it back.</p>
+        <p style="font-family:'Fustat',sans-serif; font-size:clamp(1.4rem,2.6vw,2rem); line-height:1.4; color:var(--surface); font-weight:400; margin:0">The city has never answered the question that record raises. The Council named this street in the 2022 budget and set aside $2 million for it. By 2026 that money is no longer in the project&rsquo;s budget, and no one at the city has explained where it went. The councilmember who wrote the proviso backed it. Four years later it still isn&rsquo;t built. <span style="color:var(--red)">So what is happening on the blocks where no one kept the emails?</span></p>
       </div>
 
     </div>
@@ -2904,19 +2896,15 @@ document.addEventListener('DOMContentLoaded', () => {
     <h2 class="sg-h">1 &middot; Display &middot; VTC Martin</h2>
     <div class="sg-row">
       <p style="font-family:'VTC Martin','Fustat',sans-serif;text-transform:uppercase;font-size:clamp(3rem,6.4vw,5rem);line-height:0.80;margin:0;">What&nbsp;$350,000&nbsp;buys</p>
-      <p class="sg-spec"><b>VTC Martin</b> &middot; 400<br>clamp(3rem, 6.4vw, 5rem)<br>48&ndash;80px &middot; line-height 0.80<br>uppercase<br><i>.step-quote, .ch-divider h2 &amp; all chapter dividers</i></p>
+      <p class="sg-spec"><b>VTC Martin</b> &middot; 400<br>clamp(3rem, 6.4vw, 5rem)<br>48&ndash;80px &middot; line-height 0.80<br>uppercase<br><i>.step-quote, .ch-divider h2, .debt-statement &amp; all chapter dividers</i></p>
     </div>
 
     <!-- 2 ─ STATEMENTS ────────────────────────────── -->
     <h2 class="sg-h">2 &middot; Large statements &middot; Fustat 400</h2>
-    <p class="sg-note">Three treatments, all Fustat&nbsp;400. <b>.dp-statement</b> and <b>.debt-statement</b> are the same 41px and differ only in line-height (1.13 vs 1.30) &mdash; collapse to one. <b>.prose&nbsp;(large)</b> at 23px is a distinct mid-tier.</p>
+    <p class="sg-note">Two treatments, both Fustat&nbsp;400. <b>.dp-statement</b> is the 41px statement; <b>.prose&nbsp;(large)</b> at 23px is a distinct mid-tier. (<b>.debt-statement</b> moved up to the VTC Martin display group.)</p>
     <div class="sg-row">
       <p style="font-family:'Fustat',sans-serif;font-weight:400;font-size:41px;line-height:1.13;margin:0;">In August 2026, Seattle plans to pour asphalt on a street it promised concrete.</p>
       <p class="sg-spec"><b>Fustat</b> &middot; 400<br>41px &middot; line-height 1.13<br><i>.dp-statement</i></p>
-    </div>
-    <div class="sg-row">
-      <p style="font-family:'Fustat',sans-serif;font-weight:400;font-size:41px;line-height:1.30;margin:0;">The window to change what gets built is closing.</p>
-      <p class="sg-spec"><b>Fustat</b> &middot; 400<br>41px &middot; line-height 1.30<br><i>.debt-statement</i></p>
     </div>
     <div class="sg-row">
       <p style="font-family:'Fustat',sans-serif;font-weight:400;font-size:23px;line-height:1.4;margin:0;">This is one block, and it sits inside a city that has redlined, divided, and underbuilt for a century.</p>
@@ -2925,14 +2913,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     <!-- 3 ─ DATA ──────────────────────────────────── -->
     <h2 class="sg-h">3 &middot; Data numbers &middot; Fustat</h2>
-    <p class="sg-note"><b>Collapsed:</b> the <b>/24</b> denominator, <b>.stat-trio-num</b> and <b>.budget-amt</b> &mdash; three prior sizes across two weights &mdash; now share one step: <b>400 &middot; 40px</b>. Remaining one-offs: <code>.stat-num</code> (display) and <code>.eq-pct</code> (inline).</p>
+    <p class="sg-note"><b>Collapsed:</b> the <b>/24</b> denominator, trio numbers and budget amounts &mdash; three prior sizes across two weights &mdash; now share one class, <code>.stat-figure</code> (<b>400 &middot; 40px</b>). Remaining one-offs: <code>.stat-num</code> (display) and <code>.eq-pct</code> (inline).</p>
     <table class="sg-tbl">
       <thead><tr><th>Specimen</th><th>Spec</th><th>Class</th></tr></thead>
       <tbody>
         <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:400;font-size:48px;line-height:1;">130+</span></td><td class="c-spec"><b>400</b> &middot; &asymp;63px &middot; lh&nbsp;1.0</td><td class="c-cls">.stat-num</td></tr>
-        <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:400;font-size:40px;line-height:1;">/24</span></td><td class="c-spec"><b>400</b> &middot; 40px</td><td class="c-cls">stat denominator</td></tr>
-        <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:400;font-size:40px;line-height:1;">88%</span></td><td class="c-spec"><b>400</b> &middot; 40px</td><td class="c-cls">.stat-trio-num</td></tr>
-        <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:400;font-size:40px;line-height:1;">$2M</span></td><td class="c-spec"><b>400</b> &middot; 40px</td><td class="c-cls">.budget-amt</td></tr>
+        <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:400;font-size:40px;line-height:1;">88%</span></td><td class="c-spec"><b>400</b> &middot; 40px &middot; lh&nbsp;1.0</td><td class="c-cls">.stat-figure <span style="opacity:0.6">(trio &middot; budget &middot; /24)</span></td></tr>
         <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:600;font-size:13px;line-height:1.7;">17%</span></td><td class="c-spec"><b>600</b> &middot; 13px</td><td class="c-cls">.eq-pct</td></tr>
       </tbody>
     </table>
@@ -2954,29 +2940,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     <!-- 6 ─ SECONDARY TEXT ────────────────────────── -->
     <h2 class="sg-h">6 &middot; Secondary text &middot; Fustat 11.5&ndash;19.7px</h2>
-    <p class="sg-note">Seven treatments between body and caption sizes. <b>.stat-label</b>, <b>.cov-row</b>, <b>.sandi-sub</b> are all 13px and differ only in line-height; <b>.budget-label</b> and <b>.unanswered-note</b> are both 11.5px/400. Strong candidate to collapse to ~2 sub-body sizes.</p>
+    <p class="sg-note"><b>Collapsed:</b> <b>.stat-label</b>, <b>.cov-row</b> and <b>.sandi-sub</b> now share one sub-body type step (<b>400 &middot; 13px &middot; lh&nbsp;1.7</b>); each keeps only its own color/layout. (<code>.cov-row.here</code> stays 500 as the &ldquo;you are here&rdquo; emphasis.) <b>.unanswered-note</b> now joins the same step. <b>.budget-label</b> stays 11.5px/400 on its own.</p>
     <table class="sg-tbl">
       <thead><tr><th>Specimen</th><th>Spec</th><th>Class</th></tr></thead>
       <tbody>
-        <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:600;font-size:19.7px;line-height:1.4;">They were managed, not consulted.</span></td><td class="c-spec"><b>600</b> &middot; 19.7px &middot; lh&nbsp;1.4</td><td class="c-cls">.managed-kicker</td></tr>
         <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:400;font-size:17.6px;line-height:1.4;">The current fight.</span></td><td class="c-spec"><b>400</b> &middot; 17.6px &middot; lh&nbsp;1.4</td><td class="c-cls">.map-headline, .dg-step-sentence</td></tr>
-        <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:400;font-size:13px;line-height:1.5;">years this block has waited</span></td><td class="c-spec"><b>400</b> &middot; 13px &middot; lh&nbsp;1.5</td><td class="c-cls">.stat-label</td></tr>
-        <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:400;font-size:13px;line-height:1.7;">North Seattle</span></td><td class="c-spec"><b>400/500</b> &middot; 13px &middot; lh&nbsp;1.7</td><td class="c-cls">.cov-row</td></tr>
-        <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:400;font-size:13px;line-height:1.75;">When public investment is withheld&hellip;</span></td><td class="c-spec"><b>400</b> &middot; 13px &middot; lh&nbsp;1.75</td><td class="c-cls">.sandi-sub</td></tr>
-        <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:400;font-size:12px;line-height:1.55;">A 2016 low-cost sidewalk project&hellip;</span></td><td class="c-spec"><b>400</b> &middot; 12px</td><td class="c-cls">.kenyon-compare-caption, .eq-approx</td></tr>
-        <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:400;font-size:11.5px;line-height:1.55;">2022 Council proviso, restricted to D2&hellip;</span></td><td class="c-spec"><b>400</b> &middot; 11.5px</td><td class="c-cls">.budget-label, .unanswered-note</td></tr>
+        <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:400;font-size:13px;line-height:1.7;">years this block has waited</span></td><td class="c-spec"><b>400</b> &middot; 13px &middot; lh&nbsp;1.7</td><td class="c-cls">.stat-label, .cov-row, .sandi-sub, .dg-step-caption, .kenyon-compare-caption, .eq-approx, .unanswered-note</td></tr>
+        <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:400;font-size:11.5px;line-height:1.55;">2022 Council proviso, restricted to D2&hellip;</span></td><td class="c-spec"><b>400</b> &middot; 11.5px</td><td class="c-cls">.budget-label</td></tr>
       </tbody>
     </table>
 
     <!-- 7 ─ CAPTIONS & CITES ──────────────────────── -->
     <h2 class="sg-h">7 &middot; Captions &amp; cites &middot; Fustat 10&ndash;11px</h2>
-    <p class="sg-note"><b>.step-cite</b> and <b>.doc-receipt-caption</b> are uppercase; <b>.dg-step-caption</b> is sentence-case. Three near-identical small captions.</p>
+    <p class="sg-note"><b>.step-cite</b> and <b>.doc-receipt-caption</b> now match the eyebrow labels (500 &middot; 10px &middot; 0.12em &middot; UC). <b>.dg-step-caption</b> now matches the secondary-text group (400 &middot; 13px &middot; lh&nbsp;1.7).</p>
     <table class="sg-tbl">
       <thead><tr><th>Specimen</th><th>Spec</th><th>Class</th></tr></thead>
       <tbody>
-        <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:500;font-size:11px;line-height:1.7;letter-spacing:0.09em;text-transform:uppercase;">&mdash; Letha, resident</span></td><td class="c-spec"><b>500</b> &middot; 11px &middot; 0.09em &middot; UC</td><td class="c-cls">.step-cite</td></tr>
-        <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:400;font-size:11px;line-height:1.5;letter-spacing:0.02em;">Each dot is one missing segment.</span></td><td class="c-spec"><b>400</b> &middot; 11px &middot; 0.02em</td><td class="c-cls">.dg-step-caption</td></tr>
-        <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:500;font-size:10.5px;line-height:1.7;letter-spacing:0.08em;text-transform:uppercase;">Restrictive covenant language</span></td><td class="c-spec"><b>500</b> &middot; 10.5px &middot; 0.08em &middot; UC</td><td class="c-cls">.doc-receipt-caption</td></tr>
+        <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:500;font-size:10px;line-height:1.7;letter-spacing:0.12em;text-transform:uppercase;">&mdash; Letha, resident</span></td><td class="c-spec"><b>500</b> &middot; 10px &middot; 0.12em &middot; UC</td><td class="c-cls">.step-cite</td></tr>
+        <tr><td><span style="font-family:'Fustat',sans-serif;font-weight:500;font-size:10px;line-height:1.7;letter-spacing:0.12em;text-transform:uppercase;">Restrictive covenant language</span></td><td class="c-spec"><b>500</b> &middot; 10px &middot; 0.12em &middot; UC</td><td class="c-cls">.doc-receipt-caption</td></tr>
       </tbody>
     </table>
 
