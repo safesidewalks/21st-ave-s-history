@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Long Wait — 21st Ave S, North Beacon Hill</title>
+<title>The Long Walk: 21st Ave S, North Beacon Hill</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='10' fill='%23E24B4A'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Besley:wght@400;500;600&family=Fustat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -1307,8 +1308,11 @@ body {
    collides with the rest of the page (esp. the generic .step / .note).
    ═══════════════════════════════════════════════════════════════ */
 .sc-scrolly {
-  display: flex; align-items: flex-start; justify-content: center;
+  display: block;
   position: relative; background: var(--surface); color: var(--ink);
+}
+.sc-scrolly-main {
+  display: flex; align-items: flex-start; justify-content: center;
   padding: 0 2rem;
 }
 .sc-sticky-pane {
@@ -1344,7 +1348,16 @@ body {
   transition: opacity 0.4s ease, max-height 0.4s ease, margin-top 0.4s ease;
 }
 .sc-col-dollars strong { font-weight: 700; }
-.sc-viz[data-phase="4"] .sc-col-dollars { max-height: 2.4em; margin-top: 4px; opacity: 1; }
+.sc-viz[data-phase="4"] .sc-col-dollars,
+.sc-viz[data-phase="5"] .sc-col-dollars { max-height: 2.4em; margin-top: 4px; opacity: 1; }
+
+/* levy floor %, shown under each district only in phase 3 (Where it lands) */
+.sc-col-floor {
+  font-size: 11.5px; font-weight: 600; color: var(--ink); margin-top: 0;
+  max-height: 0; overflow: hidden; opacity: 0;
+  transition: opacity 0.4s ease, max-height 0.4s ease, margin-top 0.4s ease;
+}
+.sc-viz[data-phase="3"] .sc-col-floor { max-height: 2.4em; margin-top: 4px; opacity: 1; }
 
 /* the remainder: the ~25% (~$28M) the levy does NOT floor-commit to these three districts.
    Instead of vanishing, it stays as a dimmed, labelled cluster up top so the split reads honestly. */
@@ -1383,13 +1396,22 @@ body {
 .sc-seg.sc-focus .sc-mdot { background: var(--ink); }
 .sc-viz[data-phase="2"] .sc-seg,
 .sc-viz[data-phase="3"] .sc-seg,
-.sc-viz[data-phase="4"] .sc-seg.sc-is-hero { opacity: 1; transform: scale(1); }
+.sc-viz[data-phase="4"] .sc-seg.sc-is-hero,
+.sc-viz[data-phase="5"] .sc-seg.sc-is-hero { opacity: 1; transform: scale(1); }
 .sc-viz[data-phase="2"] .sc-col-label,
 .sc-viz[data-phase="3"] .sc-col-label,
-.sc-viz[data-phase="4"] .sc-col-label { opacity: 1; }
-.sc-viz[data-phase="4"] .sc-seg:not(.sc-is-hero) { opacity: 0; transform: scale(0.5); }
-.sc-viz[data-phase="4"] .sc-seg.sc-is-hero .sc-mdot { width: 19px; height: 19px; }
-.sc-viz[data-phase="4"] .sc-seg.sc-is-hero { z-index: 3; }
+.sc-viz[data-phase="4"] .sc-col-label,
+.sc-viz[data-phase="5"] .sc-col-label { opacity: 1; }
+.sc-viz[data-phase="4"] .sc-seg:not(.sc-is-hero),
+.sc-viz[data-phase="5"] .sc-seg:not(.sc-is-hero) { opacity: 0; transform: scale(0.5); }
+.sc-viz[data-phase="4"] .sc-seg.sc-is-hero .sc-mdot,
+.sc-viz[data-phase="5"] .sc-seg.sc-is-hero .sc-mdot { width: 19px; height: 19px; }
+.sc-viz[data-phase="4"] .sc-seg.sc-is-hero,
+.sc-viz[data-phase="5"] .sc-seg.sc-is-hero { z-index: 3; }
+
+/* phase 5: spotlight District 2 (the focus district) — red dots in a red-tinted stretch */
+.sc-viz[data-phase="5"] .sc-seg.sc-focus.sc-is-hero { background: #FBE4E4; }
+.sc-viz[data-phase="5"] .sc-seg.sc-focus.sc-is-hero .sc-sdot { background: var(--red); }
 @keyframes sc-coinDrop {
   0%   { transform: translateY(-76px); opacity: 0; }
   12%  { opacity: 1; }
@@ -1433,6 +1455,11 @@ body {
 }
 .sc-step-caption { font-size: 13px; line-height: 1.6; color: var(--ink-muted); }
 .sc-step-caption em { font-style: normal; color: var(--red); font-weight: 600; }
+/* phase 5 climax callout — the whole line in red */
+.sc-step-headline {
+  font-family: 'Fustat', sans-serif; font-size: 27px; font-weight: 600;
+  line-height: 1.2; color: var(--red); margin-bottom: 0.55rem;
+}
 
 /* per-step legend — the visual key, sitting below the narrative text in the right column.
    Each item stacks: swatch on top, label underneath. */
@@ -1443,11 +1470,29 @@ body {
 .sc-legend-circle { width: 34px; height: 34px; border-radius: 50%; background: #EAEAEA; }
 /* phase 4 changes scale ($1M → $1,000); this note flags the zoom above the legend keys */
 .sc-legend-note { font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: -0.3rem; }
-.sc-note { background: var(--surface); color: var(--ink-muted); padding: 3rem 2rem 5rem; font-size: 12px; line-height: 1.7; }
-.sc-note-inner { max-width: 620px; margin: 0 auto; border-top: 1px solid rgba(24,20,14,0.12); padding-top: 1.5rem; }
+/* Data & method: a full-width bar pinned to the bottom of the viewport for the whole
+   scrolly (sticky bottom), expanding upward when opened, then scrolling off with the
+   graphic as the section ends. */
+.sc-note {
+  position: sticky; bottom: 0; z-index: 5;
+  background: var(--surface); color: var(--ink-muted);
+  font-size: 12px; line-height: 1.7;
+}
+.sc-note > summary {
+  list-style: none; cursor: pointer; padding: 1.05rem 2rem;
+  border-top: 1px solid rgba(24,20,14,0.12);
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.35rem 0.75rem;
+  font-weight: 600; color: var(--ink-soft); letter-spacing: 0.01em;
+}
+.sc-note > summary::-webkit-details-marker { display: none; }
+.sc-note > summary::after { content: '+'; margin-left: auto; font-weight: 400; font-size: 15px; color: var(--ink-muted); }
+.sc-note[open] > summary::after { content: '\2212'; }
+.sc-note-source { font-weight: 400; color: var(--ink-muted); }
+.sc-note:not([open]) .sc-note-inner { display: none; }
+.sc-note-inner { padding: 0 2rem 1.5rem; max-width: 900px; }
 .sc-note b { color: var(--ink-soft); }
 @media (max-width: 820px) {
-  .sc-scrolly { flex-direction: column; }
+  .sc-scrolly-main { flex-direction: column; }
   .sc-sticky-pane { width: 100%; height: 66vh; position: sticky; }
   .sc-steps { flex: none; }
   .sc-step { min-height: 66vh; }
@@ -1628,7 +1673,7 @@ body {
     </div>
 
     <div class="prose" data-reveal>
-      <p>In February 2020, a Beacon Hill Elementary student and her mother were struck by a truck at 22nd Ave S and S College St. In June 2023, Letha watched a post-collision rescue extrication at the same intersection and emailed SDOT that day. The following month, multiple collisions were reported at the same intersection.</p>
+      <p>In June 2023, Letha watched a post-collision rescue extrication at 22nd Ave S and S College St and emailed SDOT that day. The following month, multiple collisions were reported at the same intersection.</p>
     </div>
 
     <div class="stat-pull" data-reveal>
@@ -1767,6 +1812,11 @@ body {
       <p>22nd Ave S runs north toward Rainier Ave S, one of the neighborhood&rsquo;s main arterials. Without sidewalks, the roadway is effectively wider than it needs to be, and drivers treat it accordingly. In the words of a resident who wrote to SDOT in July 2023: &ldquo;Drivers treat 22nd Ave S as an overflow street when the pedestrians-be-damned arterial of Rainier is busy and alternative route 23rd Ave is busy. &hellip; The very grade that makes sidewalk installation challenging also makes drivers go too fast.&rdquo;</p>
       <p>Parents crossing with children in strollers stepped off the curb into moving traffic. Residents coming in and out of their driveways shared the same narrow lane with cars at speed.</p>
       <p>Letha had spent more than a decade documenting this, filing crash reports and writing to a city that didn&rsquo;t act. In February 2020, a classmate of her daughter&rsquo;s was struck by a truck turning from eastbound College onto northbound 22nd Ave S. The mother and child were heading west on College and the truck didn&rsquo;t see them coming. A totaled car, a broken arm, an emergency room visit at the start of a pandemic. Her neighbor Rachel was making that same crossing with her own child every day.</p>
+      <blockquote class="pull-quote-block">
+        <span class="pull-quote-mark" aria-hidden="true">&ldquo;</span>
+        <p>I am pleased to let you know that we are in the planning stages of building a new sidewalk on the west side of 22nd Ave S from Walker to Bayview! We are planning to have it complete by the time of the new Judkins Park sound transit station opens in spring of 2023.</p>
+        <cite>Nicole Willis, SDOT Project Manager &mdash; October 15, 2021</cite>
+      </blockquote>
       <p>When SDOT&rsquo;s email arrived in October 2021 promising a concrete sidewalk, they had reason to believe it.</p>
       <p>So they eased off. The October 2021 email had tied the sidewalk to a date: finished by the time the Judkins Park light rail station opened, then expected in spring 2023. When the station&rsquo;s opening slipped, residents assumed the sidewalk had slipped with it. The delay looked ordinary, a small project waiting on a bigger one. They had a written promise, and no reason to keep pressing the city for it.</p>
       <p>The promise didn&rsquo;t hold. On June 6, 2023, a resident wrote SDOT to check on the timeline, days after watching a rescue crew cut someone out of a car at 22nd and College. Burgesser took twenty-seven days to answer. When the reply came, the project was cancelled: the grades were too steep, the cost too high. He never mentioned the $2 million the Council had set aside for it, or where the money had gone.</p>
@@ -2150,6 +2200,7 @@ body {
 
     <!-- ── "money into segments" scrollytelling viz (ported from prototype_segment-circles.html) ── -->
     <section class="sc-scrolly" aria-label="How the levy money divides across districts">
+      <div class="sc-scrolly-main">
       <div class="sc-sticky-pane">
         <div class="sc-viz" id="sc-viz" data-phase="1">
           <div class="sc-stage">
@@ -2176,7 +2227,7 @@ body {
         <div class="sc-step" data-phase="2">
           <div class="sc-step-content">
             <p class="sc-step-eyebrow">The need</p>
-            <p class="sc-step-sentence">Now the need: the stretches of sidewalk that are simply <em>missing</em>.</p>
+            <p class="sc-step-sentence">Now the need: the stretches of sidewalk that are simply <mark>missing</mark>.</p>
             <p class="sc-step-caption">Each circle stands for about 470 of them. District 5 is missing the most &mdash; and District 2 is missing more than District 1.</p>
             <div class="sc-step-legend">
               <div class="sc-legend-item"><span class="sc-legend-swatch"><span class="sc-legend-dot"></span></span><span class="sc-legend-label">&asymp; $1 million</span></div>
@@ -2187,8 +2238,8 @@ body {
         <div class="sc-step" data-phase="3">
           <div class="sc-step-content">
             <p class="sc-step-eyebrow">Where it lands</p>
-            <p class="sc-step-sentence">Divide the money across that need, and it settles <em>unevenly</em>.</p>
-            <p class="sc-step-caption">More reaches District 5; District 2's circles fill the thinnest. But these are only the levy's <em>floors</em> &mdash; at least 22% to D1, 17% to D2, 36% to D5. The dimmed dots up top are the other ~$28M (25%) for the rest of the city.</p>
+            <p class="sc-step-sentence">Divide the money across that need, and it settles <mark>unevenly</mark>.</p>
+            <p class="sc-step-caption">More reaches District 5; District 2's circles fill the thinnest. But these are only the levy's <em>floors</em> &mdash; the minimum each district is guaranteed. The dimmed dots up top are the other ~$28M (25%) for the rest of the city.</p>
             <div class="sc-step-legend">
               <div class="sc-legend-item"><span class="sc-legend-swatch"><span class="sc-legend-dot"></span></span><span class="sc-legend-label">&asymp; $1 million</span></div>
               <div class="sc-legend-item"><span class="sc-legend-swatch"><span class="sc-legend-circle"></span></span><span class="sc-legend-label">&asymp; 470 missing stretches</span></div>
@@ -2199,7 +2250,18 @@ body {
           <div class="sc-step-content">
             <p class="sc-step-eyebrow">Block by block</p>
             <p class="sc-step-sentence">Now zoom all the way in &mdash; to a <mark>single stretch</mark> of sidewalk in each district. This close, each dot is just <strong>$1,000</strong>.</p>
-            <p class="sc-step-caption"><em>District 2</em> has more missing sidewalk than District 1, yet draws the fewest dollars behind each block of it. The most need, the least money.</p>
+            <p class="sc-step-caption"><em>District 2</em> has more missing sidewalk than District 1, yet draws the fewest dollars behind each block of it.</p>
+            <div class="sc-step-legend">
+              <p class="sc-legend-note">Zoomed in &times; 1,000</p>
+              <div class="sc-legend-item"><span class="sc-legend-swatch"><span class="sc-legend-dot"></span></span><span class="sc-legend-label">&asymp; $1,000</span></div>
+              <div class="sc-legend-item"><span class="sc-legend-swatch"><span class="sc-legend-circle"></span></span><span class="sc-legend-label">&asymp; 1 missing stretch</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="sc-step" data-phase="5">
+          <div class="sc-step-content">
+            <p class="sc-step-headline">The most need, the least money.</p>
+            <p class="sc-step-caption"><em>District 2</em> carries the most missing sidewalk of the three, with the fewest dollars behind each block of it.</p>
             <div class="sc-step-legend">
               <p class="sc-legend-note">Zoomed in &times; 1,000</p>
               <div class="sc-legend-item"><span class="sc-legend-swatch"><span class="sc-legend-dot"></span></span><span class="sc-legend-label">&asymp; $1,000</span></div>
@@ -2209,13 +2271,14 @@ body {
         </div>
         <div class="sc-step-spacer"></div>
       </div>
-    </section>
-
-    <div class="sc-note">
-      <div class="sc-note-inner">
-        <b>Data &amp; method.</b> Money is each district's minimum levy floor from the 2024 Seattle Transportation Levy ($111M for new sidewalks; District 1: 22%, District 2: 17%, District 5: 36%). The pot shows that total in dots of roughly $1 million. Need is each district's share of the city's 11,550 missing sidewalk segments (D1: 1,898; D2: 2,596; D5: 3,885); each circle shown stands for roughly 470 of those segments (D1: 4 circles, D2: 6, D5: 8), a scaled stand-in rather than a literal segment tally. The dollars-per-stretch figures (D1 &asymp; $12,900, D5 &asymp; $10,300, D2 &asymp; $7,300) divide each district's levy floor by its missing-segment count. In the final view the scale changes: one circle is zoomed to a single stretch and filled with dots of roughly $1,000 each, so the dots inside (13 / 10 / 7) read directly as those dollars, rounded to the nearest thousand. Per-stretch dollars assume every stretch costs the same to build, which it does not, so no exact total is claimed. &ldquo;Need&rdquo; here is proxied by missing-sidewalk count only.
       </div>
-    </div>
+      <details class="sc-note">
+        <summary>Data &amp; method <span class="sc-note-source">2024 Seattle Transportation Levy &middot; SDOT missing-sidewalk inventory</span></summary>
+        <div class="sc-note-inner">
+          Money is each district's minimum levy floor from the 2024 Seattle Transportation Levy ($111M for new sidewalks). Need is each district's share of the city's 11,550 missing sidewalk segments; each circle shown is a scaled stand-in for roughly 470 of them, not a literal tally. The per-stretch dollars divide each district's levy floor by its missing-segment count &mdash; which assumes every stretch costs the same to build. It does not, so no exact total is claimed, and &ldquo;need&rdquo; here is proxied by missing-sidewalk count only.
+        </div>
+      </details>
+    </section>
 
   </div>
 
@@ -2231,9 +2294,9 @@ body {
     //   stretchDots = round(dollars-per-stretch / 1000), so the dots read straight off
     //   as the per-stretch figure (D1 most, D2 least — the inequality).
     var DISTRICTS = [
-      { key: 'd1', name: 'District 1', seg: '1,898 missing', perStretch: '$12,900', money: 24, circles: 4, perCircle: 6, stretchDots: 13, focus: false },
-      { key: 'd2', name: 'District 2', seg: '2,596 missing', perStretch: '$7,300',  money: 18, circles: 6, perCircle: 3, stretchDots: 7,  focus: true  },
-      { key: 'd5', name: 'District 5', seg: '3,885 missing', perStretch: '$10,300', money: 40, circles: 8, perCircle: 5, stretchDots: 10, focus: false }
+      { key: 'd1', name: 'District 1', seg: '1,898 missing', floor: '22% floor', perStretch: '$12,900', money: 24, circles: 4, perCircle: 6, stretchDots: 13, focus: false },
+      { key: 'd2', name: 'District 2', seg: '2,596 missing', floor: '17% floor', perStretch: '$7,300',  money: 18, circles: 6, perCircle: 3, stretchDots: 7,  focus: true  },
+      { key: 'd5', name: 'District 5', seg: '3,885 missing', floor: '36% floor', perStretch: '$10,300', money: 40, circles: 8, perCircle: 5, stretchDots: 10, focus: false }
     ];
     var OTHER_MONEY = 29; // 111 - (24+18+40)
 
@@ -2275,6 +2338,7 @@ body {
       var label = document.createElement('div');
       label.className = 'sc-col-label' + (d.focus ? ' sc-is-focus' : '');
       label.innerHTML = '<div class="sc-col-name">' + d.name + '</div><div class="sc-col-seg">' + d.seg + '</div>' +
+        '<div class="sc-col-floor">' + d.floor + '</div>' +
         '<div class="sc-col-dollars"><strong>' + d.perStretch + '</strong> per stretch</div>';
       col.appendChild(label);
 
@@ -2311,6 +2375,7 @@ body {
     }
 
     var moneyLocation = 'pot';
+    var heroZoomed = false; // tracks zoom state so the coin-drop only fires on first zoom-in (not on every phase 4↔5 move)
 
     function placeMoney(target) {
       if (target === 'pot') {
@@ -2438,6 +2503,9 @@ body {
     // apply at this scale, so we hide the hero's money dots and reveal a dedicated set of
     // $1,000 stretch dots (count = round(perStretch/1000)), which read straight off as dollars.
     function setHero(zoom) {
+      // only run the staggered coin-drop when first entering the zoom (e.g. phase 3→4),
+      // not on a repeat setHero(true) within the zoom (phase 4↔5) where dots are already placed
+      var firstZoom = zoom && !heroZoomed;
       DISTRICTS.forEach(function (d) {
         var info = districtData[d.key];
         var h = info.hero;
@@ -2453,8 +2521,8 @@ body {
           stretch.forEach(function (dot) { dot.style.display = ''; });
           // fill the stretch (the circle) bottom-up to its dollar level
           layoutFill(h, HERO_R, HERO_DOTR, HERO_MARGIN, HERO_GAP, '.sc-sdot');
-          // drop the dots in like coins, staggered
-          if (!reduceMotion) {
+          // drop the dots in like coins, staggered (only on first zoom-in)
+          if (!reduceMotion && firstZoom) {
             stretch.forEach(function (dot, i) {
               dot.style.animation = 'none';
               void dot.offsetWidth; // force restart so it re-fires on re-entry
@@ -2473,6 +2541,7 @@ body {
           layoutCircleDots(h, SMALL_R, SMALL_DOTR, SMALL_MARGIN, SMALL_GAP);
         }
       });
+      heroZoomed = zoom;
     }
 
     function moveMoney(target) {
@@ -2526,13 +2595,13 @@ body {
     function applyPhase(p) {
       if (viz.getAttribute('data-phase') === String(p)) return;
       viz.setAttribute('data-phase', p);
-      setHero(p === 4);
+      setHero(p === 4 || p === 5);
       moveMoney(p >= 3 ? 'fields' : 'pot');
       // If the reader fast-scrolls straight into phase 4 (skipping phase 3), moveMoney
       // still runs the pot→fields pack, which re-lays EVERY circle (incl. the hero) at
       // small spacing — overlapping the enlarged hero dots. Re-assert the hero zoom/layout
       // after moveMoney so the hero always ends at hero spacing regardless of scroll speed.
-      if (p === 4) setHero(true);
+      if (p === 4 || p === 5) setHero(true);
     }
 
     var steps = Array.prototype.slice.call(document.querySelectorAll('.sc-step'));
