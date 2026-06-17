@@ -1261,18 +1261,20 @@ body {
     padding: 0.75rem 0;
   }
 
-  /* ── Map reveal — stacked: map above, text below ── */
+  /* ── Map reveal — sticky map pinned on top, narration scrolls beneath ── */
   .map-reveal-section {
     display: block;
     padding: 0;
   }
   .map-sticky-pane {
-    position: relative;      /* no longer sticky */
+    position: sticky; top: 0;   /* pin the map through the whole narrative */
     width: 100%;
-    height: 65vw;            /* tall enough for a useful map view */
-    min-height: 240px;
-    max-height: 320px;
+    height: 52vh;
+    min-height: 300px;
     flex-shrink: unset;
+    z-index: 2;                 /* keep the map above the scrolling text */
+    background: #FFFFFF;
+    box-shadow: 0 14px 18px -12px rgba(0,0,0,0.12);
   }
   /* Always show the map on mobile — scroll-driven fade doesn't apply */
   .street-map-wrap    { opacity: 1 !important; }
@@ -1280,12 +1282,16 @@ body {
     flex: none;
     width: 100%;
     padding: 0 1.25rem;
+    position: relative; z-index: 1;
   }
-  .map-step           { min-height: 30vh; }
-  .map-step:first-child{ min-height: 20vh; padding-top: 2vh; }
-  .map-step-spacer    { height: 10vh; }
-  /* Same: always show map step text on mobile */
-  .map-step-content   { opacity: 1 !important; transform: none !important; }
+  .map-step           { min-height: 58vh; padding: 1.5rem 0; }
+  .map-step:first-child{ min-height: 30vh; padding-top: 3vh; }
+  .map-step-spacer    { height: 16vh; }
+  /* Same: always show map step text on mobile, on a solid backdrop */
+  .map-step-content   {
+    opacity: 1 !important; transform: none !important;
+    background: #FFFFFF; padding: 0.75rem 0;
+  }
 
   /* ── Stat trio — single column ── */
   .stat-trio {
@@ -1817,6 +1823,14 @@ body {
         <p class="map-street-label" style="color:rgba(24,20,14,0.45);">22nd Ave S &middot; S Walker St to S Bayview St</p>
         <p class="map-headline">The cautionary tale.</p>
         <p class="map-sub">Residents reported crashes. Asked about timelines. Were told a sidewalk was coming. It wasn&rsquo;t.</p>
+      </div>
+    </div>
+
+    <div class="map-step" id="map-step-walkshed">
+      <div class="map-step-content">
+        <p class="map-street-label" style="color:#185FA5;">Within a half-mile walk</p>
+        <p class="map-headline">What one block connects.</p>
+        <p class="map-sub">Step back half a mile and the stakes widen: <strong>five schools</strong>, <strong>two light-rail stations</strong>, and <strong>four housing developments</strong> &mdash; hundreds of new homes &mdash; all reach this corridor on foot. Seattle funded the density and the trains. It never funded the sidewalk that ties them together.</p>
       </div>
     </div>
 
@@ -2665,16 +2679,18 @@ body {
       if (best) applyPhase(parseInt(best.getAttribute('data-phase'), 10));
     }
 
-    // The district-column field is a fixed 408px wide (3 x 116px + 2 x 30px gap).
+    // The full district-column field is a fixed 408px wide (3 x 116px + 2 x 30px gap).
     // On narrow viewports the sticky pane is much smaller, so the outer columns
     // (D1, D5) clip against the pane's overflow:hidden. Scale the whole viz down
     // uniformly to fit — preserving every internal proportion and alignment.
-    var FIELD_W = 408;
+    // NB: must NOT be named FIELD_W — that name is already taken (=116, the single
+    // column width) and is used by setHero() to position the zoom circles.
+    var VIZ_FIT_W = 408;
     var vizPane = viz.parentElement; // .sc-sticky-pane
     function fitViz() {
-      var avail = vizPane ? vizPane.clientWidth : FIELD_W;
-      if (avail >= FIELD_W + 8) { viz.style.transform = ''; return; }
-      var s = Math.max(0.5, (avail - 6) / FIELD_W);
+      var avail = vizPane ? vizPane.clientWidth : VIZ_FIT_W;
+      if (avail >= VIZ_FIT_W + 8) { viz.style.transform = ''; return; }
+      var s = Math.max(0.5, (avail - 6) / VIZ_FIT_W);
       viz.style.transformOrigin = 'center center';
       viz.style.transform = 'scale(' + s.toFixed(3) + ')';
     }
@@ -2876,7 +2892,7 @@ const revealObs = new IntersectionObserver((entries) => {
       revealObs.unobserve(e.target);
     }
   });
-}, { threshold: 0.2, rootMargin: '0px 0px -60px 0px' });
+}, { threshold: 0, rootMargin: '0px 0px -60px 0px' });
 revealEls.forEach(el => revealObs.observe(el));
 
 
@@ -3447,7 +3463,9 @@ mapSteps.forEach(s => mapStepObs.observe(s));
       pyWalker = w21.y;  pyBayview = b21.y;
 
       tilesLoaded = true;
+      buildWalkshedLayer();
       updateLines();
+      updateWalkshed();
     });
   }
 
@@ -3509,6 +3527,18 @@ mapSteps.forEach(s => mapStepObs.observe(s));
     ));
 
     initOverlayCanvas();
+
+    // ── Zoomed-out walkshed view takes over ───────────────────────────────────
+    // When the map has zoomed out to the half-mile view, the scroll-driven
+    // canvas line drawing is irrelevant (positions are computed at zoom 17).
+    // Clear the overlay + flight canvas, keep the map fully opaque, and let the
+    // native Google polylines + category markers carry the visual.
+    if (zoomedOut) {
+      if (oCtx) oCtx.clearRect(0, 0, mapEl.offsetWidth, mapEl.offsetHeight);
+      if (flightCanvas) flightCanvas.style.display = 'none';
+      mapEl.style.opacity = 1;
+      return;
+    }
 
     // ── Timeline ────────────────────────────────────────────────────────────
     //   section enters viewport  →  flight begins (dots lift off grid, visible)
@@ -3634,7 +3664,158 @@ mapSteps.forEach(s => mapStepObs.observe(s));
     drawSegmentDots(px22, 'rgba(24,20,14,0.95)');
   }
 
+  // ══════════════════════════════════════════════════════════════════════════
+  //  WALKSHED ZOOM-OUT  —  the half-mile view
+  //  After the 21st/22nd corridor steps, the map zooms out to ~0.5 mi and
+  //  reveals every school, light-rail station, and new housing development
+  //  that reaches this one block on foot. Streets stay highlighted as native
+  //  polylines (no ring). Narrative: scale of impact + investment mismatch.
+  // ══════════════════════════════════════════════════════════════════════════
+  let zoomedOut     = false;
+  let walkLayerReady = false;
+  let walkMarkers   = [];
+  let line21Native  = null, line22Native = null;
+  let walkInfo      = null;
+  const NEAR_ZOOM   = 17;
+  const CENTER      = { lat: 47.5823491, lng: -122.3049514 }; // corridor midpoint
+  const WALK_RADIUS_M = 804.67;                               // 0.5 mile in meters
+  const walkStepEl  = document.getElementById('map-step-walkshed');
+
+  // Bounding box for a true 0.5-mi radius around the corridor midpoint.
+  // 1° lat ≈ 111,320 m; 1° lng ≈ 111,320·cos(lat). Fitting this box guarantees
+  // the half-mile walkshed is framed regardless of screen size (vs. a guessed zoom).
+  function walkBounds() {
+    const dLat = WALK_RADIUS_M / 111320;
+    const dLng = WALK_RADIUS_M / (111320 * Math.cos(CENTER.lat * Math.PI / 180));
+    return new google.maps.LatLngBounds(
+      { lat: CENTER.lat - dLat, lng: CENTER.lng - dLng },
+      { lat: CENTER.lat + dLat, lng: CENTER.lng + dLng }
+    );
+  }
+
+  // Category colors (mirrors long.html MAP_CATS)
+  const WALK_COLORS = { school: '#185FA5', transit: '#533AB7', dev: '#0F6E56' };
+
+  // Schools / transit / development within the ~half-mile walkshed (from long.html)
+  const WALK_LOCS = [
+    { lat: 47.5839742, lng: -122.3051229, cat: 'school',  label: 'Giddens School',
+      desc: 'Private K&ndash;5 directly on the project block. Hundreds of children arrive daily on a street with no sidewalk on either side.' },
+    { lat: 47.5838127, lng: -122.3045756, cat: 'school',  label: 'Lake Washington Girls Middle School',
+      desc: 'At the north end of the corridor. SDOT cited it to justify the walkway &mdash; yet the design adds no safe east-side crossing.' },
+    { lat: 47.5830053, lng: -122.3030562, cat: 'school',  label: 'French American School of Puget Sound',
+      desc: 'Under construction one block east. Its permits include no sidewalk on 22nd Ave S.' },
+    { lat: 47.5852399, lng: -122.3153096, cat: 'school',  label: "Beacon Hill Int'l Elementary",
+      desc: 'Public K&ndash;5, 347 students. Families walking from west Beacon Hill toward transit must cross 21st and 22nd with no sidewalk.' },
+    { lat: 47.5882,    lng: -122.3064,    cat: 'school',  label: 'Hamlin Robinson School',
+      desc: 'Special-education school for students with dyslexia and language-based learning disabilities &mdash; the same standard of safe walking access applies here.' },
+    { lat: 47.5901791, lng: -122.3072481, cat: 'transit', label: 'Judkins Park Station',
+      desc: '2 Line light rail, opened March 2026. Half a mile north. The corridor is the pedestrian gap to the station.' },
+    { lat: 47.5793753, lng: -122.3116706, cat: 'transit', label: 'Beacon Hill Station',
+      desc: '1 Line light rail, opened 2009. 21st Ave S sits between two stations with no safe walking route connecting them.' },
+    { lat: 47.5792,    lng: -122.3011610, cat: 'dev',     label: '900 Rainier Ave S',
+      desc: '396 units completed 2025 &mdash; part of 2,000+ added near Judkins Park since 2018. The city upzoned for density with no matching pedestrian commitment.' },
+    { lat: 47.5803803, lng: -122.3055831, cat: 'dev',     label: '1910 21st Ave S (proposed)',
+      desc: 'Proposed 7-story, 212-unit building on the project block itself. Hundreds of new residents would walk this street daily.' },
+    { lat: 47.5776,    lng: -122.3011610, cat: 'dev',     label: 'Community Roots / Jazz House',
+      desc: '128 units of affordable housing in development on Rainier. Affordable-housing residents are more likely to be transit-dependent pedestrians.' },
+    { lat: 47.5763,    lng: -122.3011610, cat: 'dev',     label: 'Urban League Empowerment Center',
+      desc: '6&ndash;7 stories of affordable housing + Urban League HQ. Built in a neighborhood where disinvestment is visible in the street itself.' },
+  ];
+
+  // Build a Google Maps marker icon (ported from long.html mkSvgIcon)
+  function mkWalkIcon(loc) {
+    const c = WALK_COLORS[loc.cat] || '#666';
+    const size = 28, r = 13;
+    let iconPath = '';
+    if (loc.cat === 'transit')      iconPath = 'M184,24H72A32,32,0,0,0,40,56V184a32,32,0,0,0,32,32h8L65.6,235.2a8,8,0,1,0,12.8,9.6L100,216h56l21.6,28.8a8,8,0,1,0,12.8-9.6L176,216h8a32,32,0,0,0,32-32V56A32,32,0,0,0,184,24ZM56,120V80h64v40Zm80-40h64v40H136ZM72,40H184a16,16,0,0,1,16,16v8H56V56A16,16,0,0,1,72,40ZM184,200H72a16,16,0,0,1-16-16V136H200v48A16,16,0,0,1,184,200ZM96,172a12,12,0,1,1-12-12A12,12,0,0,1,96,172Zm88,0a12,12,0,1,1-12-12A12,12,0,0,1,184,172Z';
+    else if (loc.cat === 'school')  iconPath = 'M226.53,56.41l-96-32a8,8,0,0,0-5.06,0l-96,32A8,8,0,0,0,24,64v80a8,8,0,0,0,16,0V75.1L73.59,86.29a64,64,0,0,0,20.65,88.05c-18,7.06-33.56,19.83-44.94,37.29a8,8,0,1,0,13.4,8.74C77.77,197.25,101.57,184,128,184s50.23,13.25,65.3,36.37a8,8,0,0,0,13.4-8.74c-11.38-17.46-27-30.23-44.94-37.29a64,64,0,0,0,20.65-88l44.12-14.7a8,8,0,0,0,0-15.18ZM176,120A48,48,0,1,1,89.35,91.55l36.12,12a8,8,0,0,0,5.06,0l36.12-12A47.89,47.89,0,0,1,176,120ZM128,87.57,57.3,64,128,40.43,198.7,64Z';
+    else if (loc.cat === 'dev')     iconPath = 'M240,208h-8V72a8,8,0,0,0-8-8H184V40a8,8,0,0,0-8-8H80a8,8,0,0,0-8,8V96H32a8,8,0,0,0-8,8V208H16a8,8,0,0,0,0,16H240a8,8,0,0,0,0-16ZM40,112H80a8,8,0,0,0,8-8V48h80V72a8,8,0,0,0,8,8h40V208H152V168a8,8,0,0,0-8-8H112a8,8,0,0,0-8,8v40H40Zm96,96H120V176h16ZM112,72a8,8,0,0,1,8-8h16a8,8,0,0,1,0,16H120A8,8,0,0,1,112,72Zm0,32a8,8,0,0,1,8-8h16a8,8,0,0,1,0,16H120A8,8,0,0,1,112,104Zm56,0a8,8,0,0,1,8-8h16a8,8,0,0,1,0,16H176A8,8,0,0,1,168,104ZM88,136a8,8,0,0,1-8,8H64a8,8,0,0,1,0-16H80A8,8,0,0,1,88,136Zm0,32a8,8,0,0,1-8,8H64a8,8,0,0,1,0-16H80A8,8,0,0,1,88,168Zm24-32a8,8,0,0,1,8-8h16a8,8,0,0,1,0,16H120A8,8,0,0,1,112,136Zm56,0a8,8,0,0,1,8-8h16a8,8,0,0,1,0,16H176A8,8,0,0,1,168,136Zm0,32a8,8,0,0,1,8-8h16a8,8,0,0,1,0,16H176A8,8,0,0,1,168,168Z';
+    const symbol = iconPath
+      ? '<g transform="translate(5,5) scale(0.0703)"><path d="' + iconPath + '" fill="white"/></g>'
+      : '';
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '">' +
+      '<circle cx="' + (size/2) + '" cy="' + (size/2) + '" r="' + r + '" fill="' + c + '" stroke="white" stroke-width="2"/>' + symbol + '</svg>';
+    return {
+      url: 'data:image/svg+xml;base64,' + btoa(svg),
+      scaledSize: new google.maps.Size(size, size),
+      anchor: new google.maps.Point(size/2, size/2),
+    };
+  }
+
+  // Build the native polyline + marker layer once tiles are ready (hidden initially)
+  function buildWalkshedLayer() {
+    if (walkLayerReady || !gmap || !window.google) return;
+    walkLayerReady = true;
+
+    walkInfo = new google.maps.InfoWindow();
+
+    // 21st & 22nd Ave S corridor — start invisible, revealed on zoom-out
+    line21Native = new google.maps.Polyline({
+      path: [ { lat: 47.5836616, lng: -122.3055831 }, { lat: 47.5810366, lng: -122.3055831 } ],
+      strokeColor: '#E24B4A', strokeOpacity: 0, strokeWeight: 5, map: gmap, zIndex: 5,
+    });
+    line22Native = new google.maps.Polyline({
+      path: [ { lat: 47.5836616, lng: -122.3043196 }, { lat: 47.5810366, lng: -122.3043196 } ],
+      strokeColor: '#18140E', strokeOpacity: 0, strokeWeight: 5, map: gmap, zIndex: 5,
+    });
+
+    walkMarkers = WALK_LOCS.map(loc => {
+      const m = new google.maps.Marker({
+        position: { lat: loc.lat, lng: loc.lng },
+        map: gmap, icon: mkWalkIcon(loc), title: loc.label, visible: false, zIndex: 10,
+      });
+      m.addListener('click', () => {
+        walkInfo.setContent(
+          '<div style="max-width:220px;font-family:inherit;">' +
+          '<strong style="color:' + (WALK_COLORS[loc.cat] || '#333') + ';">' + loc.label + '</strong>' +
+          '<p style="margin:.35em 0 0;font-size:.82rem;line-height:1.4;color:#333;">' + loc.desc + '</p></div>'
+        );
+        walkInfo.open(gmap, m);
+      });
+      return m;
+    });
+  }
+
+  function goWide() {
+    if (zoomedOut || !gmap) return;
+    zoomedOut = true;
+    buildWalkshedLayer();
+    if (oCtx) oCtx.clearRect(0, 0, mapEl.offsetWidth, mapEl.offsetHeight);
+    if (flightCanvas) flightCanvas.style.display = 'none';
+    mapEl.style.opacity = 1;
+    // Frame the true 0.5-mi box. Padding keeps edge pins off the pane border.
+    gmap.fitBounds(walkBounds(), { top: 24, right: 24, bottom: 24, left: 24 });
+    if (line21Native) line21Native.setOptions({ strokeOpacity: 0.9 });
+    if (line22Native) line22Native.setOptions({ strokeOpacity: 0.85 });
+    walkMarkers.forEach((m, i) => {
+      m.setAnimation(google.maps.Animation.DROP);
+      setTimeout(() => m.setVisible(true), i * 45);
+    });
+  }
+
+  function goNear() {
+    if (!zoomedOut || !gmap) return;
+    zoomedOut = false;
+    if (walkInfo) walkInfo.close();
+    walkMarkers.forEach(m => { m.setVisible(false); m.setAnimation(null); });
+    if (line21Native) line21Native.setOptions({ strokeOpacity: 0 });
+    if (line22Native) line22Native.setOptions({ strokeOpacity: 0 });
+    gmap.setZoom(NEAR_ZOOM);
+    gmap.setCenter(CENTER); // fitBounds may have nudged center — restore it
+    updateLines();
+  }
+
+  // Hysteresis so the zoom doesn't thrash at the threshold
+  function updateWalkshed() {
+    if (!walkStepEl || !tilesLoaded) return;
+    const top = walkStepEl.getBoundingClientRect().top;
+    const vh  = window.innerHeight;
+    if (!zoomedOut && top < vh * 0.5)  goWide();
+    else if (zoomedOut && top > vh * 0.68) goNear();
+  }
+
   window.addEventListener('scroll', updateLines, { passive: true });
+  window.addEventListener('scroll', updateWalkshed, { passive: true });
 })();
 
 /* ── Evidence lightbox ─────────────────────────── */
