@@ -1318,20 +1318,14 @@ body {
   overflow: hidden;
 }
 .sc-viz { width: 100%; max-width: 540px; }
-.sc-viz-title {
-  font-size: var(--label-size); font-weight: 700; letter-spacing: var(--label-track);
-  text-transform: uppercase; color: var(--ink-muted); margin-bottom: 0.4rem;
-  transition: color 0.4s ease;
-}
-.sc-viz-sub {
-  font-size: 12px; color: var(--ink-muted); margin-bottom: 1.2rem; min-height: 1.2em;
-}
 .sc-stage { position: relative; height: 430px; }
 .sc-pot {
   position: absolute; top: 0; left: 0; right: 0;
   display: flex; flex-wrap: wrap; gap: 5px;
   justify-content: center; align-content: flex-start; padding-top: 6px;
-  max-width: 470px; margin: 0 auto;
+  /* match the district columns' span (3 x 116px field + 2 x 30px gap = 408px)
+     so the pot's left/right edges line up with the outer circles below */
+  max-width: 408px; margin: 0 auto;
 }
 .sc-pot .sc-mdot { width: 12px; height: 12px; }
 .sc-cols {
@@ -1342,6 +1336,7 @@ body {
 .sc-field { position: relative; width: 116px; height: 244px; }
 .sc-col-label { margin-top: 0.7rem; text-align: center; opacity: 0; transition: opacity 0.4s ease; }
 .sc-col-name { font-size: 12px; font-weight: 600; color: var(--ink); }
+.sc-col-label.sc-is-focus .sc-col-name { color: var(--red); }
 .sc-col-seg { font-size: 10.5px; color: var(--ink-muted); margin-top: 1px; }
 .sc-col-dollars {
   font-size: 11.5px; color: var(--ink); margin-top: 0;
@@ -1350,10 +1345,28 @@ body {
 }
 .sc-col-dollars strong { font-weight: 700; }
 .sc-viz[data-phase="4"] .sc-col-dollars { max-height: 2.4em; margin-top: 4px; opacity: 1; }
+
+/* the remainder: the ~25% (~$28M) the levy does NOT floor-commit to these three districts.
+   Instead of vanishing, it stays as a dimmed, labelled cluster up top so the split reads honestly. */
+.sc-rest {
+  position: absolute; top: 2px; left: 50%; transform: translateX(-50%);
+  width: 168px; text-align: center; opacity: 0; transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+.sc-viz[data-phase="3"] .sc-rest { opacity: 1; }
+.sc-rest-dots { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; }
+.sc-rest-label { margin-top: 0.5rem; font-size: 10.5px; line-height: 1.3; color: var(--ink-muted); }
+
 .sc-mdot {
   width: 10px; height: 10px; border-radius: 50%; background: var(--ink);
   flex: 0 0 auto;
   transition: opacity 0.5s ease, width 0.5s ease, height 0.5s ease;
+}
+/* a per-stretch dot — phase 4 only. One ≈ $1,000, shown inside the single
+   zoomed stretch, so dots × $1,000 read straight off as dollars-per-stretch */
+.sc-sdot {
+  position: absolute;
+  width: 16px; height: 16px; border-radius: 50%; background: var(--ink);
 }
 .sc-seg {
   position: absolute; width: 52px; height: 52px; border-radius: 50%;
@@ -1396,25 +1409,40 @@ body {
   93%  { transform: translate(0,-2.5px) scale(1); }
   100% { transform: translate(0,0) scale(1); }
 }
-.sc-verdict {
-  margin-top: 1.4rem; font-size: 13px; line-height: 1.6; color: var(--ink-soft);
-  max-width: 46ch; opacity: 0; transition: opacity 0.5s ease;
-}
-.sc-viz[data-phase="4"] .sc-verdict { opacity: 1; }
-.sc-verdict strong { color: var(--red); font-weight: 600; }
 .sc-steps { flex: 0 0 300px; padding: 0 2rem; }
 .sc-step { min-height: 95vh; display: flex; align-items: center; padding: 2rem 0; }
 .sc-step:first-child { min-height: 72vh; padding-top: 12vh; }
 .sc-step-spacer { height: 55vh; }
 .sc-step-content { opacity: 0.22; transform: translateY(8px); transition: opacity 0.4s ease, transform 0.4s ease; }
 .sc-step.sc-active .sc-step-content { opacity: 1; transform: translateY(0); }
+.sc-step-eyebrow {
+  font-size: var(--label-size); font-weight: 700; letter-spacing: var(--label-track);
+  text-transform: uppercase; color: var(--ink-muted); margin-bottom: 0.55rem;
+}
 .sc-step-sentence {
   font-family: 'Fustat', sans-serif; font-size: 18px; font-weight: 400;
   line-height: 1.45; color: var(--ink); margin-bottom: 0.55rem;
 }
 .sc-step-sentence strong { font-weight: 600; }
 .sc-step-sentence em { font-style: normal; color: var(--red); font-weight: 600; }
+/* highlighted concept (e.g. "single stretch") — light-grey rounded pill, black text */
+.sc-step-sentence mark {
+  background: #EAEAEA; color: var(--ink);
+  border-radius: 0.45em; padding: 0.06em 0.3em;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+}
 .sc-step-caption { font-size: 13px; line-height: 1.6; color: var(--ink-muted); }
+.sc-step-caption em { font-style: normal; color: var(--red); font-weight: 600; }
+
+/* per-step legend — the visual key, sitting below the narrative text in the right column.
+   Each item stacks: swatch on top, label underneath. */
+.sc-step-legend { margin-top: 1.8rem; display: flex; flex-direction: column; gap: 1.4rem; }
+.sc-legend-item { display: flex; flex-direction: column; align-items: flex-start; gap: 0.5rem; font-size: 12px; color: var(--ink-muted); }
+.sc-legend-swatch { flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; }
+.sc-legend-dot { width: 11px; height: 11px; border-radius: 50%; background: var(--ink); }
+.sc-legend-circle { width: 34px; height: 34px; border-radius: 50%; background: #EAEAEA; }
+/* phase 4 changes scale ($1M → $1,000); this note flags the zoom above the legend keys */
+.sc-legend-note { font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: -0.3rem; }
 .sc-note { background: var(--surface); color: var(--ink-muted); padding: 3rem 2rem 5rem; font-size: 12px; line-height: 1.7; }
 .sc-note-inner { max-width: 620px; margin: 0 auto; border-top: 1px solid rgba(24,20,14,0.12); padding-top: 1.5rem; }
 .sc-note b { color: var(--ink-soft); }
@@ -1718,12 +1746,12 @@ body {
   <div class="pinned-ch4" id="pinned-ch4">
     <div class="ch4-divider">
       <div class="cov-scatter" aria-hidden="true">
-        <div class="cov-item" data-float="-90" data-rot="0" style="left:2%;  top:6%;  width:clamp(180px,20vw,330px);"><img class="cov-img" src="imgs/Community-SDOT_Email_01.png" alt=""></div>
-        <div class="cov-item" data-float="78"  data-rot="0" style="left:60%; top:5%;  width:clamp(190px,21vw,340px);"><img class="cov-img" src="imgs/Community-SDOT_Email_02.png" alt=""></div>
-        <div class="cov-item" data-float="-60" data-rot="0" style="left:70%; top:30%; width:clamp(150px,15vw,250px);"><img class="cov-img" src="imgs/Community-SDOT_Email_06.png" alt=""></div>
-        <div class="cov-item" data-float="88"  data-rot="0" style="left:1%;  top:44%; width:clamp(190px,22vw,350px);"><img class="cov-img" src="imgs/Community-SDOT_Email_03.png" alt=""></div>
-        <div class="cov-item" data-float="64"  data-rot="0" style="left:8%;  top:70%; width:clamp(180px,19vw,300px);"><img class="cov-img" src="imgs/Community-SDOT_Email_04.png" alt=""></div>
-        <div class="cov-item" data-float="-96" data-rot="0" style="left:58%; top:72%; width:clamp(190px,21vw,330px);"><img class="cov-img" src="imgs/Community-SDOT_Email_05.png" alt=""></div>
+        <div class="cov-item" data-float="-90" data-rot="0" style="left:2%;  top:6%;  width:clamp(205px,23vw,370px);"><img class="cov-img" src="imgs/Community-SDOT_Email_01.png" alt=""></div>
+        <div class="cov-item" data-float="78"  data-rot="0" style="left:68%; top:5%;  width:clamp(215px,24vw,380px);"><img class="cov-img" src="imgs/Community-SDOT_Email_02.png" alt=""></div>
+        <div class="cov-item" data-float="-60" data-rot="0" style="left:79%; top:30%; width:clamp(175px,18vw,285px);"><img class="cov-img" src="imgs/Community-SDOT_Email_06.png" alt=""></div>
+        <div class="cov-item" data-float="88"  data-rot="0" style="left:1%;  top:44%; width:clamp(215px,25vw,390px);"><img class="cov-img" src="imgs/Community-SDOT_Email_03.png" alt=""></div>
+        <div class="cov-item" data-float="64"  data-rot="0" style="left:8%;  top:70%; width:clamp(205px,22vw,340px);"><img class="cov-img" src="imgs/Community-SDOT_Email_04.png" alt=""></div>
+        <div class="cov-item" data-float="-96" data-rot="0" style="left:67%; top:72%; width:clamp(215px,24vw,370px);"><img class="cov-img" src="imgs/Community-SDOT_Email_05.png" alt=""></div>
       </div>
       <div class="ch4-divider-inner">
         <p class="ch-eyebrow" data-ch4-stat="0.25">22nd &amp; 21st Ave S &middot; 2021&ndash;2023</p>
@@ -2047,7 +2075,17 @@ body {
 
     <div class="prose" data-reveal>
       <p>Residents organized the survey themselves, because SDOT had not asked.</p>
-      <p>By SDOT&rsquo;s own prioritization data, this block is Tier 1, the highest possible. Equity score: 12 out of 12, the maximum. Among 11,550 missing sidewalk segments citywide, 21st Ave S ranks in the top 7.8%. An asphalt path on one side of the street is not the standard the rest of Seattle is held to.</p>
+      <p>By SDOT&rsquo;s own prioritization data, this block is Tier 1, the highest possible. Equity score: 12 out of 12, the maximum. Among 11,550 missing sidewalk segments citywide, 21st Ave S ranks in the top 7.8%.</p>
+    </div>
+
+    <div class="stat-pull" data-reveal>
+      <div class="stat-pull-num">20<span class="stat-figure" style="vertical-align:super;opacity:0.4">/24</span></div>
+      <div class="stat-pull-label">priority score, nearly double the citywide average of 10.4. Equity score: 12 of 12.</div>
+      <div class="stat-pull-source">SDOT sidewalk prioritization data</div>
+    </div>
+
+    <div class="prose" data-reveal>
+      <p>Top priority on paper. On the ground, a 6-foot asphalt path on one side of the street.</p>
     </div>
 
   </div>
@@ -2110,52 +2148,63 @@ body {
       <p>The families on 21st Ave S could not move to those North Seattle neighborhoods. Covenants barred them by deed. Now, decades later, those same neighborhoods receive two dollars of levy funding for every one dollar that goes to District 2. District 5 has more missing sidewalk than District 2, so a larger share might look fair. It isn&rsquo;t. Per stretch of missing sidewalk, District 5 still draws about $10,300 in levy money to District 2&rsquo;s $7,300, nearly 40% more. The reason is a 1954 promise made to neighborhoods that had legally locked these families out, a promise they were never allowed to benefit from.</p>
     </div>
 
-    <div class="stat-pull" data-reveal>
-      <div class="stat-pull-num">20<span class="stat-figure" style="vertical-align:super;opacity:0.4">/24</span></div>
-      <div class="stat-pull-label">priority score, nearly double the citywide average of 10.4. Equity score: 12 of 12.</div>
-      <div class="stat-pull-source">SDOT sidewalk prioritization data</div>
-    </div>
-
-    <div class="prose" data-reveal>
-      <p>Top priority on paper. On the ground, a 6-foot asphalt path on one side of the street.</p>
-    </div>
-
     <!-- ── "money into segments" scrollytelling viz (ported from prototype_segment-circles.html) ── -->
     <section class="sc-scrolly" aria-label="How the levy money divides across districts">
       <div class="sc-sticky-pane">
         <div class="sc-viz" id="sc-viz" data-phase="1">
-          <p class="sc-viz-title" id="sc-vtitle">The money</p>
-          <p class="sc-viz-sub" id="sc-vsub">Each dot &asymp; $1 million</p>
           <div class="sc-stage">
             <div class="sc-pot" id="sc-pot"></div>
             <div class="sc-cols" id="sc-cols"></div>
+            <div class="sc-rest" id="sc-rest" aria-hidden="true">
+              <div class="sc-rest-dots" id="sc-restDots"></div>
+              <p class="sc-rest-label">&asymp; $28M &middot; the rest of the city</p>
+            </div>
           </div>
-          <p class="sc-verdict">District 2 has more missing sidewalk than District 1, yet draws the <strong>fewest dollars</strong> behind each block of it &mdash; the most need, the least money.</p>
         </div>
       </div>
 
       <div class="sc-steps">
         <div class="sc-step" data-phase="1">
           <div class="sc-step-content">
-            <p class="sc-step-sentence">Start with the money. In 2024, Seattle's levy set aside <strong>$111 million</strong> to build new sidewalks.</p>
+            <p class="sc-step-eyebrow">The money</p>
+            <p class="sc-step-sentence">Start with the money. In 2024, Seattle's levy set aside <strong>$111 million</strong> to build new sidewalks across the city.</p>
+            <div class="sc-step-legend">
+              <div class="sc-legend-item"><span class="sc-legend-swatch"><span class="sc-legend-dot"></span></span><span class="sc-legend-label">&asymp; $1 million</span></div>
+            </div>
           </div>
         </div>
         <div class="sc-step" data-phase="2">
           <div class="sc-step-content">
+            <p class="sc-step-eyebrow">The need</p>
             <p class="sc-step-sentence">Now the need: the stretches of sidewalk that are simply <em>missing</em>.</p>
             <p class="sc-step-caption">Each circle stands for about 470 of them. District 5 is missing the most &mdash; and District 2 is missing more than District 1.</p>
+            <div class="sc-step-legend">
+              <div class="sc-legend-item"><span class="sc-legend-swatch"><span class="sc-legend-dot"></span></span><span class="sc-legend-label">&asymp; $1 million</span></div>
+              <div class="sc-legend-item"><span class="sc-legend-swatch"><span class="sc-legend-circle"></span></span><span class="sc-legend-label">&asymp; 470 missing stretches</span></div>
+            </div>
           </div>
         </div>
         <div class="sc-step" data-phase="3">
           <div class="sc-step-content">
+            <p class="sc-step-eyebrow">Where it lands</p>
             <p class="sc-step-sentence">Divide the money across that need, and it settles <em>unevenly</em>.</p>
-            <p class="sc-step-caption">More reaches District 5, which has the most missing sidewalk. District 2's circles fill the thinnest.</p>
+            <p class="sc-step-caption">More reaches District 5; District 2's circles fill the thinnest. But these are only the levy's <em>floors</em> &mdash; at least 22% to D1, 17% to D2, 36% to D5. The dimmed dots up top are the other ~$28M (25%) for the rest of the city.</p>
+            <div class="sc-step-legend">
+              <div class="sc-legend-item"><span class="sc-legend-swatch"><span class="sc-legend-dot"></span></span><span class="sc-legend-label">&asymp; $1 million</span></div>
+              <div class="sc-legend-item"><span class="sc-legend-swatch"><span class="sc-legend-circle"></span></span><span class="sc-legend-label">&asymp; 470 missing stretches</span></div>
+            </div>
           </div>
         </div>
         <div class="sc-step" data-phase="4">
           <div class="sc-step-content">
-            <p class="sc-step-sentence">Now look at a single stretch in each district.</p>
-            <p class="sc-step-caption">It draws about $12,900 in District 1 and $10,300 in District 5 &mdash; but just <strong>$7,300 in District 2</strong>, the district with more missing sidewalk than District 1.</p>
+            <p class="sc-step-eyebrow">Block by block</p>
+            <p class="sc-step-sentence">Now zoom all the way in &mdash; to a <mark>single stretch</mark> of sidewalk in each district. This close, each dot is just <strong>$1,000</strong>.</p>
+            <p class="sc-step-caption"><em>District 2</em> has more missing sidewalk than District 1, yet draws the fewest dollars behind each block of it. The most need, the least money.</p>
+            <div class="sc-step-legend">
+              <p class="sc-legend-note">Zoomed in &times; 1,000</p>
+              <div class="sc-legend-item"><span class="sc-legend-swatch"><span class="sc-legend-dot"></span></span><span class="sc-legend-label">&asymp; $1,000</span></div>
+              <div class="sc-legend-item"><span class="sc-legend-swatch"><span class="sc-legend-circle"></span></span><span class="sc-legend-label">&asymp; 1 missing stretch</span></div>
+            </div>
           </div>
         </div>
         <div class="sc-step-spacer"></div>
@@ -2164,7 +2213,7 @@ body {
 
     <div class="sc-note">
       <div class="sc-note-inner">
-        <b>Data &amp; method.</b> Money is each district's minimum levy floor from the 2024 Seattle Transportation Levy ($111M for new sidewalks; District 1: 22%, District 2: 17%, District 5: 36%). The pot shows that total in dots of roughly $1 million. Need is each district's share of the city's 11,550 missing sidewalk segments (D1: 1,898; D2: 2,596; D5: 3,885); each circle shown stands for roughly 470 of those segments (D1: 4 circles, D2: 6, D5: 8), a scaled stand-in rather than a literal segment tally. The dollars-per-stretch figures (D1 &asymp; $12,900, D5 &asymp; $10,300, D2 &asymp; $7,300) divide each district's levy floor by its missing-segment count; the dot counts inside the circles (6 / 5 / 3) are a rounded visual proxy for that same ratio. Per-stretch dollars assume every stretch costs the same to build, which it does not, so no exact total is claimed. &ldquo;Need&rdquo; here is proxied by missing-sidewalk count only.
+        <b>Data &amp; method.</b> Money is each district's minimum levy floor from the 2024 Seattle Transportation Levy ($111M for new sidewalks; District 1: 22%, District 2: 17%, District 5: 36%). The pot shows that total in dots of roughly $1 million. Need is each district's share of the city's 11,550 missing sidewalk segments (D1: 1,898; D2: 2,596; D5: 3,885); each circle shown stands for roughly 470 of those segments (D1: 4 circles, D2: 6, D5: 8), a scaled stand-in rather than a literal segment tally. The dollars-per-stretch figures (D1 &asymp; $12,900, D5 &asymp; $10,300, D2 &asymp; $7,300) divide each district's levy floor by its missing-segment count. In the final view the scale changes: one circle is zoomed to a single stretch and filled with dots of roughly $1,000 each, so the dots inside (13 / 10 / 7) read directly as those dollars, rounded to the nearest thousand. Per-stretch dollars assume every stretch costs the same to build, which it does not, so no exact total is claimed. &ldquo;Need&rdquo; here is proxied by missing-sidewalk count only.
       </div>
     </div>
 
@@ -2177,10 +2226,14 @@ body {
     if (!viz) return;
     var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+    // PHASES 1-3 (macro, dot ≈ $1M): circles = need; money = circles * perCircle exactly.
+    // PHASE 4 (zoom, dot ≈ $1,000): one circle becomes a single stretch, filled with
+    //   stretchDots = round(dollars-per-stretch / 1000), so the dots read straight off
+    //   as the per-stretch figure (D1 most, D2 least — the inequality).
     var DISTRICTS = [
-      { key: 'd1', name: 'District 1', seg: '1,898 missing', perStretch: '$12,900', money: 24, circles: 4, perCircle: 6, focus: false },
-      { key: 'd2', name: 'District 2', seg: '2,596 missing', perStretch: '$7,300',  money: 18, circles: 6, perCircle: 3, focus: true  },
-      { key: 'd5', name: 'District 5', seg: '3,885 missing', perStretch: '$10,300', money: 40, circles: 8, perCircle: 5, focus: false }
+      { key: 'd1', name: 'District 1', seg: '1,898 missing', perStretch: '$12,900', money: 24, circles: 4, perCircle: 6, stretchDots: 13, focus: false },
+      { key: 'd2', name: 'District 2', seg: '2,596 missing', perStretch: '$7,300',  money: 18, circles: 6, perCircle: 3, stretchDots: 7,  focus: true  },
+      { key: 'd5', name: 'District 5', seg: '3,885 missing', perStretch: '$10,300', money: 40, circles: 8, perCircle: 5, stretchDots: 10, focus: false }
     ];
     var OTHER_MONEY = 29; // 111 - (24+18+40)
 
@@ -2190,9 +2243,8 @@ body {
     var HERO = 96;
 
     var pot = document.getElementById('sc-pot');
+    var restDots = document.getElementById('sc-restDots');
     var cols = document.getElementById('sc-cols');
-    var vtitle = document.getElementById('sc-vtitle');
-    var vsub = document.getElementById('sc-vsub');
 
     var moneyDots = [];
     var otherDots = [];
@@ -2221,7 +2273,7 @@ body {
       col.appendChild(field);
 
       var label = document.createElement('div');
-      label.className = 'sc-col-label';
+      label.className = 'sc-col-label' + (d.focus ? ' sc-is-focus' : '');
       label.innerHTML = '<div class="sc-col-name">' + d.name + '</div><div class="sc-col-seg">' + d.seg + '</div>' +
         '<div class="sc-col-dollars"><strong>' + d.perStretch + '</strong> per stretch</div>';
       col.appendChild(label);
@@ -2235,7 +2287,16 @@ body {
         pot.appendChild(dot); moneyDots.push(dot); dotEls.push(dot);
       }
 
-      districtData[d.key] = { circles: circleEls, dots: dotEls, hero: circleEls[0] };
+      // per-stretch dots ($1,000 each): live in the hero circle, hidden until phase 4
+      var stretchEls = [];
+      for (var sd = 0; sd < d.stretchDots; sd++) {
+        var sdot = document.createElement('div');
+        sdot.className = 'sc-sdot'; sdot.dataset.key = d.key;
+        sdot.style.display = 'none';
+        circleEls[0].appendChild(sdot); stretchEls.push(sdot);
+      }
+
+      districtData[d.key] = { circles: circleEls, dots: dotEls, hero: circleEls[0], stretch: stretchEls };
     });
 
     for (var o = 0; o < OTHER_MONEY; o++) {
@@ -2268,13 +2329,19 @@ body {
             layoutCircleDots(circle, SMALL_R, SMALL_DOTR, SMALL_MARGIN, SMALL_GAP);
           });
         });
-        otherDots.forEach(function (c) { c.style.opacity = '0'; });
+        // the remainder (~$28M) the levy doesn't floor-commit to these three: keep it visible
+        // but dimmed in a labelled "rest of the city" cluster, instead of fading it to nothing.
+        otherDots.forEach(function (c) {
+          c.style.position = ''; c.style.left = ''; c.style.top = ''; c.style.opacity = '0.22';
+          restDots.appendChild(c);
+        });
       }
     }
 
     var PILE_ROWS = {
       1: [1], 2: [2], 3: [2, 1], 4: [3, 1], 5: [3, 2],
-      6: [4, 2], 7: [4, 3], 8: [5, 3], 9: [5, 4]
+      6: [4, 2], 7: [4, 3], 8: [5, 3], 9: [5, 4],
+      10: [6, 4], 11: [6, 4, 1], 12: [6, 5, 1], 13: [6, 5, 2]
     };
 
     function settlePositions(n, R, dotR, margin, gap) {
@@ -2309,24 +2376,89 @@ body {
       });
     }
 
-    var SMALL_R = CIRCLE / 2, SMALL_DOTR = 5, SMALL_MARGIN = 2, SMALL_GAP = 1.5;
-    var HERO_R = HERO / 2, HERO_DOTR = 9.5, HERO_MARGIN = 3, HERO_GAP = 2;
+    // ── phase-4 "fuel gauge" fill ──
+    // Fill the circle bottom-up like balls settling under gravity in a round bowl. We build a
+    // HEX lattice (every other row offset by half a step, so dots nestle into the valleys of the
+    // row below) clipped to the circle, then keep the N LOWEST seats. The sides follow the curve,
+    // the pile comes to a rounded point in the well, and a fuller stretch (more dollars) rises
+    // HIGHER — so the per-stretch difference reads at a glance, with an organic settled look.
+    function fillPositions(n, R, dotR, margin, gap) {
+      var cx = R, cy = R;
+      var Rin = R - dotR - margin;              // dot centres stay within this radius
+      var s = 2 * dotR + gap;                   // horizontal centre-to-centre within a row
+      var rowH = s * 0.866;                     // hex row rise (√3/2 · s) — rows interlock
+      // Anchor the bottom row a touch above the true bottom so the base spans ~3 dots (±s),
+      // i.e. a flat floor rather than a single-dot point (which reads as a pointed star tip).
+      var baseHalf = s;
+      var yFloor = cy + Math.sqrt(Math.max(0, Rin * Rin - baseHalf * baseHalf));
+      var seats = [];
+      var row = 0;
+      for (var yc = yFloor; yc > cy - Rin - 0.5; yc -= rowH, row++) {
+        var dyc = yc - cy;
+        var half2 = Rin * Rin - dyc * dyc;
+        if (half2 < 0) half2 = 0;
+        var chordHalf = Math.sqrt(half2);       // available half-width at this row's height
+        var offset = (row % 2) * (s / 2);       // odd rows nestle into the valleys
+        for (var k = 0; ; k++) {
+          var xr = offset + k * s;              // rightward seats
+          if (xr > chordHalf + 0.01) break;
+          seats.push({ x: cx + xr, y: yc });
+          if (xr > 0.01) seats.push({ x: cx - xr, y: yc });   // mirror to the left
+        }
+      }
+      // gravity: lowest seats first; tie-break toward the centre line so it piles symmetrically
+      seats.sort(function (a, b) {
+        if (Math.abs(a.y - b.y) > 0.5) return b.y - a.y;
+        return Math.abs(a.x - cx) - Math.abs(b.x - cx);
+      });
+      var positions = [];
+      for (var i = 0; i < n && i < seats.length; i++) {
+        positions.push({ left: seats[i].x - dotR, top: seats[i].y - dotR });
+      }
+      return positions;
+    }
 
+    function layoutFill(circleEl, R, dotR, margin, gap, sel) {
+      var dots = circleEl.querySelectorAll(sel || '.sc-sdot');
+      if (!dots.length) return;
+      var pos = fillPositions(dots.length, R, dotR, margin, gap);
+      dots.forEach(function (dot, i) {
+        if (!pos[i]) return;
+        dot.style.position = 'absolute';
+        dot.style.margin = '0';
+        dot.style.left = pos[i].left + 'px';
+        dot.style.top = pos[i].top + 'px';
+      });
+    }
+
+    var SMALL_R = CIRCLE / 2, SMALL_DOTR = 5, SMALL_MARGIN = 2, SMALL_GAP = 1.5;
+    var HERO_R = HERO / 2, HERO_DOTR = 8, HERO_MARGIN = 3, HERO_GAP = 3;   // 96px circle, 16px $1,000 dots; capacity ≈ 15 so D1 (13) reads nearly full
+
+    // Phase 4 zooms ONE circle into a single stretch. The macro $1M money dots no longer
+    // apply at this scale, so we hide the hero's money dots and reveal a dedicated set of
+    // $1,000 stretch dots (count = round(perStretch/1000)), which read straight off as dollars.
     function setHero(zoom) {
       DISTRICTS.forEach(function (d) {
-        var h = districtData[d.key].hero;
-        var dots = h.querySelectorAll('.sc-mdot');
+        var info = districtData[d.key];
+        var h = info.hero;
+        var moneyInHero = h.querySelectorAll('.sc-mdot');
+        var stretch = info.stretch;
         if (zoom) {
           h.style.left = ((FIELD_W - HERO) / 2) + 'px';
           h.style.top = ((FIELD_H - HERO) / 2) + 'px';
           h.style.width = HERO + 'px';
           h.style.height = HERO + 'px';
-          layoutCircleDots(h, HERO_R, HERO_DOTR, HERO_MARGIN, HERO_GAP);
+          // hide the macro money dots; this circle is now one stretch at $1,000-dot scale
+          moneyInHero.forEach(function (dot) { dot.style.display = 'none'; });
+          stretch.forEach(function (dot) { dot.style.display = ''; });
+          // fill the stretch (the circle) bottom-up to its dollar level
+          layoutFill(h, HERO_R, HERO_DOTR, HERO_MARGIN, HERO_GAP, '.sc-sdot');
+          // drop the dots in like coins, staggered
           if (!reduceMotion) {
-            dots.forEach(function (dot, i) {
+            stretch.forEach(function (dot, i) {
               dot.style.animation = 'none';
-              void dot.offsetWidth;
-              dot.style.animation = 'sc-coinDrop 0.62s cubic-bezier(.34,0,.5,1) ' + (i * 85) + 'ms both';
+              void dot.offsetWidth; // force restart so it re-fires on re-entry
+              dot.style.animation = 'sc-coinDrop 0.62s cubic-bezier(.34,0,.5,1) ' + (i * 60) + 'ms both';
             });
           }
         } else {
@@ -2334,7 +2466,10 @@ body {
           h.style.top = gridTop(0) + 'px';
           h.style.width = '';
           h.style.height = '';
-          dots.forEach(function (dot) { dot.style.animation = ''; });
+          // put the stretch dots away and restore the macro money dots
+          stretch.forEach(function (dot) { dot.style.display = 'none'; dot.style.animation = ''; });
+          moneyInHero.forEach(function (dot) { dot.style.display = ''; dot.style.animation = ''; });
+          // re-settle the money at small scale (no-op while the money still sits in the pot)
           layoutCircleDots(h, SMALL_R, SMALL_DOTR, SMALL_MARGIN, SMALL_GAP);
         }
       });
@@ -2386,18 +2521,11 @@ body {
       moneyLocation = target;
     }
 
-    var COPY = {
-      1: { t: 'The money', s: 'Each dot ≈ $1 million' },
-      2: { t: 'The need', s: 'Each circle ≈ 470 missing stretches' },
-      3: { t: 'Where it lands', s: 'Each dot ≈ $1 million' },
-      4: { t: 'Block by block', s: 'Each dot ≈ $1 million' }
-    };
-
+    // Phase title + legend now live per-step in the right column (.sc-step-eyebrow / .sc-step-legend),
+    // so phase changes only need to drive the viz state and dot choreography.
     function applyPhase(p) {
       if (viz.getAttribute('data-phase') === String(p)) return;
       viz.setAttribute('data-phase', p);
-      vtitle.textContent = COPY[p].t;
-      vsub.textContent = COPY[p].s;
       setHero(p === 4);
       moveMoney(p >= 3 ? 'fields' : 'pot');
       // If the reader fast-scrolls straight into phase 4 (skipping phase 3), moveMoney
