@@ -318,9 +318,23 @@ body {
   50%      { transform: translateY(-7px); }
 }
 @media (max-width: 760px) {
+  /* Thin the scatter so the headline breathes, then pull the survivors into a
+     contained collage that frames the headline without clipping off-screen.
+     Inline left/top/width need !important to win over the element style attr. */
   .cov-item:nth-child(3),
   .cov-item:nth-child(5),
   .cov-item:nth-child(6) { display: none; }
+
+  /* Ch2 covenant clippings — four corners around the quote */
+  .ch-divider .cov-item:nth-child(1) { left: 2%  !important; top: 6%  !important; width: 42vw !important; }
+  .ch-divider .cov-item:nth-child(2) { left: 55% !important; top: 4%  !important; width: 43vw !important; }
+  .ch-divider .cov-item:nth-child(4) { left: 3%  !important; top: 63% !important; width: 43vw !important; }
+  .ch-divider .cov-item:nth-child(7) { left: 54% !important; top: 66% !important; width: 43vw !important; }
+
+  /* Ch4 SDOT-email clippings — three points around the headline */
+  .ch4-divider .cov-item:nth-child(1) { left: 2%  !important; top: 6%  !important; width: 42vw !important; }
+  .ch4-divider .cov-item:nth-child(2) { left: 55% !important; top: 5%  !important; width: 43vw !important; }
+  .ch4-divider .cov-item:nth-child(4) { left: 14% !important; top: 66% !important; width: 48vw !important; }
 }
 @media (prefers-reduced-motion: reduce) {
   .cov-img { animation: none; }
@@ -1217,22 +1231,35 @@ body {
   .ask-dark               { padding: 3.5rem 1.25rem; }
   .debt-section           { padding: 4rem   1.25rem; }
 
-  /* ── Dot-grid section — text-only on mobile (canvas hidden) ── */
+  /* ── Dot-grid section — sticky graphic on top, narration scrolls beneath ── */
   .dotgrid-section {
     display: block;
     padding: 0 1.25rem;
   }
-  .dotgrid-sticky-pane { display: none; }  /* canvas adds no value at phone width */
+  .dotgrid-sticky-pane {
+    position: sticky; top: 0;
+    width: 100%;
+    height: 56vh;            /* canvas fits to this via updateCanvasScale() */
+    flex-shrink: unset;
+    padding-top: 2vh;
+    background: #FFFFFF;
+    z-index: 2;              /* keep the grid above the scrolling text */
+  }
   .dg-steps {
     flex: none;
     width: 100%;
     padding: 0;
   }
-  .dg-step            { min-height: 28vh; }
-  .dg-step:first-child{ min-height: 18vh; padding-top: 2vh; }
-  .dg-step-spacer     { height: 8vh; }
-  /* Make all dg-step-content visible immediately on mobile (no scroll-trigger hiding) */
+  .dg-step            { min-height: 60vh; }
+  .dg-step:first-child{ min-height: 44vh; padding-top: 2vh; }
+  .dg-step-spacer     { height: 16vh; }
+  /* Keep narration legible regardless of the scroll-trigger fade */
   .dg-step-content    { opacity: 1 !important; transform: none !important; }
+  /* Give the text a solid backdrop so it never muddies against the grid */
+  .dg-step-content {
+    background: #FFFFFF;
+    padding: 0.75rem 0;
+  }
 
   /* ── Map reveal — stacked: map above, text below ── */
   .map-reveal-section {
@@ -1500,10 +1527,18 @@ body {
 }
 .sc-note-links a:hover { color: var(--ink-soft); }
 @media (max-width: 820px) {
-  .sc-scrolly-main { flex-direction: column; }
-  .sc-sticky-pane { width: 100%; height: 66vh; position: sticky; }
-  .sc-steps { flex: none; }
-  .sc-step { min-height: 66vh; }
+  .sc-scrolly-main { flex-direction: column; padding: 0 1rem; }
+  /* Opaque, layered pane so the scrolling step text passes cleanly BEHIND the
+     pinned viz instead of bleeding through the dots. */
+  .sc-sticky-pane {
+    width: 100%; height: 52vh; position: sticky; top: 0; z-index: 2;
+    background: var(--surface);
+    box-shadow: 0 14px 18px -12px rgba(0,0,0,0.12);
+  }
+  .sc-steps { flex: none; width: 100%; padding: 0 0.5rem; position: relative; z-index: 1; }
+  .sc-step { min-height: 72vh; padding: 1.5rem 0; }
+  .sc-step:first-child { min-height: 48vh; padding-top: 4vh; }
+  .sc-step-spacer { height: 24vh; }
 }
 </style>
 </head>
@@ -2630,11 +2665,26 @@ body {
       if (best) applyPhase(parseInt(best.getAttribute('data-phase'), 10));
     }
 
+    // The district-column field is a fixed 408px wide (3 x 116px + 2 x 30px gap).
+    // On narrow viewports the sticky pane is much smaller, so the outer columns
+    // (D1, D5) clip against the pane's overflow:hidden. Scale the whole viz down
+    // uniformly to fit — preserving every internal proportion and alignment.
+    var FIELD_W = 408;
+    var vizPane = viz.parentElement; // .sc-sticky-pane
+    function fitViz() {
+      var avail = vizPane ? vizPane.clientWidth : FIELD_W;
+      if (avail >= FIELD_W + 8) { viz.style.transform = ''; return; }
+      var s = Math.max(0.5, (avail - 6) / FIELD_W);
+      viz.style.transformOrigin = 'center center';
+      viz.style.transform = 'scale(' + s.toFixed(3) + ')';
+    }
+
     var ticking = false;
     window.addEventListener('scroll', function () {
       if (!ticking) { requestAnimationFrame(function () { update(); ticking = false; }); ticking = true; }
     }, { passive: true });
-    window.addEventListener('resize', update);
+    window.addEventListener('resize', function () { fitViz(); update(); });
+    fitViz();
     applyPhase(1);
     update();
   })();
@@ -2975,8 +3025,13 @@ revealEls.forEach(el => revealObs.observe(el));
   const canvasWrap = document.getElementById('dotgrid-canvas-wrap');
   function updateCanvasScale(phase) {
     if (!canvasWrap) return;
-    if (phase === 11 || phase === 12) {
-      // Translate-only: center D2 in the sticky pane, no upscale → no pixelation, labels stay normal size
+    const pane  = canvasWrap.parentElement;
+    const paneW = pane ? pane.clientWidth  : CW;
+    const paneH = pane ? pane.clientHeight : window.innerHeight;
+    // "narrow" = the sticky pane can't hold the 660px canvas at 1:1 (i.e. phones).
+    const narrow = paneW < CW + 40;
+    if ((phase === 11 || phase === 12) && !narrow) {
+      // Desktop: translate-only zoom — center D2 in the sticky pane, no upscale → no pixelation, labels stay normal size
       // Sticky pane is 700px wide; canvas (660px wide) is flex-centered → 20px left margin
       // D2 center in pane currently: (20 + D2_CX, 5vh + D2_CY)  target: (350, 50vh)
       const padTop = window.innerHeight * 0.05;
@@ -2986,10 +3041,14 @@ revealEls.forEach(el => revealObs.observe(el));
       canvasWrap.style.transform = `translate(${txX.toFixed(1)}px, ${txY.toFixed(1)}px)`;
       return;
     }
+    // Every other phase — and 11/12 on phones — fit the whole grid into the pane.
+    // In 11/12 the non-D2 districts are drawn near-invisible, so a fitted full grid
+    // still reads cleanly as "District 2 isolated" without the fragile translate math.
     canvasWrap.style.transformOrigin = 'top center';
-    const canH  = (phase >= 2) ? CH_BAND : CH_FLAT;
-    const avail = window.innerHeight * 0.88;  // leave 5vh top + ~7vh bottom breathing room
-    const scale = Math.min(1, avail / canH);
+    const canH   = (phase >= 2) ? CH_BAND : CH_FLAT;
+    const availH = paneH * 0.88;   // leave top/bottom breathing room
+    const availW = paneW;          // fit width too — this is what unblocks phones
+    const scale  = Math.min(1, availH / canH, availW / CW);
     canvasWrap.style.transform = scale < 1 ? `scale(${scale})` : '';
   }
   window.addEventListener('resize', () => updateCanvasScale(lastPhase || 1));
