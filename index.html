@@ -615,7 +615,7 @@ body {
 .kenyon-compare-img { position: relative; }
 .kenyon-compare-img img {
   width: 100%; height: 200px; object-fit: cover;
-  display: block; border-radius: 4px;
+  display: block; border-radius: 4px; cursor: zoom-in;
 }
 .kenyon-compare-year {
   position: absolute; bottom: 0.45rem; left: 0.45rem;
@@ -1150,7 +1150,7 @@ body {
   overflow: hidden;
 }
 .doc-receipt-img {
-  display: block; width: 100%; height: auto;
+  display: block; width: 100%; height: auto; cursor: zoom-in;
 }
 .doc-receipt-caption {
   font-size: var(--label-size); font-weight: 500; letter-spacing: var(--label-track);
@@ -1621,7 +1621,6 @@ body {
 .sc-note:not([open]) .sc-note-inner { display: none; }
 .sc-note-inner { padding: 0 2rem 1.5rem; max-width: 900px; }
 .sc-note b { color: var(--ink-soft); }
-}
 
 @media (max-width: 820px) {
   .sc-scrolly-main { flex-direction: column; padding: 0 1rem; }
@@ -1763,7 +1762,7 @@ body {
 
   <div class="cov-quote-section">
     <div class="cov-quote-inner doc-receipt" data-reveal>
-      <img src="imgs/magnoliaCovenant.png" alt="Magnolia covenant document showing restrictive racial language" class="doc-receipt-img">
+      <img src="imgs/magnoliaCovenant.png" data-cap="Restrictive covenant language in Seattle property deeds &middot; Magnolia Community Council Racial Restrictive Covenants Project" alt="Magnolia covenant document showing restrictive racial language" class="doc-receipt-img">
       <p class="doc-receipt-caption">Restrictive covenant language in Seattle property deeds &mdash; Magnolia Community Council Racial Restrictive Covenants Project</p>
     </div>
   </div>
@@ -2052,7 +2051,7 @@ body {
   <!-- Morales newsletter -->
   <div class="cream-section" style="padding-top:0; overflow:hidden">
     <div class="doc-receipt" data-reveal>
-      <img src="imgs/morales-newsletter-jul2023.png" alt="CM Morales July 2023 newsletter naming 22nd Ave S as the reason she secured the $2M proviso" class="doc-receipt-img">
+      <img src="imgs/morales-newsletter-jul2023.png" data-cap="CM Morales&rsquo; July 31, 2023 newsletter naming 22nd Ave S as first priority for the $2 million proviso she secured" alt="CM Morales July 2023 newsletter naming 22nd Ave S as the reason she secured the $2M proviso" class="doc-receipt-img">
       <p class="doc-receipt-caption">CM Morales&rsquo; July 31, 2023 newsletter explicitly names 22nd Ave S as the reason she secured the $2 million proviso. Four days earlier, her own policy director had emailed a neighbor to ask whether the sidewalks had been installed. Her office had not been told the funds were redirected.</p>
     </div>
   </div>
@@ -2262,11 +2261,11 @@ body {
 
     <div class="kenyon-compare" data-reveal>
       <div class="kenyon-compare-img">
-        <img src="imgs/s-kenyon-st_2016.jpg" alt="S Kenyon St in 2016 with newly installed asphalt walkway and concrete wheel stops">
+        <img src="imgs/s-kenyon-st_2016.jpg" data-cap="S Kenyon St, 2016 &middot; a low-cost project added concrete wheel stops to an asphalt walkway &middot; Google Maps" alt="S Kenyon St in 2016 with newly installed asphalt walkway and concrete wheel stops">
         <span class="kenyon-compare-year">2016</span>
       </div>
       <div class="kenyon-compare-img">
-        <img src="imgs/s-kenyon-st_2025.jpg" alt="S Kenyon St in 2025 with wheel stops being swallowed by weeds">
+        <img src="imgs/s-kenyon-st_2025.jpg" data-cap="S Kenyon St, 2025 &middot; the wheel stops are already being swallowed by weeds &middot; Google Maps" alt="S Kenyon St in 2025 with wheel stops being swallowed by weeds">
         <span class="kenyon-compare-year">2025</span>
       </div>
       <p class="kenyon-compare-caption">A 2016 low-cost sidewalk project added wheel stops to S Kenyon St elsewhere in Beacon Hill. By 2025, the wheel stops are already starting to be swallowed by weeds. (Google Maps)</p>
@@ -2359,7 +2358,7 @@ body {
 
   <div class="cream-section" style="padding-top:0; overflow:hidden">
     <div class="doc-receipt" data-reveal>
-      <img src="imgs/90pct-plans-grading-detail.png" alt="SDOT design reviewer comment on the 90% grading plans flagging a potential conflict with future compliant curb ramp construction and a utility lost in the system since 2021" class="doc-receipt-img">
+      <img src="imgs/90pct-plans-grading-detail.png" data-cap="SDOT design reviewer comment on the 90% grading plans, summer 2025 &middot; DOT_C247504_01_00351" alt="SDOT design reviewer comment on the 90% grading plans flagging a potential conflict with future compliant curb ramp construction and a utility lost in the system since 2021" class="doc-receipt-img">
       <p class="doc-receipt-caption">SDOT design reviewer comment on the 90% grading plans, summer 2025 &mdash; flagging a potential conflict with future compliant curb ramp construction, and a utility &ldquo;built since at least 2021 and lost in the system.&rdquo; There is no record of a response. &middot; DOT_C247504_01_00351<button class="record-evidence" data-img="imgs/90pct-plans-grading-annotated.jpg" data-zoom="true" data-cap="SDOT 90% grading plans with design reviewer comments, summer 2025 &middot; DOT_C247504_01_00351" data-alt="Full 90% grading plan sheet GD04 for 21st Ave S with design reviewer annotations">View full plans &rarr;</button></p>
     </div>
     <div class="unanswered" data-reveal style="margin-top: 4rem;">
@@ -4394,17 +4393,24 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Neighborhood comparison photos open in the same lightbox (photo mode)
-  document.querySelectorAll('.hood-standard img, .hood-cell img').forEach(img => {
-    img.setAttribute('role', 'button');
-    img.setAttribute('tabindex', '0');
-    img.setAttribute('aria-label', 'Enlarge photo: ' + (img.alt || ''));
-    const open = () => openLightbox(img.getAttribute('src'), img.dataset.cap || '', img.alt, true);
-    img.addEventListener('click', open);
-    img.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+  // Make content images open in the same lightbox.
+  //   isPhoto = true  → fit-to-viewport photo mode (photographs)
+  //   isPhoto = false → scrollable document mode (document scans, more legible)
+  function wireImageLightbox(selector, isPhoto) {
+    document.querySelectorAll(selector).forEach(img => {
+      img.setAttribute('role', 'button');
+      img.setAttribute('tabindex', '0');
+      img.setAttribute('aria-label', 'Enlarge image: ' + (img.alt || ''));
+      const open = () => openLightbox(img.getAttribute('src'), img.dataset.cap || '', img.alt, isPhoto);
+      img.addEventListener('click', open);
+      img.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+      });
     });
-  });
+  }
+  wireImageLightbox('.hood-standard img, .hood-cell img', true);  // neighborhood comparison photos
+  wireImageLightbox('.kenyon-compare-img img', true);             // before/after street photos
+  wireImageLightbox('.doc-receipt-img', false);                  // inline document scans (scrollable)
   lightbox.addEventListener('click', e => {
     if (e.target === lightbox || e.target === closeBtn) closeLightbox();
   });
