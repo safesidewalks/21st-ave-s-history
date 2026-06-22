@@ -136,7 +136,6 @@ body {
   text-transform: uppercase;
   text-wrap: balance;
   color: var(--surface);
-  text-shadow: 0 2px 24px rgba(0,0,0,0.55);
   margin-bottom: 1rem;
 }
 .step-quote .hq {
@@ -151,8 +150,9 @@ body {
 }
 
 .scroll-cue {
-  position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+  position: absolute; bottom: 2.5rem; left: 0; right: 0;
   display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+  padding: 0 1.5rem;
   z-index: 20;
   opacity: 1; transition: opacity 0.6s ease;
   pointer-events: none;
@@ -345,6 +345,7 @@ body {
   box-shadow: 0 4px 14px rgba(60,8,8,0.08);
   border-radius: 0;
   animation: covBob 8s ease-in-out infinite;
+  cursor: pointer;   /* tap/click to read the clipping full-size in the lightbox */
 }
 .cov-item:nth-child(2n) .cov-img { animation-duration: 9.5s; animation-delay: -2.4s; }
 .cov-item:nth-child(3n) .cov-img { animation-duration: 11s;  animation-delay: -4.6s; }
@@ -370,6 +371,15 @@ body {
   .ch4-divider .cov-item:nth-child(1) { left: 2%  !important; top: 6%  !important; width: 42vw !important; }
   .ch4-divider .cov-item:nth-child(2) { left: 55% !important; top: 5%  !important; width: 43vw !important; }
   .ch4-divider .cov-item:nth-child(4) { left: 14% !important; top: 66% !important; width: 48vw !important; }
+
+  /* Pinned-section pacing — these reserve 2–3 full screens of scroll for content
+     that resolves quickly on a phone. Shorten the scrub runway so the page doesn't
+     feel like dead scrolling between beats. Sticky children stay 100vh; the parent
+     height only controls how long each pin holds. (Pinned sections defined later in
+     this stylesheet are overridden in a second mobile block below, after their base
+     rules, so source order lets the override win.) */
+  .pinned-section { height: 200vh; }   /* ch1 statement → question swap */
+  .pinned-ch2     { height: 160vh; }   /* covenant divider */
 }
 @media (prefers-reduced-motion: reduce) {
   .cov-img { animation: none; }
@@ -945,7 +955,8 @@ body {
 .lightbox-img { display: block; width: 100%; height: auto; }
 /* PDF viewer variant */
 .lightbox.is-pdf .lightbox-figure { max-width: 1000px; height: 92vh; max-height: 92vh; }
-.lightbox-pdf { display: none; width: 100%; flex: 1 1 auto; border: 0; }
+.lightbox-pdf { display: none; width: 100%; flex: 1 1 auto; border: 0; overflow: auto; }
+.lightbox-pdf-fallback { display: block; width: 100%; height: auto; }
 .lightbox.is-pdf .lightbox-scroll { display: none; }
 .lightbox.is-pdf .lightbox-pdf { display: block; }
 .lightbox-caption {
@@ -955,14 +966,14 @@ body {
   border-top: 1px solid rgba(24,20,14,0.08); margin: 0; text-align: left;
 }
 .lightbox-close {
-  position: absolute; top: 1.25rem; right: 1.5rem;
-  width: 40px; height: 40px; border-radius: 50%;
-  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.25);
-  color: var(--surface); font-size: 24px; line-height: 1; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
+  position: absolute; top: 1.25rem; right: 1.5rem; z-index: 10;
+  width: 46px; height: 46px; border: none; border-radius: 9px;
+  background: rgba(24,20,14,0.82); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+  color: #fff; font-size: 24px; line-height: 1; cursor: pointer; padding: 0;
+  display: grid; place-items: center;
   transition: background 0.2s ease;
 }
-.lightbox-close:hover { background: rgba(255,255,255,0.2); }
+.lightbox-close:hover { background: rgba(24,20,14,0.95); }
 /* Dual-image variant — full plan sheet + detail side by side */
 .lightbox.is-dual .lightbox-figure { width: 95vw; max-width: 95vw; flex-direction: row; align-items: stretch; flex-wrap: wrap; }
 .lightbox-scroll2 { display: none; overflow-y: auto; -webkit-overflow-scrolling: touch; min-width: 0; }
@@ -1020,7 +1031,7 @@ body {
 }
 .ch5-bg::after {
   content: ''; position: absolute; inset: 0;
-  background: rgba(0,0,0,0.85);
+  background: rgba(0,0,0,0.6);
 }
 .ch5-divider-inner { position: relative; z-index: 2; max-width: min(900px, 88vw); text-align: center; margin: 0 auto; }
 .ch5-divider .ch-eyebrow { color: rgba(255,255,255,0.5); margin-bottom: 1.25rem; }
@@ -1039,6 +1050,16 @@ body {
   padding: 0 2rem; z-index: 10;
 }
 .ch6-divider-inner { max-width: min(900px, 88vw); text-align: center; margin: 0 auto; }
+
+/* Mobile pinned-section pacing (part 2) — placed after the base rules above so the
+   shorter mobile heights win on source order (media queries add no specificity). */
+@media (max-width: 760px) {
+  .pinned-debt,
+  .pinned-ch3,
+  .pinned-ch4,
+  .pinned-ch5,
+  .pinned-ch6 { height: 150vh; }
+}
 .ch6-divider .ch-eyebrow { color: var(--ink-muted); margin-bottom: 1.25rem; }
 .ch6-divider h2 {
   font-family: 'Fustat', sans-serif; font-weight: 400;
@@ -1830,13 +1851,13 @@ body {
   <div class="pinned-ch2" id="pinned-ch2">
     <div class="ch-divider" id="ch2-trigger">
       <div class="cov-scatter" aria-hidden="true">
-        <div class="cov-item" data-float="-90" data-rot="0" style="left:1%;  top:4%;  width:clamp(200px,21vw,340px);"><img class="cov-img" src="imgs/racial-covenant_01.png" alt=""></div>
-        <div class="cov-item" data-float="74"  data-rot="0" style="left:64%; top:5%;  width:clamp(210px,22vw,350px);"><img class="cov-img" src="imgs/racial-covenant_02.png" alt=""></div>
-        <div class="cov-item" data-float="-58" data-rot="0" style="left:53%; top:26%; width:clamp(210px,23vw,360px);"><img class="cov-img" src="imgs/racial-covenant_03.png" alt=""></div>
-        <div class="cov-item" data-float="88"  data-rot="0" style="left:1%;  top:47%; width:clamp(210px,24vw,380px);"><img class="cov-img" src="imgs/racial-covenant_04.png" alt=""></div>
-        <div class="cov-item" data-float="-72" data-rot="0" style="left:82%; top:37%; width:clamp(130px,13vw,220px);"><img class="cov-img" src="imgs/racial-covenant_05.png" alt=""></div>
-        <div class="cov-item" data-float="64"  data-rot="0" style="left:10%; top:65%; width:clamp(175px,19vw,300px);"><img class="cov-img" src="imgs/racial-covenant_06.png" alt=""></div>
-        <div class="cov-item" data-float="-96" data-rot="0" style="left:61%; top:80%; width:clamp(180px,22vw,340px);"><img class="cov-img" src="imgs/racial-covenant_07.png" alt=""></div>
+        <div class="cov-item" data-float="-90" data-rot="0" style="left:1%;  top:4%;  width:clamp(200px,21vw,340px);"><img class="cov-img" src="imgs/racial-covenant_01.png" alt="" data-cap="Racial restrictive covenant language recorded in a Seattle property deed"></div>
+        <div class="cov-item" data-float="74"  data-rot="0" style="left:64%; top:5%;  width:clamp(210px,22vw,350px);"><img class="cov-img" src="imgs/racial-covenant_02.png" alt="" data-cap="Racial restrictive covenant language recorded in a Seattle property deed"></div>
+        <div class="cov-item" data-float="-58" data-rot="0" style="left:53%; top:26%; width:clamp(210px,23vw,360px);"><img class="cov-img" src="imgs/racial-covenant_03.png" alt="" data-cap="Racial restrictive covenant language recorded in a Seattle property deed"></div>
+        <div class="cov-item" data-float="88"  data-rot="0" style="left:1%;  top:47%; width:clamp(210px,24vw,380px);"><img class="cov-img" src="imgs/racial-covenant_04.png" alt="" data-cap="Racial restrictive covenant language recorded in a Seattle property deed"></div>
+        <div class="cov-item" data-float="-72" data-rot="0" style="left:82%; top:37%; width:clamp(130px,13vw,220px);"><img class="cov-img" src="imgs/racial-covenant_05.png" alt="" data-cap="Racial restrictive covenant language recorded in a Seattle property deed"></div>
+        <div class="cov-item" data-float="64"  data-rot="0" style="left:10%; top:65%; width:clamp(175px,19vw,300px);"><img class="cov-img" src="imgs/racial-covenant_06.png" alt="" data-cap="Racial restrictive covenant language recorded in a Seattle property deed"></div>
+        <div class="cov-item" data-float="-96" data-rot="0" style="left:61%; top:80%; width:clamp(180px,22vw,340px);"><img class="cov-img" src="imgs/racial-covenant_07.png" alt="" data-cap="Racial restrictive covenant language recorded in a Seattle property deed"></div>
       </div>
       <div class="ch-divider-inner">
         <p class="ch-eyebrow" data-ch-stat="0.25">Racial covenants &middot; 1889&ndash;1968</p>
@@ -2089,12 +2110,12 @@ body {
   <div class="pinned-ch4" id="pinned-ch4">
     <div class="ch4-divider">
       <div class="cov-scatter" aria-hidden="true">
-        <div class="cov-item" data-float="-90" data-rot="0" style="left:2%;  top:6%;  width:clamp(205px,23vw,370px);"><img class="cov-img" src="imgs/Community-SDOT_Email_01.png" alt=""></div>
-        <div class="cov-item" data-float="78"  data-rot="0" style="left:68%; top:5%;  width:clamp(215px,24vw,380px);"><img class="cov-img" src="imgs/Community-SDOT_Email_02.png" alt=""></div>
-        <div class="cov-item" data-float="-60" data-rot="0" style="left:79%; top:30%; width:clamp(175px,18vw,285px);"><img class="cov-img" src="imgs/Community-SDOT_Email_06.png" alt=""></div>
-        <div class="cov-item" data-float="88"  data-rot="0" style="left:1%;  top:44%; width:clamp(215px,25vw,390px);"><img class="cov-img" src="imgs/Community-SDOT_Email_03.png" alt=""></div>
-        <div class="cov-item" data-float="64"  data-rot="0" style="left:8%;  top:70%; width:clamp(205px,22vw,340px);"><img class="cov-img" src="imgs/Community-SDOT_Email_04.png" alt=""></div>
-        <div class="cov-item" data-float="-96" data-rot="0" style="left:67%; top:72%; width:clamp(215px,24vw,370px);"><img class="cov-img" src="imgs/Community-SDOT_Email_05.png" alt=""></div>
+        <div class="cov-item" data-float="-90" data-rot="0" style="left:2%;  top:6%;  width:clamp(205px,23vw,370px);"><img class="cov-img" src="imgs/Community-SDOT_Email_01.png" alt="" data-cap="Community correspondence with SDOT about the 21st Ave S sidewalk"></div>
+        <div class="cov-item" data-float="78"  data-rot="0" style="left:68%; top:5%;  width:clamp(215px,24vw,380px);"><img class="cov-img" src="imgs/Community-SDOT_Email_02.png" alt="" data-cap="Community correspondence with SDOT about the 21st Ave S sidewalk"></div>
+        <div class="cov-item" data-float="-60" data-rot="0" style="left:79%; top:30%; width:clamp(175px,18vw,285px);"><img class="cov-img" src="imgs/Community-SDOT_Email_06.png" alt="" data-cap="Community correspondence with SDOT about the 21st Ave S sidewalk"></div>
+        <div class="cov-item" data-float="88"  data-rot="0" style="left:1%;  top:44%; width:clamp(215px,25vw,390px);"><img class="cov-img" src="imgs/Community-SDOT_Email_03.png" alt="" data-cap="Community correspondence with SDOT about the 21st Ave S sidewalk"></div>
+        <div class="cov-item" data-float="64"  data-rot="0" style="left:8%;  top:70%; width:clamp(205px,22vw,340px);"><img class="cov-img" src="imgs/Community-SDOT_Email_04.png" alt="" data-cap="Community correspondence with SDOT about the 21st Ave S sidewalk"></div>
+        <div class="cov-item" data-float="-96" data-rot="0" style="left:67%; top:72%; width:clamp(215px,24vw,370px);"><img class="cov-img" src="imgs/Community-SDOT_Email_05.png" alt="" data-cap="Community correspondence with SDOT about the 21st Ave S sidewalk"></div>
       </div>
       <div class="ch4-divider-inner">
         <p class="ch-eyebrow" data-ch4-stat="0.25">22nd &amp; 21st Ave S &middot; 2021&ndash;2023</p>
@@ -2250,7 +2271,7 @@ body {
         <div class="record-card">
           <div class="record-row">
             <div class="record-date">May 2025</div>
-            <div class="record-fact">SDOT mails a construction notice &mdash; printed in five languages &mdash; to 21st Ave S residents announcing a new asphalt walkway between S Walker St and S Bayview St. Construction is &ldquo;expected as early as Summer 2025.&rdquo; The scope had been locked since August 2023, twenty-two months earlier. Residents were not consulted about the choice of asphalt over concrete. They were being told what had already been decided.<button class="record-evidence" data-img="imgs/construction-notice-may2025.jpg" data-cap="SDOT construction notice, May 2025 &mdash; New Walkway on 21st Ave S, printed in five languages" data-alt="SDOT May 2025 construction notice for 21st Ave S announcing asphalt walkway">View the notice &rarr;</button></div>
+            <div class="record-fact">SDOT mails a construction notice &mdash; printed in five languages &mdash; to 21st Ave S residents announcing a new asphalt walkway between S Walker St and S Bayview St. Construction is &ldquo;expected as early as Summer 2025.&rdquo; The scope had been locked since August 2023, twenty-two months earlier. Residents were not consulted about the choice of asphalt over concrete. They were being told what had already been decided.<button class="record-evidence" data-img="imgs/21stAveS_Walkway_Construction_Notice_May2025.png" data-cap="SDOT construction notice, May 2025 &mdash; New Walkway on 21st Ave S, printed in five languages" data-alt="SDOT construction notice mailed to 21st Ave S residents in May 2025, announcing a new asphalt walkway between S Walker St and S Bayview St, printed in five languages.">View the notice &rarr;</button></div>
           </div>
         </div>
       </div>
@@ -3594,14 +3615,23 @@ const dpInner       = document.getElementById('dp-inner');
 const dpLayerA      = document.getElementById('dp-layer-a');
 const dpLayerB      = document.getElementById('dp-layer-b');
 
-window.addEventListener('scroll', () => {
+let heroTicking = false;
+let heroDisplayed = null;                       // lerped hero progress for smooth scrubbing
+const HERO_LERP = reduceMotion ? 1 : 0.16;      // 1 = snap (no smoothing) when reduced-motion
+function updateScrollScene() {
   // progress bar
   const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
   prog.style.width = Math.min(pct, 100) + '%';
 
-  // pinned hero — ken burns + text reveals
-  const heroRect     = pinnedHero.getBoundingClientRect();
-  const heroProgress = Math.max(0, Math.min(1, -heroRect.top / (pinnedHero.offsetHeight - window.innerHeight)));
+  // pinned hero — ken burns + text reveals, eased toward the scroll target so
+  // coarse wheel/trackpad deltas don't read as stepped motion
+  const heroRect   = pinnedHero.getBoundingClientRect();
+  const heroTarget = Math.max(0, Math.min(1, -heroRect.top / (pinnedHero.offsetHeight - window.innerHeight)));
+  if (heroDisplayed === null) heroDisplayed = heroTarget;
+  heroDisplayed += (heroTarget - heroDisplayed) * HERO_LERP;
+  if (Math.abs(heroTarget - heroDisplayed) < 0.0008) heroDisplayed = heroTarget;
+  const heroSettled  = heroDisplayed === heroTarget;
+  const heroProgress = heroDisplayed;
   sceneImg.style.transform = `scale(${1 + heroProgress * 0.09}) translateX(${heroProgress * -1.5}%)`;
   heroScrim.style.opacity = Math.min(heroProgress * 0.7, 0.55);
   // Text rides in from below during first 40% of section scroll, then stays put
@@ -3610,7 +3640,7 @@ window.addEventListener('scroll', () => {
   // ease-out cubic: slow down as it settles
   const eased    = textT * textT * (3 - 2 * textT);
   heroStepBlock.style.transform = `translateY(${eased * 80}vh)`;
-  if (heroProgress > 0.04) scrollCue.classList.add('hidden');
+  if (heroTarget > 0.04) scrollCue.classList.add('hidden');
   else scrollCue.classList.remove('hidden');
 
   // ch1 pinned stats
@@ -3618,24 +3648,13 @@ window.addEventListener('scroll', () => {
   const psProgress = Math.max(0, Math.min(1, -psRect.top / (pinnedSection.offsetHeight - window.innerHeight)));
   scrollStats.forEach(el => {
     const threshold = parseFloat(el.dataset.scrollStat);
-    if (psProgress >= threshold && !el.classList.contains('on')) {
-      el.classList.add('on');
-      const countEl = el.querySelector('[data-count-up]');
-      if (countEl) countUp(countEl, parseInt(countEl.dataset.countUp), 1400);
-    }
+    if (psProgress >= threshold && !el.classList.contains('on')) el.classList.add('on');
   });
-  // ch1 swap: statement fades out, count + question fade in
+  // ch1 swap: statement fades out, closing question fades in
   const SWAP_AT = 0.50;
   if (psProgress >= SWAP_AT) {
     dpLayerA.classList.add('faded');
-    if (!dpLayerB.classList.contains('on')) {
-      dpLayerB.classList.add('on');
-      const countEl = dpLayerB.querySelector('[data-count-up]');
-      if (countEl && !countEl.dataset.counted) {
-        countEl.dataset.counted = '1';
-        countUp(countEl, parseInt(countEl.dataset.countUp), 1400);
-      }
-    }
+    dpLayerB.classList.add('on');
   } else {
     dpLayerA.classList.remove('faded');
     dpLayerB.classList.remove('on');
@@ -3706,18 +3725,14 @@ window.addEventListener('scroll', () => {
     });
   }
 
-}, { passive: true });
-
-// ── COUNT-UP ─────────────────────────────────────
-function countUp(el, to, ms) {
-  const t0 = performance.now();
-  (function tick(now) {
-    const p = Math.min((now - t0) / ms, 1);
-    const e = 1 - Math.pow(1 - p, 3);
-    el.childNodes[0].textContent = Math.round(to * e);
-    if (p < 1) requestAnimationFrame(tick);
-  })(t0);
+  heroTicking = false;
+  // keep easing for a few frames after scroll stops, until the hero settles
+  if (!heroSettled) { heroTicking = true; requestAnimationFrame(updateScrollScene); }
 }
+window.addEventListener('scroll', () => {
+  if (!heroTicking) { heroTicking = true; requestAnimationFrame(updateScrollScene); }
+}, { passive: true });
+updateScrollScene();
 
 // ── GENERIC SCROLL REVEALS ───────────────────────
 const revealEls = document.querySelectorAll('[data-reveal]');
@@ -3725,11 +3740,6 @@ const revealObs = new IntersectionObserver((entries) => {
   entries.forEach(e => {
     if (e.isIntersecting) {
       e.target.classList.add('on');
-      const countEl = e.target.querySelector('[data-count-up]');
-      if (countEl) {
-        const delay = parseFloat(getComputedStyle(e.target).transitionDelay) * 1000 || 0;
-        setTimeout(() => countUp(countEl, parseInt(countEl.dataset.countUp), 1400), delay);
-      }
       revealObs.unobserve(e.target);
     }
   });
@@ -4851,6 +4861,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const imgEl    = lightbox.querySelector('.lightbox-img');
   const img2El   = lightbox.querySelector('.lightbox-img2');
   const pdfEl    = lightbox.querySelector('.lightbox-pdf');
+  const pdfFallbackEl = lightbox.querySelector('.lightbox-pdf-fallback');
   const capEl    = lightbox.querySelector('.lightbox-caption');
   const scrollEl = lightbox.querySelector('.lightbox-scroll');
   const closeBtn = lightbox.querySelector('.lightbox-close');
@@ -4947,11 +4958,12 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('mousemove', onMove);
     document.addEventListener('mouseup', onUp);
   });
-  function openPdfLightbox(src, cap) {
+  function openPdfLightbox(src, cap, fallback) {
     lastFocus = document.activeElement;
     lightbox.classList.add('is-pdf');
     imgEl.src = '';
-    if (pdfEl) pdfEl.src = src;
+    if (pdfFallbackEl) pdfFallbackEl.src = fallback || '';
+    if (pdfEl) pdfEl.data = src;
     capEl.innerHTML = cap || '';
     lightbox.classList.add('open');
     lightbox.setAttribute('aria-hidden', 'false');
@@ -4964,7 +4976,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.style.overflow = '';
     imgEl.src = '';
     if (img2El) img2El.src = '';
-    if (pdfEl) pdfEl.src = '';
+    if (pdfEl) pdfEl.removeAttribute('data');
+    if (pdfFallbackEl) pdfFallbackEl.src = '';
     lightbox.classList.remove('is-pdf', 'is-photo', 'is-dual', 'is-zoom');
     zoomReset();
     if (lastFocus && typeof lastFocus.focus === 'function') lastFocus.focus();
@@ -4973,7 +4986,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.record-evidence').forEach(btn => {
     btn.addEventListener('click', () => {
       if (btn.dataset.pdf) {
-        openPdfLightbox(btn.dataset.pdf, btn.dataset.cap);
+        openPdfLightbox(btn.dataset.pdf, btn.dataset.cap, btn.dataset.fallback);
       } else if (btn.dataset.zoom) {
         openZoomLightbox(btn.dataset.img, btn.dataset.cap, btn.dataset.alt);
       } else if (btn.dataset.img2) {
@@ -5002,8 +5015,15 @@ document.addEventListener('DOMContentLoaded', () => {
   wireImageLightbox('.hood-standard img, .hood-cell img', true);  // neighborhood comparison photos
   wireImageLightbox('.kenyon-compare-img img', true);             // before/after street photos
   wireImageLightbox('.doc-receipt-img', false);                  // inline document scans (scrollable)
+  // Collage clippings (covenant deeds + SDOT emails) — illegible at collage size,
+  // especially on mobile. Click/tap to read full-size in the scrollable lightbox.
+  // The scatter is aria-hidden (decorative; the same records appear accessibly in
+  // the timeline), so this is a click-only affordance — no role/tabindex added.
+  document.querySelectorAll('.cov-img').forEach(img => {
+    img.addEventListener('click', () => openLightbox(img.getAttribute('src'), img.dataset.cap || '', img.alt, false));
+  });
   lightbox.addEventListener('click', e => {
-    if (e.target === lightbox || e.target === closeBtn) closeLightbox();
+    if (e.target === lightbox || (e.target.closest && e.target.closest('.lightbox-close'))) closeLightbox();
   });
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && lightbox.classList.contains('open')) closeLightbox();
@@ -5017,11 +5037,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <!-- Evidence lightbox (email screenshots from records request C247504) -->
 <div class="lightbox" id="evidence-lightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Email evidence viewer">
-  <button class="lightbox-close" type="button" aria-label="Close">&times;</button>
+  <button class="lightbox-close" type="button" aria-label="Close"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6.40013 18.3069L5.69238 17.5992L11.2924 11.9992L5.69238 6.39916L6.40013 5.69141L12.0001 11.2914L17.6001 5.69141L18.3079 6.39916L12.7079 11.9992L18.3079 17.5992L17.6001 18.3069L12.0001 12.7069L6.40013 18.3069Z" fill="currentColor"></path></svg></button>
   <figure class="lightbox-figure">
     <div class="lightbox-scroll"><img class="lightbox-img" src="" alt=""></div>
     <div class="lightbox-scroll2"><img class="lightbox-img2" src="" alt=""></div>
-    <iframe class="lightbox-pdf" src="" title="Document viewer"></iframe>
+    <object class="lightbox-pdf" data="" type="application/pdf" aria-label="Document viewer"><img class="lightbox-pdf-fallback" src="" alt=""></object>
     <figcaption class="lightbox-caption"></figcaption>
   </figure>
 </div>
