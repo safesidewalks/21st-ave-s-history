@@ -1256,9 +1256,10 @@ body {
 .walk-stat.lit { opacity: 1; transform: none; }
 .walk-stat-num {
   display: block;
-  font-family: 'Fustat', sans-serif; font-weight: 700;
-  font-size: 3rem; line-height: 1.05;
-  color: var(--lit, #185FA5);
+  /* Match the big pull-stat number (e.g. "56%"): same Fustat weight 400 and clamp size. */
+  font-family: 'Fustat', sans-serif; font-weight: 400;
+  font-size: clamp(3.6rem, 7vw, 5.5rem); line-height: 1;
+  color: var(--lit, #E24B4A);
 }
 .walk-stat-label {
   display: block; margin-top: 0.1rem;
@@ -1365,7 +1366,7 @@ body {
   /* Compact the stat stack so all five fit below the map strip. */
   .walk-stats .map-headline { margin-bottom: 0.2rem; }
   .walk-stat       { margin-top: 0.7rem; }
-  .walk-stat-num   { font-size: 2rem; }
+  /* No size override: let .walk-stat-num use the same clamp() as the pull-stat number. */
   .walk-stat-label { font-size: 12.5px; }
   /* Same: always show map step text on mobile, on a solid backdrop */
   .map-step-content   {
@@ -1624,11 +1625,21 @@ body {
 .zoning-reveal-section { display: flex; position: relative; background: #FFFFFF; }
 .zoning-sticky-pane { position: sticky; top: 0; width: 55%; height: 100vh; flex-shrink: 0; overflow: hidden; }
 .zoning-steps { flex: 1; padding: 0 3rem 0 2.5rem; position: relative; z-index: 1; }
-.zoning-step { min-height: 80vh; display: flex; align-items: center; }
-.zoning-step:first-child { min-height: 70vh; padding-top: 10vh; }
+/* Speed bump: each step is a tall scroll-track and its copy sticks at the ~40vh
+   active band, so the text (and the map state it drives) holds at center for a
+   beat before the next step takes over. Centering is via translateY(-50%) about
+   the sticky top line; the small +10px is the fade-in nudge. */
+.zoning-step { min-height: 100vh; display: block; }
+.zoning-step:first-child { min-height: 80vh; padding-top: 10vh; }
 .zoning-step-spacer { height: 50vh; }
-.zoning-step-content { opacity: 0; transform: translateY(10px); transition: opacity 0.4s ease, transform 0.4s ease; max-width: 360px; }
-.zoning-step.active .zoning-step-content { opacity: 1; transform: translateY(0); }
+.zoning-step-content {
+  position: sticky; top: 40vh;
+  opacity: 0; transform: translateY(calc(-50% + 10px));
+  transition: opacity 0.4s ease, transform 0.4s ease; max-width: 360px;
+}
+.zoning-step:first-child .zoning-step-content { position: static; transform: translateY(10px); }
+.zoning-step:first-child.active .zoning-step-content { transform: translateY(0); }
+.zoning-step.active .zoning-step-content { opacity: 1; transform: translateY(-50%); }
 .zoning-step-eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-muted); margin: 0 0 0.6rem; }
 .dg-step-caption-em { font-size: 13px; font-weight: 600; line-height: 1.7; color: var(--ink); }
 .zoning-step-quote { border-left: 3px solid #E24B4A; padding-left: 1rem; margin-top: 1.25rem; font-size: var(--body-size); line-height: var(--body-lh); color: var(--ink); }
@@ -1653,7 +1664,8 @@ body {
   .zoning-step { min-height: 55vh; padding: 1.5rem 0; }
   .zoning-step:first-child { min-height: 40vh; padding-top: 3vh; }
   .zoning-step-spacer { height: 16vh; }
-  .zoning-step-content { opacity: 1 !important; transform: none !important; background: #fff; padding: 0.75rem 0; }
+  /* Mobile stacks the map above the copy, so drop the sticky-center dwell. */
+  .zoning-step-content { position: static !important; opacity: 1 !important; transform: none !important; background: #fff; padding: 0.75rem 0; }
 }
 </style>
 </head>
@@ -1705,12 +1717,6 @@ body {
           </div>
           <!-- State B: the count + closing question (swaps in on scroll) -->
           <div class="dp-layer" id="dp-layer-b">
-            <div class="stats-row">
-              <div>
-                <div class="stat-num" data-count-up="130">0<span style="font-size:0.5em;vertical-align:super">+</span></div>
-                <div class="stat-label">years this block has waited for a sidewalk</div>
-              </div>
-            </div>
             <p class="dp-question">How long is too long to wait for sidewalks?</p>
           </div>
         </div>
@@ -1958,15 +1964,15 @@ body {
         <div class="map-step-content walk-stats">
           <p class="map-street-label walk-eyebrow">Half-mile walkshed</p>
           <p class="map-headline">What&rsquo;s in a 10-minute walk</p>
-          <div class="walk-stat" id="ph-schools" style="--lit:#185FA5;">
+          <div class="walk-stat" id="ph-schools" style="--lit:#E24B4A;">
             <span class="walk-stat-num">5</span>
             <span class="walk-stat-label">Schools</span>
           </div>
-          <div class="walk-stat" id="ph-rail" style="--lit:#533AB7;">
+          <div class="walk-stat" id="ph-rail" style="--lit:#76BF8A;">
             <span class="walk-stat-num">2</span>
             <span class="walk-stat-label">Light-rail stations</span>
           </div>
-          <div class="walk-stat" id="ph-bus" style="--lit:#533AB7;">
+          <div class="walk-stat" id="ph-bus" style="--lit:#234F74;">
             <span class="walk-stat-num">2</span>
             <span class="walk-stat-label">High-ridership bus lines</span>
           </div>
@@ -3111,22 +3117,22 @@ body {
     const LAT_N = 47.5836616, LAT_S = 47.5810366;
     // 21st Ave S, WEST curb — solid: the one side with a planned asphalt walkway.
     new google.maps.Polyline({
-      path: [{ lat: LAT_N, lng: -122.3057531 }, { lat: LAT_S, lng: -122.3057531 }],
+      path: [{ lat: LAT_N, lng: -122.3057131 }, { lat: LAT_S, lng: -122.3057131 }],
       strokeColor: '#18140E', strokeOpacity: 0, map: zmap, zIndex: 9999, icons: [solidIcon()],
     });
     // 21st Ave S, EAST curb — dashed: the upzoned side, no walkway planned.
     new google.maps.Polyline({
-      path: [{ lat: LAT_N, lng: -122.3054131 }, { lat: LAT_S, lng: -122.3054131 }],
+      path: [{ lat: LAT_N, lng: -122.3054531 }, { lat: LAT_S, lng: -122.3054531 }],
       strokeColor: '#18140E', strokeOpacity: 0, map: zmap, zIndex: 9999, icons: [dashIcon()],
     });
     // 22nd Ave S, WEST curb — dashed: no walkway planned on either side.
     new google.maps.Polyline({
-      path: [{ lat: LAT_N, lng: -122.3044686 }, { lat: LAT_S, lng: -122.3044686 }],
+      path: [{ lat: LAT_N, lng: -122.3044286 }, { lat: LAT_S, lng: -122.3044286 }],
       strokeColor: '#18140E', strokeOpacity: 0, map: zmap, zIndex: 9999, icons: [dashIcon()],
     });
     // 22nd Ave S, EAST curb — dashed: no walkway planned on either side.
     new google.maps.Polyline({
-      path: [{ lat: LAT_N, lng: -122.3041286 }, { lat: LAT_S, lng: -122.3041286 }],
+      path: [{ lat: LAT_N, lng: -122.3041686 }, { lat: LAT_S, lng: -122.3041686 }],
       strokeColor: '#18140E', strokeOpacity: 0, map: zmap, zIndex: 9999, icons: [dashIcon()],
     });
 
@@ -3164,8 +3170,8 @@ body {
       }
       onRemove() { if (this.div) { this.div.remove(); this.div = null; } }
     }
-    new CorridorBand(LAT_N, LAT_S, -122.3057531, -122.3054131).setMap(zmap); // 21st Ave S
-    new CorridorBand(LAT_N, LAT_S, -122.3044686, -122.3041286).setMap(zmap); // 22nd Ave S
+    new CorridorBand(LAT_N, LAT_S, -122.3057131, -122.3054531).setMap(zmap); // 21st Ave S
+    new CorridorBand(LAT_N, LAT_S, -122.3044286, -122.3041686).setMap(zmap); // 22nd Ave S
 
     // Our own clean vertical street labels, replacing Google's defaults. Same
     // muted tone as the native map label text (#8a837a) so they read as map
@@ -3258,8 +3264,8 @@ body {
       // Both chips sit at the SAME latitude so they read as a balanced pair directly
       // across 21st Ave S: West leader -> WEST curb (solid line), East leader -> EAST
       // curb (dashed line). Same spot, same street, the two sides.
-      new ValueChip(new google.maps.LatLng(47.58300, -122.3057531), 'West $240K', NR_COLOR, 'right', true),
-      new ValueChip(new google.maps.LatLng(47.58300, -122.3054131), 'East $240K', RAMP_COLOR, 'left', false),
+      new ValueChip(new google.maps.LatLng(47.58300, -122.3057131), 'West $240K', NR_COLOR, 'right', true),
+      new ValueChip(new google.maps.LatLng(47.58300, -122.3054531), 'East $240K', RAMP_COLOR, 'left', false),
     ];
     valuePins.forEach(p => p.setMap(zmap));
 
@@ -4464,7 +4470,13 @@ mapSteps.forEach(s => mapStepObs.observe(s));
   }
 
   // Category colors (mirrors long.html MAP_CATS)
-  const WALK_COLORS = { school: '#185FA5', transit: '#533AB7', dev: '#0F6E56', work: '#B45309' };
+  const WALK_COLORS = { school: '#E24B4A', transit: '#533AB7', rail: '#76BF8A', bus: '#234F74', dev: '#0F6E56', work: '#B45309' };
+  // Light-rail stations (transit without mode:'bus') and buses (mode:'bus') each get their own color.
+  function walkColor(loc) {
+    if (loc.cat === 'transit' && loc.mode === 'bus') return WALK_COLORS.bus;
+    if (loc.cat === 'transit') return WALK_COLORS.rail;
+    return WALK_COLORS[loc.cat] || '#666';
+  }
 
   // Coordinates geocoded from real street addresses (Google Geocoder, ROOFTOP
   // unless noted). tier 'half' = within ~0.5 mi.
@@ -4474,7 +4486,7 @@ mapSteps.forEach(s => mapStepObs.observe(s));
       desc: 'Private K&ndash;5 directly on the project block. Hundreds of children arrive daily on a street with no sidewalk on either side.' },
     { tier: 'half', lat: 47.5837647, lng: -122.3045786, cat: 'school',  label: 'Lake Washington Girls Middle School',
       desc: 'At the north end of the corridor. SDOT cited it to justify the walkway &mdash; yet the design adds no safe east-side crossing.' },
-    { tier: 'half', lat: 47.5829414, lng: -122.3003629, cat: 'school',  label: 'French American School of Puget Sound',
+    { tier: 'half', lat: 47.5834393, lng: -122.3033194, cat: 'school',  label: 'French American School of Puget Sound',
       desc: 'Under construction one block east. Its permits include no sidewalk on 22nd Ave S.' },
     { tier: 'half', lat: 47.5884114, lng: -122.3062233, cat: 'school',  label: 'Hamlin Robinson School',
       desc: 'Special-education school for students with dyslexia and language-based learning disabilities &mdash; the same standard of safe walking access applies here.' },
@@ -4482,12 +4494,34 @@ mapSteps.forEach(s => mapStepObs.observe(s));
       desc: '1 Line light rail, opened 2009. 21st Ave S sits between two stations with no safe walking route connecting them.' },
     { tier: 'half', lat: 47.5903,    lng: -122.30451,   cat: 'transit', label: 'Judkins Park Station',
       desc: '2 Line light rail, opened March 2026. Roughly half a mile north. The corridor is the pedestrian gap to the station.' },
-    // Rainier Ave S — Metro Route 7, one of the system's highest-ridership lines. ~0.24 mi east.
-    { tier: 'half', lat: 47.581005, lng: -122.300154, cat: 'transit', mode: 'bus', label: 'Route 7 &mdash; Rainier Ave S',
-      desc: 'One of Metro&rsquo;s busiest bus corridors runs along Rainier, a short walk east. Frequent all-day service that many residents ride instead of driving.' },
-    // Beacon Ave S — Metro Route 36, the Beacon Hill spine. ~0.33 mi west, by Beacon Hill Station.
-    { tier: 'half', lat: 47.580325, lng: -122.311293, cat: 'transit', mode: 'bus', label: 'Route 36 &mdash; Beacon Ave S',
-      desc: 'Another of Metro&rsquo;s highest-ridership routes runs the length of Beacon Hill along Beacon Ave S, just west of the corridor and feeding Beacon Hill Station.' },
+    // ── Metro Route 7 stops — Rainier Ave S (one of the system's highest-ridership
+    //    lines), ~0.24 mi east. One pin per stop location within the walkshed;
+    //    coordinates geocoded from each named stop intersection (Metro names stops
+    //    by cross street, e.g. "Rainier Ave S & S Walker St").
+    { tier: 'half', lat: 47.5844956, lng: -122.3028375, cat: 'transit', mode: 'bus', label: 'Route 7 &mdash; Rainier Ave S &amp; S Hill St',
+      desc: 'A stop on Metro Route 7, one of the system&rsquo;s busiest all-day lines, running along Rainier Ave S just east. Reaching it on foot means walking streets with no sidewalk.' },
+    { tier: 'half', lat: 47.5836551, lng: -122.302213, cat: 'transit', mode: 'bus', label: 'Route 7 &mdash; Rainier Ave S &amp; S Walker St',
+      desc: 'A stop on Metro Route 7, one of the system&rsquo;s busiest all-day lines, running along Rainier Ave S just east. Reaching it on foot means walking streets with no sidewalk.' },
+    { tier: 'half', lat: 47.5827745, lng: -122.3015345, cat: 'transit', mode: 'bus', label: 'Route 7 &mdash; Rainier Ave S &amp; S College St',
+      desc: 'A stop on Metro Route 7, one of the system&rsquo;s busiest all-day lines, running along Rainier Ave S just east. Reaching it on foot means walking streets with no sidewalk.' },
+    { tier: 'half', lat: 47.5810051, lng: -122.3001537, cat: 'transit', mode: 'bus', label: 'Route 7 &mdash; Rainier Ave S &amp; S Bayview St',
+      desc: 'A stop on Metro Route 7, one of the system&rsquo;s busiest all-day lines, running along Rainier Ave S just east. Reaching it on foot means walking streets with no sidewalk.' },
+    { tier: 'half', lat: 47.5783488, lng: -122.2981529, cat: 'transit', mode: 'bus', label: 'Route 7 &mdash; Rainier Ave S &amp; S McClellan St (Mount Baker)',
+      desc: 'A stop on Metro Route 7, one of the system&rsquo;s busiest all-day lines, by the Mount Baker hub just southeast. Reaching it on foot means walking streets with no sidewalk.' },
+    // ── Metro Route 36 stops — Beacon Ave S (the Beacon Hill spine, another of
+    //    Metro's highest-ridership routes), ~0.33 mi west, feeding Beacon Hill Station.
+    { tier: 'half', lat: 47.5829633, lng: -122.3060765, cat: 'transit', mode: 'bus', label: 'Route 36 &mdash; Beacon Ave S &amp; S College St',
+      desc: 'A stop on Metro Route 36, the Beacon Hill spine and one of Metro&rsquo;s highest-ridership routes, running along Beacon Ave S just west and feeding Beacon Hill Station.' },
+    { tier: 'half', lat: 47.5810219, lng: -122.31384, cat: 'transit', mode: 'bus', label: 'Route 36 &mdash; Beacon Ave S &amp; S Bayview St',
+      desc: 'A stop on Metro Route 36, the Beacon Hill spine and one of Metro&rsquo;s highest-ridership routes, running along Beacon Ave S just west and feeding Beacon Hill Station.' },
+    { tier: 'half', lat: 47.5786286, lng: -122.3116127, cat: 'transit', mode: 'bus', label: 'Route 36 &mdash; Beacon Ave S &amp; S McClellan St',
+      desc: 'A stop on Metro Route 36, the Beacon Hill spine and one of Metro&rsquo;s highest-ridership routes, running along Beacon Ave S just west and feeding Beacon Hill Station.' },
+    { tier: 'half', lat: 47.5777504, lng: -122.3108006, cat: 'transit', mode: 'bus', label: 'Route 36 &mdash; Beacon Ave S &amp; S Forest St',
+      desc: 'A stop on Metro Route 36, the Beacon Hill spine and one of Metro&rsquo;s highest-ridership routes, running along Beacon Ave S just west and feeding Beacon Hill Station.' },
+    { tier: 'half', lat: 47.580609, lng: -122.3134562, cat: 'transit', mode: 'bus', label: 'Route 36 &mdash; Beacon Ave S &amp; 15th Ave S',
+      desc: 'A stop on Metro Route 36, the Beacon Hill spine and one of Metro&rsquo;s highest-ridership routes, running along Beacon Ave S just west and feeding Beacon Hill Station.' },
+    { tier: 'half', lat: 47.575094, lng: -122.3092473, cat: 'transit', mode: 'bus', label: 'Route 36 &mdash; Beacon Ave S &amp; S Hanford St',
+      desc: 'A stop on Metro Route 36, the Beacon Hill spine and one of Metro&rsquo;s highest-ridership routes, running along Beacon Ave S just west and feeding Beacon Hill Station.' },
     // Beacon Hill Int'l is ~0.52 mi out — just past a strict half-mile, but inside the
     // "approximately a half-mile" walkshed (ring drawn at 0.55 mi), so it sits in this tier.
     { tier: 'half', lat: 47.5850972, lng: -122.3153864, cat: 'school',  label: "Beacon Hill Int'l Elementary",
@@ -4497,7 +4531,7 @@ mapSteps.forEach(s => mapStepObs.observe(s));
   // Build a Google Maps marker icon (ported from long.html mkSvgIcon)
   function mkWalkIcon(loc, scale) {
     scale = scale || 1;
-    const c = WALK_COLORS[loc.cat] || '#666';
+    const c = walkColor(loc);
     // Canvas is padded well beyond the pin (26px circle in a 40px box) so the
     // blossom can scale the drawn pin up without clipping AND without ever
     // changing the marker's scaledSize/anchor — a constant footprint means the
@@ -4572,7 +4606,7 @@ mapSteps.forEach(s => mapStepObs.observe(s));
       m.addListener('click', () => {
         walkInfo.setContent(
           '<div style="max-width:220px;font-family:inherit;">' +
-          '<strong style="color:' + (WALK_COLORS[loc.cat] || '#333') + ';">' + loc.label + '</strong>' +
+          '<strong style="color:' + walkColor(loc) + ';">' + loc.label + '</strong>' +
           '<p style="margin:.35em 0 0;font-size:.82rem;line-height:1.4;color:#333;">' + loc.desc + '</p></div>'
         );
         walkInfo.open(gmap, m);
