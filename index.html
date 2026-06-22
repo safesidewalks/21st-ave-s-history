@@ -1239,7 +1239,7 @@ body {
 }
 .map-step.active .map-step-content { opacity: 1; transform: translateY(0); }
 /* Half-mile "build" step: a tall scroll-track whose copy stays pinned while the
-   category pins blossom in one group at a time, then a beat before the mile tier. */
+   category pins blossom in one group at a time, then a final held beat. */
 .map-step-build { min-height: 240vh; display: block; align-items: stretch; padding: 0; }
 .map-step-build .map-step-pin {
   position: sticky; top: 0; height: 100vh;
@@ -1264,23 +1264,6 @@ body {
   display: block; margin-top: 0.1rem;
   font-size: 14px; line-height: 1.3; color: var(--ink-soft);
 }
-/* Closing thesis line that fades in after the counts finish building */
-.walk-coda {
-  opacity: 0; transform: translateY(10px);
-  transition: opacity 0.5s ease, transform 0.5s ease;
-  margin-top: 1.5rem;
-}
-.walk-coda.lit { opacity: 1; transform: none; }
-/* Emphasized closing question, lights up last after the coda */
-.walk-question {
-  opacity: 0; transform: translateY(10px);
-  transition: opacity 0.5s ease, transform 0.5s ease;
-  margin-top: 1.25rem;
-  font-size: 13px; line-height: 1.75; font-weight: 600;
-  color: var(--ink);
-}
-.walk-question.lit { opacity: 1; transform: none; }
-.walk-question .q-accent { color: #E24B4A; }
 /* Text styles within steps */
 .map-street-label {
   font-size: var(--label-size); font-weight: 700; letter-spacing: var(--label-track);
@@ -1987,41 +1970,6 @@ body {
             <span class="walk-stat-num">2</span>
             <span class="walk-stat-label">High-ridership bus lines</span>
           </div>
-          <div class="walk-stat" id="ph-dev" style="--lit:#0F6E56;">
-            <span class="walk-stat-num">4</span>
-            <span class="walk-stat-label">New housing developments</span>
-          </div>
-          <div class="walk-stat" id="ph-work" style="--lit:#B45309;">
-            <span class="walk-stat-num">1</span>
-            <span class="walk-stat-label">Major employer of blind &amp; low-vision workers</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="map-step map-step-build" id="map-step-walkshed-mile">
-      <div class="map-step-pin">
-        <div class="map-step-content walk-stats">
-          <p class="map-street-label walk-eyebrow">Within a one-mile walk</p>
-          <p class="map-headline">The dependence runs deeper</p>
-          <div class="walk-stat" id="mi-schools" style="--lit:#185FA5;">
-            <span class="walk-stat-num">8</span>
-            <span class="walk-stat-label">Schools</span>
-          </div>
-          <div class="walk-stat" id="mi-rail" style="--lit:#533AB7;">
-            <span class="walk-stat-num">2</span>
-            <span class="walk-stat-label">Light-rail stations</span>
-          </div>
-          <div class="walk-stat" id="mi-bus" style="--lit:#533AB7;">
-            <span class="walk-stat-num">4</span>
-            <span class="walk-stat-label">Major bus corridors</span>
-          </div>
-          <div class="walk-stat" id="mi-dev" style="--lit:#0F6E56;">
-            <span class="walk-stat-num">5</span>
-            <span class="walk-stat-label">New housing developments</span>
-          </div>
-          <p class="map-sub walk-coda" id="mi-coda">Seattle paid for the density and the trains, but it never built the sidewalk that ties them together.</p>
-          <p class="walk-question" id="mi-question">So who is <span class="q-accent">actually paying</span> for the gaps?</p>
         </div>
       </div>
     </div>
@@ -3010,12 +2958,12 @@ body {
     <div class="zoning-step" id="zmap-step-walk">
       <div class="zoning-step-content">
         <p class="zoning-step-eyebrow">April 2026 &middot; A walk with SDOT</p>
-        <p class="dg-step-caption">In April 2026, SDOT met residents on the block for a walkthrough. According to a neighbor who was there, the city explained the choice plainly: accept the asphalt path now, or wait for developers to buy the properties and build the sidewalks piecemeal, parcel by parcel, as the block redevelops.</p>
-        <p class="dg-step-caption" style="margin-top:1rem;">One resident wrote back to the council member&rsquo;s office with what that actually describes:</p>
+        <p class="dg-step-caption">In April 2026, SDOT met residents on the block for a walkthrough.</p>
         <blockquote class="pull-quote-block">
-          <span class="pull-quote-mark" aria-hidden="true">&ldquo;</span>
-          <p>In a historically redlined neighborhood, it landed as gentrification being described as the city&rsquo;s infrastructure plan.</p>
+          <p>According to a neighbor who was there, the city explained the choice plainly: accept the asphalt path now, or wait for developers to buy the properties and build the sidewalks piecemeal, parcel by parcel, as the block redevelops.</p>
         </blockquote>
+        <p class="dg-step-caption">One resident wrote back to the council member&rsquo;s office with what that actually describes:</p>
+        <p class="dg-step-caption" style="margin-top:1rem;">&ldquo;In a historically redlined neighborhood, it landed as gentrification being described as the city&rsquo;s infrastructure plan.&rdquo;</p>
       </div>
     </div>
 
@@ -3106,10 +3054,12 @@ body {
     { featureType: 'transit',   stylers: [{ visibility: 'off' }] },
     { featureType: 'road',      elementType: 'geometry',         stylers: [{ color: '#e4ddd3' }] },
     { featureType: 'road.arterial', elementType: 'geometry',     stylers: [{ color: '#d5cec4' }] },
-    { featureType: 'road',      elementType: 'labels.text.fill', stylers: [{ color: '#8a837a' }] },
+    // Hide ALL road labels across the base map (custom vertical street labels and
+    // the tan corridor bands carry the corridor instead). Neighborhood labels off too.
+    { featureType: 'road',      elementType: 'labels',           stylers: [{ visibility: 'off' }] },
     { featureType: 'landscape', stylers: [{ color: '#FFFFFF' }] },
     { featureType: 'water',     stylers: [{ color: '#c8d4cf' }] },
-    { featureType: 'administrative.neighborhood', elementType: 'labels', stylers: [{ visibility: 'simplified' }] },
+    { featureType: 'administrative.neighborhood', elementType: 'labels', stylers: [{ visibility: 'off' }] },
   ];
 
   window.initZmap = function() {
@@ -3144,21 +3094,108 @@ body {
     fitHalfMileRadius();
     window.addEventListener('resize', fitHalfMileRadius);
 
-    // 21st Ave S — solid black
+    // The two streets, drawn as curb lines so the walkway split reads on the map.
+    // Square (butt) dash ends, not rounded; ~19px repeat. Each curb is offset ~9m
+    // (0.00012 deg lng at this latitude) from the street centerline.
+    // Square (butt) end caps for both solid and dashed lines. google.maps.Polyline
+    // strokes only render with round caps, so we draw both as repeated filled-rectangle
+    // symbols (closed paths => crisp square corners). W = line width in px.
+    const W = 3;
+    const rect = (h) => ({ path: `M ${-W/2},${-h/2} ${W/2},${-h/2} ${W/2},${h/2} ${-W/2},${h/2} z`,
+      fillColor: '#18140E', fillOpacity: 1, strokeOpacity: 0, strokeWeight: 0, scale: 1 });
+    // Percentage repeats so a symbol lands exactly at 0% and 100% of every line:
+    // all four curbs then start and end flush at the same points (no ragged stubs,
+    // equal symmetric overhang). 4% => 26 evenly-fitted dashes; 1% => seamless solid.
+    const dashIcon  = () => ({ icon: rect(5), offset: '0%', repeat: '4%' });
+    const solidIcon = () => ({ icon: rect(5), offset: '0%', repeat: '1%' });
+    const LAT_N = 47.5836616, LAT_S = 47.5810366;
+    // 21st Ave S, WEST curb — solid: the one side with a planned asphalt walkway.
     new google.maps.Polyline({
-      path: [{ lat: 47.5836616, lng: -122.3055831 }, { lat: 47.5810366, lng: -122.3055831 }],
-      strokeColor: '#18140E', strokeWeight: 5, strokeOpacity: 0.95, map: zmap, zIndex: 9999,
+      path: [{ lat: LAT_N, lng: -122.3057531 }, { lat: LAT_S, lng: -122.3057531 }],
+      strokeColor: '#18140E', strokeOpacity: 0, map: zmap, zIndex: 9999, icons: [solidIcon()],
     });
-    // 22nd Ave S — dashed black (nudged ~1.5px east total to sit centered on the street)
-    // Filled rectangle dashes = square (butt) ends, not rounded.
+    // 21st Ave S, EAST curb — dashed: the upzoned side, no walkway planned.
     new google.maps.Polyline({
-      path: [{ lat: 47.5836616, lng: -122.3042986 }, { lat: 47.5810366, lng: -122.3042986 }],
-      strokeColor: '#18140E', strokeOpacity: 0, map: zmap, zIndex: 9999,
-      icons: [{
-        icon: { path: 'M -2.5,-5 2.5,-5 2.5,5 -2.5,5 z', fillColor: '#18140E', fillOpacity: 0.95, strokeOpacity: 0, strokeWeight: 0, scale: 1 },
-        offset: '0', repeat: '19px',
-      }],
+      path: [{ lat: LAT_N, lng: -122.3054131 }, { lat: LAT_S, lng: -122.3054131 }],
+      strokeColor: '#18140E', strokeOpacity: 0, map: zmap, zIndex: 9999, icons: [dashIcon()],
     });
+    // 22nd Ave S, WEST curb — dashed: no walkway planned on either side.
+    new google.maps.Polyline({
+      path: [{ lat: LAT_N, lng: -122.3044686 }, { lat: LAT_S, lng: -122.3044686 }],
+      strokeColor: '#18140E', strokeOpacity: 0, map: zmap, zIndex: 9999, icons: [dashIcon()],
+    });
+    // 22nd Ave S, EAST curb — dashed: no walkway planned on either side.
+    new google.maps.Polyline({
+      path: [{ lat: LAT_N, lng: -122.3041286 }, { lat: LAT_S, lng: -122.3041286 }],
+      strokeColor: '#18140E', strokeOpacity: 0, map: zmap, zIndex: 9999, icons: [dashIcon()],
+    });
+
+    // ── Corridor cleanup ──────────────────────────────────────────────────
+    // A tan band (the base map's own road color) over each street's right-of-way
+    // masks Google's default road fill + rotated street labels in the corridor,
+    // plus our own clean vertical labels. Both live in the LOWEST overlay pane
+    // (mapPane), so the translucent zoning color fills wash OVER them, while the
+    // black curb lines (Polylines, zIndex 9999) stay highest of all. Band is
+    // appended before the labels so the labels sit on top of the band.
+    const ROAD_TAN = '#e4ddd3';
+    // Tan corridor band, drawn as a mapPane div so the color overlays cover it.
+    class CorridorBand extends google.maps.OverlayView {
+      constructor(latN, latS, lngW, lngE) {
+        super();
+        this.nw = new google.maps.LatLng(latN, lngW);
+        this.se = new google.maps.LatLng(latS, lngE);
+        this.div = null;
+      }
+      onAdd() {
+        const d = document.createElement('div');
+        d.style.cssText = 'position:absolute;background:' + ROAD_TAN + ';pointer-events:none;';
+        this.div = d; this.getPanes().mapPane.appendChild(d);
+      }
+      draw() {
+        if (!this.div) return;
+        const proj = this.getProjection();
+        const a = proj.fromLatLngToDivPixel(this.nw);
+        const b = proj.fromLatLngToDivPixel(this.se);
+        if (!a || !b) return;
+        this.div.style.left   = Math.min(a.x, b.x) + 'px';
+        this.div.style.top    = Math.min(a.y, b.y) + 'px';
+        this.div.style.width  = Math.abs(b.x - a.x) + 'px';
+        this.div.style.height = Math.abs(b.y - a.y) + 'px';
+      }
+      onRemove() { if (this.div) { this.div.remove(); this.div = null; } }
+    }
+    new CorridorBand(LAT_N, LAT_S, -122.3057531, -122.3054131).setMap(zmap); // 21st Ave S
+    new CorridorBand(LAT_N, LAT_S, -122.3044686, -122.3041286).setMap(zmap); // 22nd Ave S
+
+    // Our own clean vertical street labels, replacing Google's defaults. Same
+    // muted tone as the native map label text (#8a837a) so they read as map
+    // labels, but tidy and uppercase. Rotated to run up the corridor. Placed in
+    // mapPane too (after the bands), so the zoning colors wash over them.
+    class StreetLabel extends google.maps.OverlayView {
+      constructor(pos, text) { super(); this.pos = pos; this.text = text; this.div = null; }
+      onAdd() {
+        const d = document.createElement('div');
+        d.textContent = this.text;
+        d.style.cssText = 'position:absolute;transform:translate(-50%,-50%) rotate(-90deg);'
+          + 'transform-origin:center;white-space:nowrap;pointer-events:none;'
+          + 'font-family:Fustat,sans-serif;font-size:10.5px;font-weight:600;line-height:1;'
+          + 'letter-spacing:0.14em;text-transform:uppercase;color:#8a837a;'
+          + 'padding:1px 7px;'
+          + 'text-shadow:1px 1px 0 rgba(255,255,255,.8),-1px 1px 0 rgba(255,255,255,.8),'
+          + '1px -1px 0 rgba(255,255,255,.8),-1px -1px 0 rgba(255,255,255,.8),'
+          + '0 1px 0 rgba(255,255,255,.8),0 -1px 0 rgba(255,255,255,.8),'
+          + '1px 0 0 rgba(255,255,255,.8),-1px 0 0 rgba(255,255,255,.8);';
+        this.div = d; this.getPanes().mapPane.appendChild(d);
+      }
+      draw() {
+        if (!this.div) return;
+        const p = this.getProjection().fromLatLngToDivPixel(this.pos);
+        if (p) { this.div.style.left = p.x + 'px'; this.div.style.top = p.y + 'px'; }
+      }
+      onRemove() { if (this.div) { this.div.remove(); this.div = null; } }
+    }
+    new StreetLabel(new google.maps.LatLng(47.5827, -122.3055831), '21st Ave S').setMap(zmap);
+    new StreetLabel(new google.maps.LatLng(47.5819, -122.3042986), '22nd Ave S').setMap(zmap);
 
     zmap.data.addGeoJson(ZONING_GJ);
     zmap.data.addGeoJson(OZ_GJ);
@@ -3169,15 +3206,18 @@ body {
     // side 'right' = leader on the pill's right, so the pill sits to the LEFT of the corridor;
     // side 'left'  = leader on the pill's left,  so the pill sits to the RIGHT of the corridor.
     class ValueChip extends google.maps.OverlayView {
-      constructor(pos, text, color, side) {
-        super(); this.pos = pos; this.text = text; this.color = color; this.side = side || 'left'; this.div = null; this.pill = null; this.trend = false;
+      constructor(pos, text, color, side, solidLine) {
+        super(); this.pos = pos; this.text = text; this.color = color; this.side = side || 'left'; this.solidLine = !!solidLine; this.div = null; this.pill = null; this.trend = false;
       }
       onAdd() {
         const wrap = document.createElement('div');
         const xform = this.side === 'right' ? 'translate(-100%,-50%)' : 'translateY(-50%)';
         wrap.style.cssText = 'position:absolute;align-items:center;white-space:nowrap;pointer-events:none;display:none;transform:' + xform + ';';
         const line = document.createElement('div');
-        line.style.cssText = 'width:30px;height:3px;background:#18140E;flex:none;';
+        // Connector matches the curb it points to: solid on the walkway (west) side,
+        // dashed (square dashes) on the no-walkway (east) side.
+        const lineFill = this.solidLine ? '#18140E' : 'repeating-linear-gradient(to right,#18140E 0 3px,transparent 3px 6px)';
+        line.style.cssText = 'width:30px;height:2px;flex:none;background:' + lineFill + ';';
         const pill = document.createElement('div');
         pill.style.cssText = 'display:flex;align-items:baseline;gap:6px;background:#fff;border-radius:4px;padding:4px 11px;font-family:Fustat,sans-serif;color:#18140E;box-shadow:0 3px 10px rgba(0,0,0,0.22);flex:none;';
         // Direction word uses the narrative eyebrow style; the value stays bold dark.
@@ -3215,8 +3255,11 @@ body {
       }
     }
     valuePins = [
-      new ValueChip(new google.maps.LatLng(47.58330, -122.3055831), 'West $240K', NR_COLOR, 'right'),
-      new ValueChip(new google.maps.LatLng(47.58150, -122.3055831), 'East $240K', RAMP_COLOR, 'left'),
+      // Both chips sit at the SAME latitude so they read as a balanced pair directly
+      // across 21st Ave S: West leader -> WEST curb (solid line), East leader -> EAST
+      // curb (dashed line). Same spot, same street, the two sides.
+      new ValueChip(new google.maps.LatLng(47.58300, -122.3057531), 'West $240K', NR_COLOR, 'right', true),
+      new ValueChip(new google.maps.LatLng(47.58300, -122.3054131), 'East $240K', RAMP_COLOR, 'left', false),
     ];
     valuePins.forEach(p => p.setMap(zmap));
 
@@ -3367,7 +3410,9 @@ body {
     else if (stepId === 'zmap-step-lr1' || stepId === 'zmap-step-value') html = sf + lr1;
     else if (stepId === 'zmap-step-oz'  || stepId === 'zmap-step-walk' || stepId === 'zmap-step-question') html = oz + lr1 + sf;
     // Street key: 21st Ave S solid, 22nd Ave S dotted — shown whenever the legend is visible.
-    if (html !== '') html = legLine(false, '21st Ave S') + legLine(true, '22nd Ave S') + html;
+    const lines = legLine(false, 'Walkway planned (21st Ave S, west side)') + legLine(true, 'No walkway planned');
+    if (stepId === 'zmap-step-intro') html = lines;          // intro: line key only, no zoning colors yet
+    else if (html !== '') html = lines + html;
     zmapLegend.innerHTML = html;
     zmapLegend.classList.toggle('visible', html !== '');
     // Relocate the legend under the copy of the active step (right column),
@@ -4367,7 +4412,7 @@ mapSteps.forEach(s => mapStepObs.observe(s));
   //  that reaches this one block on foot. Streets stay highlighted as native
   //  polylines (no ring). Narrative: scale of impact + investment mismatch.
   // ══════════════════════════════════════════════════════════════════════════
-  // level: 'near' (street zoom) → 'half' (0.5-mi walkshed) → 'mile' (1-mi walkshed)
+  // level: 'near' (street zoom) → 'half' (0.5-mi walkshed)
   let level          = 'near';
   let walkGen        = 0;   // bumped on every transition; cancels stale marker drops
   let walkLayerReady = false;
@@ -4379,10 +4424,8 @@ mapSteps.forEach(s => mapStepObs.observe(s));
   const NEAR_ZOOM    = 17;
   const CENTER       = { lat: 47.5823491, lng: -122.3049514 }; // corridor midpoint
   const HALF_M       = 910;                                    // ≈0.57 mi — "approximately a half-mile"; encloses Beacon Hill Int'l Elementary + Judkins Park Station
-  const MILE_M       = 1609.34;                                // 1.0 mile in meters
   const FRAME_PAD    = 1.15;                                   // frame box slightly larger than the ring so it isn't flush to the pane edge
   const walkStepEl   = document.getElementById('map-step-walkshed');
-  const walkMileEl   = document.getElementById('map-step-walkshed-mile');
 
   // Square bounding box of a given radius around the corridor midpoint.
   // 1° lat ≈ 111,320 m; 1° lng ≈ 111,320·cos(lat). Fitting this box guarantees
@@ -4424,7 +4467,7 @@ mapSteps.forEach(s => mapStepObs.observe(s));
   const WALK_COLORS = { school: '#185FA5', transit: '#533AB7', dev: '#0F6E56', work: '#B45309' };
 
   // Coordinates geocoded from real street addresses (Google Geocoder, ROOFTOP
-  // unless noted). tier 'half' = within 0.5 mi; tier 'mile' = 0.5–1.0 mi.
+  // unless noted). tier 'half' = within ~0.5 mi.
   const WALK_LOCS = [
     // ── within a half mile ──────────────────────────────────────────────
     { tier: 'half', lat: 47.5839693, lng: -122.3051087, cat: 'school',  label: 'Giddens School',
@@ -4445,40 +4488,10 @@ mapSteps.forEach(s => mapStepObs.observe(s));
     // Beacon Ave S — Metro Route 36, the Beacon Hill spine. ~0.33 mi west, by Beacon Hill Station.
     { tier: 'half', lat: 47.580325, lng: -122.311293, cat: 'transit', mode: 'bus', label: 'Route 36 &mdash; Beacon Ave S',
       desc: 'Another of Metro&rsquo;s highest-ridership routes runs the length of Beacon Hill along Beacon Ave S, just west of the corridor and feeding Beacon Hill Station.' },
-    { tier: 'half', lat: 47.58582,   lng: -122.3051889, cat: 'dev',     label: '1910 21st Ave S (proposed)',
-      desc: 'Proposed 7-story, 212-unit building on the project block itself. Hundreds of new residents would walk this street daily.' },
-    { tier: 'half', lat: 47.5852898, lng: -122.3040045, cat: 'dev',     label: 'Urban League Empowerment Center',
-      desc: '6&ndash;7 stories of affordable housing + Urban League HQ on Rainier. Built in a neighborhood where disinvestment is visible in the street itself.' },
     // Beacon Hill Int'l is ~0.52 mi out — just past a strict half-mile, but inside the
     // "approximately a half-mile" walkshed (ring drawn at 0.55 mi), so it sits in this tier.
     { tier: 'half', lat: 47.5850972, lng: -122.3153864, cat: 'school',  label: "Beacon Hill Int'l Elementary",
       desc: 'Public K&ndash;5, 347 students. Families walking from west Beacon Hill toward transit must cross 21st and 22nd with no sidewalk.' },
-    // 2101 22nd Ave S — one block east of the corridor, well inside the half-mile.
-    { tier: 'half', lat: 47.584136,  lng: -122.3050689, cat: 'dev',     label: 'Community Roots / Jazz House',
-      desc: '128 units of affordable housing above a performing-arts space, in development at 2101 22nd Ave S &mdash; one block east of the corridor. Affordable-housing residents are more likely to be transit-dependent pedestrians.' },
-    // 1911 22nd Ave S — just north along the same block, inside the half-mile.
-    { tier: 'half', lat: 47.5859408, lng: -122.3045057, cat: 'dev',     label: 'Hobson Place',
-      desc: 'Permanent supportive housing at 1911 22nd Ave S &mdash; a short walk up the same corridor. Residents here depend on safe pedestrian access to transit and services.' },
-    // 2501 S Plum St — the region's largest employer of blind and low-vision workers,
-    // ~0.31 mi from the corridor. A workplace whose staff cannot drive by definition.
-    { tier: 'half', lat: 47.5850286, lng: -122.2996594, cat: 'work',    label: 'The Lighthouse for the Blind, Inc.',
-      desc: 'The region&rsquo;s largest employer of people who are blind, DeafBlind, or low-vision &mdash; workers who depend entirely on safe sidewalks and transit to get to their jobs. A missing walkway is not an inconvenience here; it is a barrier to work.' },
-    // ── 0.5 to 1 mile ───────────────────────────────────────────────────
-    { tier: 'mile', lat: 47.5739561, lng: -122.3023538, cat: 'school',  label: 'Kimball Elementary',
-      desc: 'Public K&ndash;5 to the south. Students walk the same corridor toward transit and the wider neighborhood.' },
-    { tier: 'mile', lat: 47.5760672, lng: -122.2931439, cat: 'school',  label: 'Franklin High School',
-      desc: 'Comprehensive high school east of Rainier. Its attendance area pulls foot traffic across the corridor every school day.' },
-    // 1700 24th Ave S — ~0.44 mi out; falls in the one-mile ring.
-    { tier: 'mile', lat: 47.5880766, lng: -122.3006815, cat: 'school',  label: "Seattle Girls' School",
-      desc: 'Independent middle school for grades 5&ndash;8. Students arriving on foot and by transit share the same incomplete sidewalk network as every other school on this map.' },
-    // 23rd Ave S — Metro Route 48 crosstown corridor. ~0.67 mi.
-    { tier: 'mile', lat: 47.591885, lng: -122.302551, cat: 'transit', mode: 'bus', label: 'Route 48 &mdash; 23rd Ave S',
-      desc: 'The 23rd Ave S / MLK corridor carries Metro&rsquo;s crosstown Route 48, linking the neighborhood north toward Capitol Hill and the U-District.' },
-    // MLK Jr Way S — Metro Route 8. ~0.75 mi.
-    { tier: 'mile', lat: 47.592038, lng: -122.297654, cat: 'transit', mode: 'bus', label: 'Route 8 &mdash; MLK Jr Way S',
-      desc: 'Route 8 runs Martin Luther King Jr Way S to the east, connecting the neighborhood toward Mount Baker and Capitol Hill.' },
-    { tier: 'mile', lat: 47.593809,  lng: -122.3095196, cat: 'dev',     label: '900 Rainier Ave S',
-      desc: '396 units completed 2025 &mdash; part of 2,000+ added near Judkins Park since 2018. The city upzoned for density with no matching pedestrian commitment.' },
   ];
 
   // Build a Google Maps marker icon (ported from long.html mkSvgIcon)
@@ -4551,10 +4564,9 @@ mapSteps.forEach(s => mapStepObs.observe(s));
         position: { lat: loc.lat, lng: loc.lng },
         map: gmap, icon: icon, title: loc.label, visible: false, opacity: 0, zIndex: 10,
       });
-      m._tier = loc.tier;     // 'half' | 'mile' — which zoom level reveals it
+      m._tier = loc.tier;     // 'half' — which zoom level reveals it
       m._loc  = loc;          // for regenerating the icon at intermediate scales
       m._group = halfGroupOf(loc);  // 0..4 cascade group (half tier only); -1 otherwise
-      m._mileGroup = mileGroupOf(loc);  // 0..3 mile cascade group (mile tier only); -1 otherwise
       m._baseIcon = icon;     // full-size icon; the blossom tween always settles back to this
       m._anim = 0;            // bumped on each reveal to cancel a prior in-flight tween
       m.addListener('click', () => {
@@ -4586,37 +4598,19 @@ mapSteps.forEach(s => mapStepObs.observe(s));
   }
 
   // Cascade groups for the half-mile reveal, in the order the copy names them:
-  //   0 schools · 1 light-rail · 2 bus lines · 3 housing · 4 employer
+  //   0 schools · 1 light-rail · 2 bus lines
   function halfGroupOf(loc) {
     if (loc.tier !== 'half') return -1;
     if (loc.cat === 'school')  return 0;
     if (loc.cat === 'transit') return loc.mode === 'bus' ? 2 : 1;
-    if (loc.cat === 'dev')     return 3;
-    if (loc.cat === 'work')    return 4;
     return -1;
   }
-  const HALF_PHRASE_IDS = ['ph-schools', 'ph-rail', 'ph-bus', 'ph-dev', 'ph-work'];
+  const HALF_PHRASE_IDS = ['ph-schools', 'ph-rail', 'ph-bus'];
   // Progress (0→1 through the pinned build-track) at which each group pops.
   // The track opens on a held beat (0→0.16) showing the empty walkshed ring with
-  // the headline but no pins yet; schools then lead the cascade, and all five are
-  // up by ~0.78, leaving the tail (0.78→1.0) as a final hold before the mile tier.
-  const HALF_GROUP_AT   = [0.16, 0.31, 0.46, 0.61, 0.74];
-
-  // Mile cascade: same pattern one tier out. The half-mile pins stay on screen and
-  // the mile-only pins fill in category-by-category, with the counts ticking up to
-  // their cumulative one-mile totals (8 schools · 2 rail · 4 bus · 5 housing).
-  function mileGroupOf(loc) {
-    if (loc.tier !== 'mile') return -1;
-    if (loc.cat === 'school')  return 0;
-    if (loc.cat === 'transit') return loc.mode === 'bus' ? 2 : 1;
-    if (loc.cat === 'dev')     return 3;
-    return -1;
-  }
-  const MILE_GROUP_IDS = ['mi-schools', 'mi-rail', 'mi-bus', 'mi-dev'];
-  // Opens on the same empty-ring beat; counts build, then the closing line lights.
-  const MILE_GROUP_AT  = [0.16, 0.31, 0.46, 0.61];
-  const MILE_CODA_AT   = 0.76;
-  const MILE_QUESTION_AT = 0.88;
+  // the headline but no pins yet; schools then lead the cascade, and all three are
+  // up by ~0.52, leaving the tail (0.52→1.0) as a final held beat.
+  const HALF_GROUP_AT   = [0.16, 0.34, 0.52];
 
   function hideMarker(m) {
     m._anim++;                 // cancel any in-flight tween
@@ -4645,24 +4639,6 @@ mapSteps.forEach(s => mapStepObs.observe(s));
     });
   }
 
-  // Reveal the mile-only pins category-by-category as the reader scrolls the mile
-  // build-track. Half-mile pins are already on screen; this fills in the rest and
-  // lights each cumulative count, then the closing thesis line at the tail.
-  function revealMileProgress(p) {
-    const gen = walkGen;
-    MILE_GROUP_IDS.forEach((id, gi) => {
-      const show = p >= MILE_GROUP_AT[gi];
-      litPhrase(id, show);
-      walkMarkers.forEach(m => {
-        if (m._mileGroup !== gi) return;
-        if (show && !m.getVisible())      blossomInMarker(m, 0, gen);
-        else if (!show && m.getVisible()) hideMarker(m);
-      });
-    });
-    litPhrase('mi-coda', p >= MILE_CODA_AT);
-    litPhrase('mi-question', p >= MILE_QUESTION_AT);
-  }
-
   // Scroll progress through the pinned build-track: 0 when the track's top
   // reaches the viewport top (copy pins), 1 when its bottom reaches the viewport
   // bottom (copy unpins). Drives the category cascade; the tail is the held beat.
@@ -4670,16 +4646,6 @@ mapSteps.forEach(s => mapStepObs.observe(s));
     if (!walkStepEl) return 0;
     const vh = window.innerHeight;
     const r  = walkStepEl.getBoundingClientRect();
-    const track = r.height - vh;
-    if (track <= 0) return r.top <= 0 ? 1 : 0;
-    return Math.max(0, Math.min(1, -r.top / track));
-  }
-
-  // Same scroll-progress measure for the mile build-track.
-  function mileProgress() {
-    if (!walkMileEl) return 0;
-    const vh = window.innerHeight;
-    const r  = walkMileEl.getBoundingClientRect();
     const track = r.height - vh;
     if (track <= 0) return r.top <= 0 ? 1 : 0;
     return Math.max(0, Math.min(1, -r.top / track));
@@ -4696,9 +4662,6 @@ mapSteps.forEach(s => mapStepObs.observe(s));
       if (walkInfo) walkInfo.close();
       walkMarkers.forEach(hideMarker);
       HALF_PHRASE_IDS.forEach(id => litPhrase(id, false));  // reset the phrase highlights
-      MILE_GROUP_IDS.forEach(id => litPhrase(id, false));
-      litPhrase('mi-coda', false);
-      litPhrase('mi-question', false);
       if (line21Native) line21Native.setOptions({ strokeOpacity: 0 });
       if (line22Native) line22Native.setOptions({ strokeOpacity: 0 });
       if (walkMask) walkMask.setVisible(false);
@@ -4709,12 +4672,12 @@ mapSteps.forEach(s => mapStepObs.observe(s));
       return;
     }
 
-    // Entering (or staying within) a zoomed-out walkshed view
+    // Entering (or staying within) the half-mile walkshed view
     level = next;
     if (oCtx) oCtx.clearRect(0, 0, mapEl.offsetWidth, mapEl.offsetHeight);
     if (flightCanvas) flightCanvas.style.display = 'none';
     mapEl.style.opacity = 1;
-    const radius = next === 'mile' ? MILE_M : HALF_M;
+    const radius = HALF_M;
     // Frame a box slightly larger than the ring so it isn't flush to the pane edge.
     gmap.fitBounds(radiusBounds(radius * FRAME_PAD),
                    { top: 24, right: 24, bottom: 24, left: 24 });
@@ -4726,41 +4689,24 @@ mapSteps.forEach(s => mapStepObs.observe(s));
     }
     if (line21Native) line21Native.setOptions({ strokeOpacity: 0.9 });
     if (line22Native) line22Native.setOptions({ strokeOpacity: 0.85 });
-    if (next === 'mile') {
-      // Keep every half-mile pin on screen (and its counts lit), then let scroll
-      // position drive the mile-only cascade (schools → rail → bus → housing).
-      walkMarkers.forEach(m => { if (m._tier === 'half' && !m.getVisible()) blossomInMarker(m, 0, walkGen); });
-      HALF_PHRASE_IDS.forEach(id => litPhrase(id, true));
-      revealMileProgress(mileProgress());
-    } else {
-      // Half-mile: hide any mile-only pins (and reset their counts), then let scroll
-      // position drive the category cascade (schools → rail → bus → housing → employer).
-      walkMarkers.forEach(m => { if (m._tier === 'mile' && m.getVisible()) hideMarker(m); });
-      MILE_GROUP_IDS.forEach(id => litPhrase(id, false));
-      litPhrase('mi-coda', false);
-      litPhrase('mi-question', false);
-      revealHalfProgress(halfProgress());
-    }
+    // Half-mile: let scroll position drive the category cascade
+    // (schools → rail → bus → housing → employer).
+    revealHalfProgress(halfProgress());
   }
 
-  // Drive the zoom level from scroll position, with hysteresis so transitions
-  // don't thrash at a threshold. Two step elements gate the two walkshed tiers.
+  // Drive the zoom level from scroll position, with hysteresis so the transition
+  // doesn't thrash at the threshold. One step element gates the walkshed tier.
   function updateWalkshed() {
     if (!walkStepEl || !tilesLoaded) return;
     const vh = window.innerHeight;
     const ht = walkStepEl.getBoundingClientRect().top;
-    const mt = walkMileEl ? walkMileEl.getBoundingClientRect().top : Infinity;
     if (level === 'near') {
       if (ht < vh * 0.5) setLevel('half');
     } else if (level === 'half') {
-      if (mt < vh * 0.5)       setLevel('mile');
-      else if (ht > vh * 0.68) setLevel('near');
-    } else { // 'mile'
-      if (mt > vh * 0.68) setLevel('half');
+      if (ht > vh * 0.68) setLevel('near');
     }
-    // While in a walkshed tier, scrub its category cascade to scroll position.
-    if (level === 'half')      revealHalfProgress(halfProgress());
-    else if (level === 'mile') revealMileProgress(mileProgress());
+    // While in the walkshed tier, scrub its category cascade to scroll position.
+    if (level === 'half') revealHalfProgress(halfProgress());
   }
 
   window.addEventListener('scroll', updateLines, { passive: true });
