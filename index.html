@@ -121,7 +121,7 @@ body {
   overflow: hidden;   /* clips text while it rides in from below */
 }
 .step-inner {
-  max-width: 720px; text-align: center;
+  max-width: 644px; text-align: center;
   will-change: transform;
   transform: translateY(80vh);   /* JS animates this to 0 on scroll */
 }
@@ -132,7 +132,7 @@ body {
 }
 .step-quote {
   font-family: 'VTC Martin', 'Fustat', sans-serif; font-style: normal;
-  font-size: clamp(3rem, 6.4vw, 5rem); line-height: 0.80;
+  font-size: clamp(3.45rem, 7.35vw, 5.75rem); line-height: 0.80;
   text-transform: uppercase;
   text-wrap: balance;
   color: var(--surface);
@@ -314,7 +314,7 @@ body {
 .ch-divider .ch-eyebrow { color: rgba(24,20,14,0.75); margin-bottom: 1.25rem; }
 .ch-divider h2 {
   font-family: 'VTC Martin', 'Fustat', sans-serif; font-weight: 400;
-  font-size: clamp(3rem, 6.4vw, 5rem); line-height: 0.80;
+  font-size: clamp(3.45rem, 7.35vw, 5.75rem); line-height: 0.80;
   text-transform: uppercase; letter-spacing: 0.005em;
   color: #18140E;
 }
@@ -485,7 +485,7 @@ body {
 .debt-divider-inner { max-width: min(900px, 88vw); text-align: center; margin: 0 auto; }
 .debt-statement {
   font-family: 'VTC Martin', 'Fustat', sans-serif; font-weight: 400;
-  font-size: clamp(3rem, 6.4vw, 5rem); line-height: 0.80;
+  font-size: clamp(3.45rem, 7.35vw, 5.75rem); line-height: 0.80;
   text-transform: uppercase; letter-spacing: 0.005em;
   color: var(--surface); margin: 0 auto;
   max-width: 21.5ch; text-wrap: balance;
@@ -554,7 +554,7 @@ body {
 .pull-quote-mark {
   display: block;
   font-family: 'VTC Martin', 'Fustat', sans-serif; font-weight: 400;
-  font-size: clamp(4.5rem, 9.6vw, 7.5rem); line-height: 0.4;
+  font-size: clamp(5.18rem, 11.04vw, 8.63rem); line-height: 0.4;
   color: var(--ink);
   margin-bottom: -0.05em;
 }
@@ -716,17 +716,22 @@ body {
   padding: 0 2rem;
 }
 .dg-step {
-  min-height: 80vh;
-  display: flex; align-items: center;
+  min-height: 100vh;
+  display: block;
   padding: 2rem 0;
 }
 .dg-step:first-child { min-height: 60vh; padding-top: 10vh; }
 .dg-step-spacer { height: 50vh; }
+/* Speed bump: the copy sticks at the 40vh band and holds while the tall step
+   scrolls past, so each dot phase pauses at center before the next takes over. */
 .dg-step-content {
-  opacity: 0; transform: translateY(10px);
+  position: sticky; top: 40vh;
+  opacity: 0; transform: translateY(calc(-50% + 10px));
   transition: opacity 0.4s ease, transform 0.4s ease;
 }
-.dg-step.active .dg-step-content { opacity: 1; transform: translateY(0); }
+.dg-step:first-child .dg-step-content { position: static; transform: translateY(10px); }
+.dg-step:first-child.active .dg-step-content { transform: translateY(0); }
+.dg-step.active .dg-step-content { opacity: 1; transform: translateY(-50%); }
 .dg-step-sentence {
   font-family: 'Fustat', sans-serif;
   font-size: 17.6px; font-weight: 400;
@@ -1047,7 +1052,7 @@ body {
   font-family: 'VTC Martin', 'Fustat', sans-serif;
   text-transform: uppercase;
   line-height: 0.80;
-  font-size: clamp(3rem, 6.4vw, 5rem);
+  font-size: clamp(3.45rem, 7.35vw, 5.75rem);
 }
 
 /* Equity comparison bars */
@@ -1227,17 +1232,25 @@ body {
   padding: 0 2rem;
 }
 .map-step {
-  min-height: 80vh;
-  display: flex; align-items: center;
+  min-height: 80vh;   /* unchanged — the flight/line-draw is calibrated to this section height */
+  display: block;
   padding: 2rem 0;
 }
 .map-step:first-child { min-height: 60vh; padding-top: 10vh; }
 .map-step-spacer { height: 50vh; }
+/* Speed bump: copy sticks at the 40vh band and holds while the step scrolls past.
+   Heights are left alone so the map's scroll-progress flight stays in sync. */
 .map-step-content {
-  opacity: 0; transform: translateY(10px);
+  position: sticky; top: 40vh;
+  opacity: 0; transform: translateY(calc(-50% + 10px));
   transition: opacity 0.4s ease, transform 0.4s ease;
 }
-.map-step.active .map-step-content { opacity: 1; transform: translateY(0); }
+.map-step:first-child .map-step-content { position: static; transform: translateY(10px); }
+.map-step:first-child.active .map-step-content { transform: translateY(0); }
+.map-step.active .map-step-content { opacity: 1; transform: translateY(-50%); }
+/* The walkshed build step manages its own 100vh pin — opt it out of the sticky dwell. */
+.map-step-build .map-step-content { position: static; transform: none; }
+.map-step-build.active .map-step-content { transform: none; }
 /* Half-mile "build" step: a tall scroll-track whose copy stays pinned while the
    category pins blossom in one group at a time, then a final held beat. */
 .map-step-build { min-height: 240vh; display: block; align-items: stretch; padding: 0; }
@@ -1324,7 +1337,7 @@ body {
   .dg-step:first-child{ min-height: 44vh; padding-top: 2vh; }
   .dg-step-spacer     { height: 16vh; }
   /* Keep narration legible regardless of the scroll-trigger fade */
-  .dg-step-content    { opacity: 1 !important; transform: none !important; }
+  .dg-step-content    { opacity: 1 !important; transform: none !important; position: static !important; top: auto !important; }
   /* Give the text a solid backdrop so it never muddies against the grid */
   .dg-step-content {
     background: #FFFFFF;
@@ -1371,6 +1384,7 @@ body {
   /* Same: always show map step text on mobile, on a solid backdrop */
   .map-step-content   {
     opacity: 1 !important; transform: none !important;
+    position: static !important; top: auto !important;
     background: #FFFFFF; padding: 0.75rem 0;
   }
 
@@ -1645,7 +1659,7 @@ body {
 .zoning-step-quote { border-left: 3px solid #E24B4A; padding-left: 1rem; margin-top: 1.25rem; font-size: var(--body-size); line-height: var(--body-lh); color: var(--ink); }
 .zoning-step-ask { font-family: 'Fustat', sans-serif; font-weight: 400; font-size: 17.6px; line-height: 1.45; color: var(--ink); margin-top: 1.4rem; }
 .zoning-step .pull-quote-block { margin: 1.6rem 0 1.4rem; }
-.zoning-step .pull-quote-mark { font-size: clamp(3.5rem, 6vw, 5rem); line-height: 0.4; margin-bottom: 0.05em; }
+.zoning-step .pull-quote-mark { font-size: clamp(4.03rem, 6.9vw, 5.75rem); line-height: 0.4; margin-bottom: 0.05em; }
 .zoning-step .pull-quote-block p { font-family: var(--serif); font-weight: 400; font-size: 21px; line-height: 1.4; margin: 0; }
 .zoning-step-figure { margin: 1.1rem 0 0; max-width: 360px; }
 .zoning-step-figure img { display: block; width: 100%; height: 190px; object-fit: cover; border-radius: 6px; }
@@ -1667,11 +1681,92 @@ body {
   /* Mobile stacks the map above the copy, so drop the sticky-center dwell. */
   .zoning-step-content { position: static !important; opacity: 1 !important; transform: none !important; background: #fff; padding: 0.75rem 0; }
 }
+/* ═══ Chapter nav — light thumbnail filmstrip ═══════════════ */
+.navfs-toggle {
+  position: fixed; top: 1.1rem; right: 1.1rem; z-index: 200;
+  width: 46px; height: 46px; border: none; border-radius: 9px;
+  background: rgba(24,20,14,0.82); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+  cursor: pointer; padding: 0;
+  display: grid; place-items: center;
+  opacity: 0; visibility: hidden; transform: translateY(-8px);
+  transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s, background 0.2s ease, top 0.42s cubic-bezier(0.22,1,0.36,1);
+}
+.navfs-toggle.show { opacity: 1; visibility: visible; transform: none; }
+/* When open, the close button drops just below the full-bleed strip, right edge. */
+.navfs-toggle.open { top: calc(var(--navfs-strip-h, 82px) + 0.55rem); }
+.navfs-toggle:hover { background: rgba(24,20,14,0.95); }
+.navfs-toggle .navfs-ico {
+  grid-area: 1 / 1; color: #fff; display: block;
+  transition: opacity 0.22s ease, transform 0.28s cubic-bezier(0.22,1,0.36,1);
+}
+.navfs-toggle .navfs-ico-close { opacity: 0; transform: rotate(-45deg); }
+.navfs-toggle.open .navfs-ico-open { opacity: 0; transform: rotate(45deg); }
+.navfs-toggle.open .navfs-ico-close { opacity: 1; transform: none; }
+
+.navfs {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 199;
+  background: rgba(255,255,255,0.97); -webkit-backdrop-filter: blur(7px); backdrop-filter: blur(7px);
+  transform: translateY(-101%); transition: transform 0.42s cubic-bezier(0.22,1,0.36,1);
+  max-height: 100dvh;
+}
+.navfs.open { transform: none; }
+.navfs-strip {
+  display: flex; gap: 0; overflow: hidden;
+}
+.navfs-item {
+  flex: 1 1 0; min-width: 0; position: relative; display: block; background: #f3f1ec;
+}
+.navfs-item img { display: block; width: 100%; height: auto; }
+.navfs-bar {
+  position: absolute; top: 0; left: 0; z-index: 3;
+  height: 3px; width: 0; background: var(--red, #E24B4A);
+  transition: width 0.12s linear;
+}
+.navfs-num {
+  position: absolute; bottom: 0.45rem; right: 0.45rem; z-index: 2; pointer-events: none;
+  display: flex; align-items: center; justify-content: center;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: #fff; color: #18140e;
+  font-family: 'Fustat', sans-serif; font-weight: 700; font-size: var(--label-size);
+  letter-spacing: var(--label-track); text-transform: uppercase; text-indent: var(--label-track); line-height: 1;
+  opacity: 0.6; transition: opacity 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+.navfs-item:hover .navfs-num { opacity: 1; }
+.navfs-item.current .navfs-num { opacity: 1; background: var(--red, #E24B4A); color: #fff; }
+
+@media (max-width: 600px) {
+  .navfs-toggle { top: 0.7rem; right: 0.7rem; width: 42px; height: 42px; }
+  /* Vertical list fills the screen, so keep the close button pinned top-right. */
+  .navfs-toggle.open { top: 0.7rem; }
+  .navfs-strip {
+    flex-direction: column; overflow-x: hidden; overflow-y: auto;
+    max-height: 100dvh; scroll-behavior: smooth; -webkit-overflow-scrolling: touch;
+  }
+  .navfs-item { flex: 0 0 auto; width: 100%; }
+  .navfs-strip::-webkit-scrollbar { width: 6px; }
+  .navfs-strip::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.18); border-radius: 3px; }
+}
 </style>
 </head>
 <body>
 
 <div class="progress-bar"><div class="progress-fill" id="prog"></div></div>
+
+<button class="navfs-toggle" id="navfsToggle" aria-label="Open chapter menu" aria-expanded="false">
+  <svg class="navfs-ico navfs-ico-open" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 7V6H20V7H4ZM4 18V17H20V18H4ZM4 12.5V11.5H20V12.5H4Z" fill="currentColor"/></svg>
+  <svg class="navfs-ico navfs-ico-close" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6.40013 18.3069L5.69238 17.5992L11.2924 11.9992L5.69238 6.39916L6.40013 5.69141L12.0001 11.2914L17.6001 5.69141L18.3079 6.39916L12.7079 11.9992L18.3079 17.5992L17.6001 18.3069L12.0001 12.7069L6.40013 18.3069Z" fill="currentColor"/></svg>
+</button>
+<nav class="navfs" id="navfs" aria-hidden="true">
+  <div class="navfs-strip" id="navfsStrip">
+    <a class="navfs-item" href="#ch1" data-target="ch1"><img src="imgs/NavThumbnail_01.png" alt="Introduction" loading="lazy"><i class="navfs-bar"></i><span class="navfs-num">1</span></a>
+    <a class="navfs-item" href="#ch2" data-target="ch2"><img src="imgs/NavThumbnail_02.png" alt="Racial covenants, 1889–1968" loading="lazy"><i class="navfs-bar"></i><span class="navfs-num">2</span></a>
+    <a class="navfs-item" href="#ch3" data-target="ch3"><img src="imgs/NavThumbnail_03.png" alt="Without a sidewalk, 1967–present" loading="lazy"><i class="navfs-bar"></i><span class="navfs-num">3</span></a>
+    <a class="navfs-item" href="#ch4" data-target="ch4"><img src="imgs/NavThumbnail_04.png" alt="22nd & 21st Ave S, 2021–2023" loading="lazy"><i class="navfs-bar"></i><span class="navfs-num">4</span></a>
+    <a class="navfs-item" href="#ch5" data-target="ch5"><img src="imgs/NavThumbnail_05.png" alt="21st Ave S, 2023–2026" loading="lazy"><i class="navfs-bar"></i><span class="navfs-num">5</span></a>
+    <a class="navfs-item" href="#ch6" data-target="ch6"><img src="imgs/NavThumbnail_06.png" alt="The Funding, 2024" loading="lazy"><i class="navfs-bar"></i><span class="navfs-num">6</span></a>
+    <a class="navfs-item" href="#ch7" data-target="ch7"><img src="imgs/NavThumbnail_07.png" alt="Conclusion" loading="lazy"><i class="navfs-bar"></i><span class="navfs-num">7</span></a>
+  </div>
+</nav>
 
 
 
@@ -1744,7 +1839,7 @@ body {
         <div class="cov-item" data-float="-96" data-rot="0" style="left:61%; top:80%; width:clamp(180px,22vw,340px);"><img class="cov-img" src="imgs/racial-covenant_07.png" alt=""></div>
       </div>
       <div class="ch-divider-inner">
-        <p class="ch-eyebrow" data-ch-stat="0.25">Redlining &middot; 1889&ndash;1968</p>
+        <p class="ch-eyebrow" data-ch-stat="0.25">Racial covenants &middot; 1889&ndash;1968</p>
         <h2 data-ch-stat="0.55"><span class="hq hq-open">&ldquo;</span>No person other than<br>the Caucasian race.<span class="hq hq-close">&rdquo;</span></h2>
       </div>
     </div>
@@ -1968,11 +2063,11 @@ body {
             <span class="walk-stat-num">5</span>
             <span class="walk-stat-label">Schools</span>
           </div>
-          <div class="walk-stat" id="ph-rail" style="--lit:#76BF8A;">
+          <div class="walk-stat" id="ph-rail" style="--lit:#234F74;">
             <span class="walk-stat-num">2</span>
             <span class="walk-stat-label">Light-rail stations</span>
           </div>
-          <div class="walk-stat" id="ph-bus" style="--lit:#234F74;">
+          <div class="walk-stat" id="ph-bus" style="--lit:#44C265;">
             <span class="walk-stat-num">2</span>
             <span class="walk-stat-label">High-ridership bus lines</span>
           </div>
@@ -4291,13 +4386,15 @@ mapSteps.forEach(s => mapStepObs.observe(s));
     //   section enters viewport  →  flight begins (dots lift off grid, visible)
     //   section fully in view    →  flight nearly done, dots landing on map
     //   progress 0.06            →  dots landed, red 21st line starts growing
-    //   progress 0.06 → 0.14     →  red 21st line grows south (fully drawn before "The current fight" centers at ≈0.151)
-    //   progress 0.14 → 0.38     →  dark 22nd line grows south (fully drawn before "The cautionary tale" centers at ≈0.394)
+    //   progress 0.06 → 0.14     →  red 21st line grows south (done while "The current fight" is held, active ≈0.02–0.21)
+    //   progress 0.14 → 0.19     →  dark 22nd line grows south (fully drawn before "The cautionary tale" pops/holds at ≈0.21)
     //   progress 0.06 → 1.00     →  map blooms in on cubic curve
+    //   NOTE: the dwell (sticky map-step-content) makes each text step pop/hold earlier than its
+    //   old center point, so LINE22 finishes by ≈0.19 — before the 22nd-Ave step settles at ≈0.21.
     //
     const FLIGHT_END   = 0.06;
     const LINE21_START = 0.06,  LINE21_END = 0.14;
-    const LINE22_START = 0.14,  LINE22_END = 0.38;
+    const LINE22_START = 0.14,  LINE22_END = 0.19;
     const LINE_W   = 5;               // stroke width
     const ANCHOR_R = LINE_W / 2;      // dot radius = half stroke → diameter matches line weight
     const GRID_R   = 1.8;             // matches dot grid R constant
@@ -4470,7 +4567,7 @@ mapSteps.forEach(s => mapStepObs.observe(s));
   }
 
   // Category colors (mirrors long.html MAP_CATS)
-  const WALK_COLORS = { school: '#E24B4A', transit: '#533AB7', rail: '#76BF8A', bus: '#234F74', dev: '#0F6E56', work: '#B45309' };
+  const WALK_COLORS = { school: '#E24B4A', transit: '#533AB7', rail: '#234F74', bus: '#44C265', dev: '#0F6E56', work: '#B45309' };
   // Light-rail stations (transit without mode:'bus') and buses (mode:'bus') each get their own color.
   function walkColor(loc) {
     if (loc.cat === 'transit' && loc.mode === 'bus') return WALK_COLORS.bus;
@@ -4939,7 +5036,7 @@ document.addEventListener('DOMContentLoaded', () => {
     padding:4rem 2rem 6rem; }
   #styleguide .sg-wrap { max-width:920px; margin:0 auto; }
   #styleguide .sg-title { font-family:'VTC Martin','Fustat',sans-serif; text-transform:uppercase;
-    font-size:clamp(3rem,6.4vw,5rem); line-height:0.80; margin:0 0 0.4rem; }
+    font-size:clamp(3.45rem,7.35vw,5.75rem); line-height:0.80; margin:0 0 0.4rem; }
   #styleguide .sg-lead { color:var(--ink-muted); font-size:13px; line-height:1.6; max-width:46ch; margin:0 0 2rem; }
   #styleguide .sg-lead code { background:rgba(0,0,0,0.06); padding:1px 5px; border-radius:4px; }
   #styleguide .sg-h { font-size:10px; font-weight:700; letter-spacing:0.16em; text-transform:uppercase;
@@ -4956,7 +5053,7 @@ document.addEventListener('DOMContentLoaded', () => {
   #styleguide .sg-sw .v { font-size:10px; color:var(--ink-muted); letter-spacing:0.04em; text-transform:uppercase; }
   /* live specimens — reuse the real tiers so the guide can't drift */
   #styleguide .s-display { font-family:'VTC Martin','Fustat',sans-serif; text-transform:uppercase;
-    font-size:clamp(3rem,6.4vw,5rem); line-height:0.80; margin:0; }
+    font-size:clamp(3.45rem,7.35vw,5.75rem); line-height:0.80; margin:0; }
   #styleguide .s-statement { font-family:'Fustat',sans-serif; font-weight:400;
     font-size:clamp(2.1rem,4.6vw,3.2rem); line-height:1.3; margin:0; }
   #styleguide .s-stat { font-family:'Fustat',sans-serif; font-weight:400; font-size:3rem; line-height:1; margin:0; }
@@ -4996,8 +5093,8 @@ document.addEventListener('DOMContentLoaded', () => {
     <!-- 1 ─ DISPLAY ───────────────────────────────── -->
     <h2 class="sg-h">1 &middot; Display &middot; VTC Martin</h2>
     <div class="sg-row">
-      <p style="font-family:'VTC Martin','Fustat',sans-serif;text-transform:uppercase;font-size:clamp(3rem,6.4vw,5rem);line-height:0.80;margin:0;">What&nbsp;$350,000&nbsp;buys</p>
-      <p class="sg-spec"><b>VTC Martin</b> &middot; 400<br>clamp(3rem, 6.4vw, 5rem)<br>48&ndash;80px &middot; line-height 0.80<br>uppercase<br><i>.step-quote, .ch-divider h2, .debt-statement &amp; all chapter dividers</i></p>
+      <p style="font-family:'VTC Martin','Fustat',sans-serif;text-transform:uppercase;font-size:clamp(3.45rem,7.35vw,5.75rem);line-height:0.80;margin:0;">What&nbsp;$350,000&nbsp;buys</p>
+      <p class="sg-spec"><b>VTC Martin</b> &middot; 400<br>clamp(3.45rem, 7.35vw, 5.75rem)<br>55&ndash;92px &middot; line-height 0.80<br>uppercase<br><i>.step-quote, .ch-divider h2, .debt-statement &amp; all chapter dividers</i></p>
     </div>
 
     <!-- 2 ─ STATEMENTS ────────────────────────────── -->
@@ -5074,5 +5171,107 @@ document.addEventListener('DOMContentLoaded', () => {
     </table>
   </div>
 </section>
+
+<script>
+(function(){
+  var toggle = document.getElementById('navfsToggle');
+  var nav = document.getElementById('navfs');
+  if (!toggle || !nav) return;
+  var items = Array.prototype.slice.call(nav.querySelectorAll('.navfs-item'));
+  var strip = document.getElementById('navfsStrip');
+  var globalBar = document.querySelector('.progress-bar');
+
+  // Expose the strip height so the close button can sit just below it.
+  function syncStripHeight(){
+    if (!items[0]) return;
+    var h = items[0].getBoundingClientRect().height;
+    if (h) document.documentElement.style.setProperty('--navfs-strip-h', Math.round(h) + 'px');
+  }
+
+  function setOpen(open){
+    nav.classList.toggle('open', open);
+    toggle.classList.toggle('open', open);
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    nav.setAttribute('aria-hidden', open ? 'false' : 'true');
+    toggle.setAttribute('aria-label', open ? 'Close chapter menu' : 'Open chapter menu');
+    // The strip carries its own per-thumbnail progress bar, so hide the
+    // full-width top bar while the menu is open to avoid a duplicate line.
+    if (globalBar) globalBar.style.opacity = open ? '0' : '';
+  }
+
+  toggle.addEventListener('click', function(){
+    setOpen(!nav.classList.contains('open'));
+  });
+
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && nav.classList.contains('open')) setOpen(false);
+  });
+
+  items.forEach(function(item){
+    item.addEventListener('click', function(e){
+      e.preventDefault();
+      var t = document.getElementById(item.getAttribute('data-target'));
+      if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setOpen(false);
+    });
+  });
+
+  // Reveal the toggle once the hero is mostly scrolled past; hide (and close) when back at hero.
+  var hero = document.getElementById('pinned-hero') || document.getElementById('ch1');
+  function updateToggleVisibility(){
+    var past = true;
+    if (hero){
+      var r = hero.getBoundingClientRect();
+      past = r.bottom < window.innerHeight * 0.4;
+    }
+    if (past){
+      toggle.classList.add('show');
+    } else {
+      toggle.classList.remove('show');
+      if (nav.classList.contains('open')) setOpen(false);
+    }
+  }
+  // The body is the scroll container on this page, so listen in capture phase
+  // on document to catch scroll events from any scroller, plus window as fallback.
+  document.addEventListener('scroll', updateToggleVisibility, { passive: true, capture: true });
+  window.addEventListener('scroll', updateToggleVisibility, { passive: true });
+  window.addEventListener('resize', updateToggleVisibility);
+  updateToggleVisibility();
+
+  // Current chapter + in-chapter progress, drawn as a 2px bar on the
+  // current thumbnail. A chapter "owns" the scroll from its heading down to
+  // the next chapter's heading (interludes included).
+  var chapterEls = items.map(function(it){ return document.getElementById(it.getAttribute('data-target')); });
+  function scrollY(){ return window.scrollY || window.pageYOffset || 0; }
+  function chapterTops(){
+    var y = scrollY();
+    return chapterEls.map(function(el){ return el ? el.getBoundingClientRect().top + y : null; });
+  }
+  function updateProgress(){
+    var tops = chapterTops();
+    var playhead = scrollY() + window.innerHeight * 0.5;
+    var docEnd = document.body.scrollHeight;
+    var idx = 0;
+    for (var i = 0; i < tops.length; i++){
+      if (tops[i] != null && tops[i] <= playhead) idx = i;
+    }
+    var start = tops[idx];
+    var end = (idx + 1 < tops.length && tops[idx + 1] != null) ? tops[idx + 1] : docEnd;
+    var p = end > start ? (playhead - start) / (end - start) : 0;
+    if (p < 0) p = 0; else if (p > 1) p = 1;
+    items.forEach(function(it, i){
+      it.classList.toggle('current', i === idx);
+      var bar = it.querySelector('.navfs-bar');
+      if (bar) bar.style.width = (i === idx ? p * 100 : 0) + '%';
+    });
+  }
+  document.addEventListener('scroll', updateProgress, { passive: true, capture: true });
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  window.addEventListener('resize', function(){ syncStripHeight(); updateProgress(); });
+  window.addEventListener('load', function(){ syncStripHeight(); updateProgress(); });
+  syncStripHeight();
+  updateProgress();
+})();
+</script>
 </body>
 </html>
