@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Build Guide — Non-Arterial Concrete vs. Asphalt Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Besley:ital,wght@0,500;0,600;0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:       #18140E;
+    --ink-soft:  #433F38;
+    --ink-muted: #8A837A;
+    --rule:      #D8D0C4;
+    --rule-soft: #EBE6DD;
+    --red:       #E24B4A;
+    --red-deep:  #A32D2D;
+    --red-pale:  #FEF2F2;
+    --gold:      #C8A96E;
+    --gold-pale: #FBF5E9;
+    --green:     #0F6E56;
+    --green-pale:#E7F3EE;
+    --code-bg:   #1B1712;
+    --code-fg:   #EDE6DA;
+    --sans: 'DM Sans', system-ui, -apple-system, sans-serif;
+    --serif: 'Besley', Georgia, 'Times New Roman', serif;
+    --mono: ui-monospace, 'SF Mono', 'SFMono-Regular', Menlo, Monaco, 'Cascadia Mono', Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+  body {
+    margin: 0; background: #FFFFFF; color: var(--ink);
+    font-family: var(--sans); font-size: 15.5px; line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------- layout ---------- */
+  .wrap { max-width: 1160px; margin: 0 auto; padding: 0 32px;
+          display: grid; grid-template-columns: 236px 1fr; gap: 56px; align-items: start; }
+  nav.toc {
+    position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+    padding: 40px 0 40px; border-right: 1px solid var(--rule-soft);
+  }
+  main { min-width: 0; padding: 40px 0 120px; max-width: 780px; }
+
+  /* ---------- table of contents ---------- */
+  .toc-brand { font-family: var(--serif); font-weight: 600; font-size: 15px; color: var(--ink);
+               margin: 0 0 4px; line-height: 1.25; padding-right: 18px; }
+  .toc-sub { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--gold);
+             font-weight: 600; margin: 0 0 22px; }
+  .toc a {
+    display: block; text-decoration: none; color: var(--ink-muted);
+    font-size: 13px; line-height: 1.35; padding: 6px 14px 6px 13px;
+    border-left: 2px solid transparent; transition: color .15s, border-color .15s;
+  }
+  .toc a:hover { color: var(--ink); }
+  .toc a.active { color: var(--ink); border-left-color: var(--red); font-weight: 600; }
+  .toc a .n { color: var(--gold); font-weight: 600; font-variant-numeric: tabular-nums; margin-right: 7px; }
+
+  /* ---------- hero ---------- */
+  .eyebrow { font-size: 11px; letter-spacing: .15em; text-transform: uppercase; font-weight: 600;
+             color: var(--gold); margin: 0 0 14px; }
+  h1 { font-family: var(--serif); font-weight: 700; font-size: 34px; line-height: 1.12;
+       letter-spacing: -.01em; margin: 0 0 16px; }
+  .lede { font-size: 17px; line-height: 1.6; color: var(--ink-soft); margin: 0 0 20px; }
+  .meta-row { display: flex; flex-wrap: wrap; gap: 8px 10px; margin: 0 0 8px; }
+  .chip { font-size: 12px; padding: 4px 11px; border-radius: 100px; border: 1px solid var(--rule);
+          color: var(--ink-soft); background: #fff; }
+  .chip b { color: var(--ink); font-weight: 600; }
+
+  /* ---------- sections ---------- */
+  section { padding-top: 30px; margin-top: 30px; border-top: 1px solid var(--rule-soft); }
+  section:first-of-type { border-top: none; }
+  h2 { font-family: var(--serif); font-weight: 600; font-size: 25px; line-height: 1.2;
+       margin: 0 0 6px; letter-spacing: -.01em; display: flex; align-items: baseline; gap: 12px; }
+  .step-badge { flex: 0 0 auto; font-family: var(--sans); font-size: 12px; font-weight: 700;
+                color: #fff; background: var(--ink); border-radius: 100px; padding: 3px 11px;
+                letter-spacing: .03em; transform: translateY(-3px); }
+  h3 { font-family: var(--serif); font-weight: 600; font-size: 18px; margin: 26px 0 8px; }
+  p { margin: 0 0 14px; }
+  a { color: var(--red-deep); text-decoration: underline; text-underline-offset: 2px;
+      text-decoration-color: rgba(163,45,45,.35); }
+  a:hover { text-decoration-color: var(--red-deep); }
+  strong { font-weight: 600; color: var(--ink); }
+  em { font-style: italic; }
+  ul, ol { margin: 0 0 16px; padding-left: 22px; }
+  li { margin: 5px 0; }
+  ul li::marker { color: var(--gold); }
+  ol li::marker { color: var(--ink-muted); font-weight: 600; }
+  code:not(pre code) {
+    font-family: var(--mono); font-size: .86em; background: var(--gold-pale);
+    color: var(--ink); padding: 1.5px 6px; border-radius: 4px; border: 1px solid #EEE4CF;
+    word-break: break-word;
+  }
+
+  /* ---------- code blocks ---------- */
+  .code { position: relative; margin: 0 0 18px; }
+  .code-label { font-family: var(--mono); font-size: 11px; color: var(--ink-muted);
+                text-transform: uppercase; letter-spacing: .08em; margin: 0 0 6px; }
+  pre {
+    margin: 0; background: var(--code-bg); color: var(--code-fg);
+    border-radius: 8px; padding: 16px 18px; overflow-x: auto;
+    font-family: var(--mono); font-size: 13px; line-height: 1.6;
+  }
+  pre code { font-family: var(--mono); white-space: pre; }
+  .tok-c { color: #8f9c7e; }   /* comment / muted */
+  .tok-k { color: #e8b06b; }   /* keyword / flag */
+  .tok-s { color: #b8c99a; }   /* string */
+  .copy {
+    position: absolute; top: 30px; right: 10px;
+    font-family: var(--sans); font-size: 11px; font-weight: 600; letter-spacing: .03em;
+    color: var(--code-fg); background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.16);
+    border-radius: 6px; padding: 4px 10px; cursor: pointer; transition: background .15s, color .15s;
+  }
+  .copy:hover { background: rgba(255,255,255,.18); }
+  .copy.done { color: #b8c99a; border-color: rgba(184,201,154,.5); }
+
+  /* ---------- callouts ---------- */
+  .callout { border: 1px solid var(--rule); border-left-width: 3px; border-radius: 8px;
+             padding: 14px 16px; margin: 0 0 18px; font-size: 14.5px; background: #fff; }
+  .callout p:last-child { margin-bottom: 0; }
+  .callout .co-h { font-weight: 700; font-size: 12px; letter-spacing: .05em; text-transform: uppercase;
+                    margin: 0 0 6px; display: flex; align-items: center; gap: 7px; }
+  .callout.note   { border-left-color: var(--gold);  background: var(--gold-pale); }
+  .callout.note .co-h { color: #9a7b34; }
+  .callout.warn   { border-left-color: var(--red);   background: var(--red-pale); }
+  .callout.warn .co-h { color: var(--red-deep); }
+  .callout.tip    { border-left-color: var(--green); background: var(--green-pale); }
+  .callout.tip .co-h { color: var(--green); }
+
+  /* ---------- tables ---------- */
+  .tbl-scroll { overflow-x: auto; margin: 0 0 18px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; min-width: 460px; }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--rule-soft);
+           vertical-align: top; }
+  th { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-muted);
+       font-weight: 700; border-bottom: 1px solid var(--rule); }
+  td code { white-space: nowrap; }
+  tbody tr:last-child td { border-bottom: none; }
+
+  /* ---------- misc ---------- */
+  .datacard { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0 0 18px; }
+  .datacard .dc { border: 1px solid var(--rule); border-radius: 8px; padding: 14px 15px; background: #fff; }
+  .datacard .dc h4 { font-family: var(--serif); font-size: 15px; margin: 0 0 3px; }
+  .datacard .dc .dc-file { font-family: var(--mono); font-size: 11.5px; color: var(--ink-muted);
+                           word-break: break-all; margin: 6px 0 0; }
+  .flow { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 4px 0 20px;
+          font-family: var(--mono); font-size: 12.5px; }
+  .flow .node { border: 1px solid var(--rule); border-radius: 6px; padding: 6px 11px; background: #fff; color: var(--ink); }
+  .flow .node.hl { border-color: var(--red); background: var(--red-pale); color: var(--red-deep); font-weight: 600; }
+  .flow .arr { color: var(--gold); font-weight: 700; }
+  .foot { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--rule); font-size: 12.5px; color: var(--ink-muted); }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 860px) {
+    .wrap { grid-template-columns: 1fr; gap: 0; padding: 0 22px; }
+    nav.toc { position: static; height: auto; overflow: visible; border-right: none;
+              border-bottom: 1px solid var(--rule); padding: 24px 0 18px; }
+    .toc-links { display: flex; flex-wrap: wrap; gap: 2px 4px; }
+    .toc a { border-left: none; border-bottom: 2px solid transparent; padding: 5px 9px; }
+    .toc a.active { border-left: none; border-bottom-color: var(--red); }
+    main { padding: 26px 0 90px; }
+    h1 { font-size: 28px; }
+    .datacard { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ================= TOC ================= -->
+  <nav class="toc">
+    <p class="toc-brand">Building the Non-Arterial Sidewalk Map</p>
+    <p class="toc-sub">Reproduction Guide</p>
+    <div class="toc-links">
+      <a href="#overview"><span class="n">·</span>Overview</a>
+      <a href="#prereqs"><span class="n">·</span>Prerequisites</a>
+      <a href="#step1"><span class="n">1</span>Pull the geodata</a>
+      <a href="#step2"><span class="n">2</span>Run the build script</a>
+      <a href="#step3"><span class="n">3</span>Build the map HTML</a>
+      <a href="#step4"><span class="n">4</span>Preview locally</a>
+      <a href="#step5"><span class="n">5</span>Get a Maps API key</a>
+      <a href="#step6"><span class="n">6</span>Publish &amp; lock the key</a>
+      <a href="#trouble"><span class="n">·</span>Troubleshooting</a>
+      <a href="#caveats"><span class="n">·</span>Data caveats</a>
+      <a href="#appendix"><span class="n">·</span>Appendix</a>
+    </div>
+  </nav>
+
+  <!-- ================= MAIN ================= -->
+  <main>
+    <p class="eyebrow">21st Ave S · Reproduction Runbook</p>
+    <h1>Building the non-arterial concrete&nbsp;vs.&nbsp;asphalt map, from scratch</h1>
+    <p class="lede">This is the step-by-step record of how the SDOT non-arterial sidewalk map was made &mdash; from pulling raw geodata off Seattle&rsquo;s open-data portal, through the Python pipeline, to a published, interactive Google Map. Written so you (future Dana) can rebuild or refresh it without reverse-engineering anything.</p>
+    <div class="meta-row">
+      <span class="chip"><b>Output:</b> protype_concrete-non-arterials_v1.html</span>
+      <span class="chip"><b>Pipeline:</b> build_dataset.py</span>
+      <span class="chip"><b>~58</b> segments citywide</span>
+    </div>
+
+    <!-- ---------- OVERVIEW ---------- -->
+    <section id="overview">
+      <h2>Overview</h2>
+      <p>The map makes one argument visually: across Seattle&rsquo;s <em>non-arterial</em> streets, SDOT has poured <strong>permanent concrete curb &amp; gutter</strong> in dozens of places over the last five years &mdash; while 21st Ave S is slated only for a cheap <strong>asphalt walkway</strong>. Every built segment is a clickable line on the map; 21st Ave S is flagged in red as the outlier.</p>
+      <p>Two Seattle open-data layers feed it, joined on a shared segment key:</p>
+      <div class="datacard">
+        <div class="dc">
+          <h4>Sidewalks (the &ldquo;CDL&rdquo;)</h4>
+          <p style="margin:0;font-size:13.5px;color:var(--ink-soft)">SDOT&rsquo;s sidewalk inventory: surface type, curb type, install date, building program.</p>
+          <p class="dc-file">Sidewalks_CDL_&hellip;.csv</p>
+        </div>
+        <div class="dc">
+          <h4>Seattle Streets</h4>
+          <p style="margin:0;font-size:13.5px;color:var(--ink-soft)">The street centerlines: <strong>arterial classification</strong>, street type, geometry, centroid coordinates.</p>
+          <p class="dc-file">Seattle_Streets_1_&hellip;.csv</p>
+        </div>
+      </div>
+      <div class="flow">
+        <span class="node">Seattle geodata</span><span class="arr">&rarr;</span>
+        <span class="node">build_dataset.py</span><span class="arr">&rarr;</span>
+        <span class="node">segments_data.json</span><span class="arr">&rarr;</span>
+        <span class="node">map HTML</span><span class="arr">&rarr;</span>
+        <span class="node hl">published map</span>
+      </div>
+      <div class="callout note">
+        <p class="co-h">Don&rsquo;t confuse the two datasets</p>
+        <p>This map uses the <strong>Sidewalks + Streets</strong> layers (what got <em>built</em>). That is a different source from the scroll-driven dot visualization on the main site, which uses the Seattle Transportation Plan <strong>&ldquo;Missing Sidewalks&rdquo;</strong> layer (what is <em>missing</em> &mdash; the 11,550 / Tier-1 / equity-12 numbers). Different data, different purpose.</p>
+      </div>
+    </section>
+
+    <!-- ---------- PREREQS ---------- -->
+    <section id="prereqs">
+      <h2>Prerequisites</h2>
+      <ul>
+        <li><strong>Python 3</strong> with the <code>pyproj</code> package (used to reproject Washington State Plane coordinates to lat/lng).</li>
+        <li>A <strong>Google Cloud account</strong> to create a Maps JavaScript API key (Step&nbsp;5). A billing account is required, but a low-traffic page stays inside the free monthly allowance.</li>
+        <li>The project folder, with the <code>SeattleGeoData/</code> subfolder that holds <code>build_dataset.py</code>.</li>
+      </ul>
+      <div class="code">
+        <p class="code-label">install the one dependency</p>
+        <button class="copy" type="button">Copy</button>
+        <pre><code>pip3 install pyproj</code></pre>
+      </div>
+    </section>
+
+    <!-- ---------- STEP 1 ---------- -->
+    <section id="step1">
+      <h2><span class="step-badge">Step 1</span>Pull the source geodata</h2>
+      <p>Download both layers as CSV from Seattle&rsquo;s GIS open-data portal. These are the live pages where the data lives &mdash; both link straight to a <strong>Download</strong> panel offering CSV, GeoJSON, Shapefile, and API access:</p>
+      <ul>
+        <li><strong>Sidewalks</strong> &mdash; <a href="https://data-seattlecitygis.opendata.arcgis.com/datasets/SeattleCityGIS::sidewalks-1/about" target="_blank" rel="noopener noreferrer">data-seattlecitygis.opendata.arcgis.com/datasets/SeattleCityGIS::sidewalks-1</a></li>
+        <li><strong>Seattle Streets</strong> &mdash; <a href="https://data-seattlecitygis.opendata.arcgis.com/maps/SeattleCityGIS::seattle-streets/about" target="_blank" rel="noopener noreferrer">data-seattlecitygis.opendata.arcgis.com/maps/SeattleCityGIS::seattle-streets</a></li>
+      </ul>
+      <p>On each page: click <strong>Download</strong>, choose <strong>CSV (full dataset)</strong>, and drop both files into the <code>SeattleGeoData/</code> folder.</p>
+      <div class="callout note">
+        <p class="co-h">Filenames will have a hash suffix</p>
+        <p>ArcGIS Hub appends a layer ID, so you&rsquo;ll get something like <code>Sidewalks_CDL_2674137339776368979.csv</code> and <code>Seattle_Streets_1_-1485582646790599907.csv</code>. That&rsquo;s normal. Either keep those exact names and update the <code>CDL</code> / <code>STREETS</code> constants at the top of <code>build_dataset.py</code>, or rename your downloads to match what the script already expects.</p>
+      </div>
+      <h3>Backup: the REST API</h3>
+      <p>If the Hub download UI ever changes, the same data is reachable directly from the ArcGIS REST service. The build script already queries the Streets layer here for geometry:</p>
+      <div class="code">
+        <p class="code-label">stable REST endpoint (Seattle Streets)</p>
+        <button class="copy" type="button">Copy</button>
+        <pre><code>https://services.arcgis.com/ZOyb2t4B0UYuYNYH/arcgis/rest/services/Seattle_Streets_1/FeatureServer/0</code></pre>
+      </div>
+      <p>Append <code>/query?where=1=1&amp;outFields=*&amp;f=json</code> to pull records, or <code>&amp;f=csv</code> for CSV. The org id <code>ZOyb2t4B0UYuYNYH</code> is SeattleCityGIS&rsquo;s ArcGIS Online organization &mdash; the same one behind both pages above.</p>
+    </section>
+
+    <!-- ---------- STEP 2 ---------- -->
+    <section id="step2">
+      <h2><span class="step-badge">Step 2</span>Run the build script</h2>
+      <p><code>build_dataset.py</code> joins the two CSVs, filters to the segments that matter, enriches each one, and writes the JSON the map reads. Run it from the data folder:</p>
+      <div class="code">
+        <p class="code-label">produce segments_data.json</p>
+        <button class="copy" type="button">Copy</button>
+        <pre><code>cd SeattleGeoData
+python3 build_dataset.py</code></pre>
+      </div>
+      <p>It prints a per-district summary and writes <code>segments_data.json</code> up into the site folder. Here is exactly what it does, so you can adjust it later.</p>
+
+      <h3>The join</h3>
+      <p>Each sidewalk record carries a <code>SEGKEY</code>; each street carries a <code>COMPKEY</code>. The script keys the streets by <code>COMPKEY</code> and looks each sidewalk&rsquo;s <code>SEGKEY</code> up against it &mdash; that&rsquo;s how a built sidewalk inherits its street&rsquo;s classification and geometry.</p>
+
+      <h3>The filters (a row is kept only if all pass)</h3>
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Filter</th><th>Rule</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td>Program</td><td><code>BUILDERCD</code> in CIP-SDOT, SSRP, SDOT-SSRP, SDOTPED, ADAPROG, NSF-CRF</td><td>SDOT-funded work only</td></tr>
+          <tr><td>Recency</td><td><code>INSTALL_DATE</code> &ge; <strong>2021-06-23</strong></td><td>&ldquo;last five years&rdquo; window</td></tr>
+          <tr><td>Category</td><td><code>SW_CATEGORY</code> == <code>BLOCK</code></td><td>whole-block installs, not corner ramps</td></tr>
+          <tr><td>Non-arterial</td><td><code>ARTCLASS</code> == <code>"0"</code> on the joined street</td><td><strong>the core filter</strong> &mdash; residential/local streets only</td></tr>
+          <tr><td>Exclusion</td><td>street name does not contain <code>WEST MARGINAL</code></td><td>drops 2 mislabeled arterial segments</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="callout warn">
+        <p class="co-h">The date window is hardcoded</p>
+        <p>The script pins &ldquo;today&rdquo; to <code>2026-06-23</code> and the cutoff to <code>2021-06-23</code>. To refresh the map with newer data, bump <code>TODAY</code> and <code>CUTOFF</code> near the top of the file before re-running.</p>
+      </div>
+
+      <h3>The enrichment (added to each kept segment)</h3>
+      <ul>
+        <li><strong>Coordinates:</strong> the street centroid (<code>GIS_MID_X/Y</code>) is reprojected from Washington State Plane (<code>EPSG:2926</code>) to lat/lng (<code>EPSG:4326</code>) with <code>pyproj</code>.</li>
+        <li><strong>Concrete flag (<code>true_cg</code>):</strong> <code>true</code> only when surface is <code>PCC</code> <em>and</em> curb is <code>410A/410B/410C</code>. This is what separates real concrete curb &amp; gutter (solid lines) from asphalt walkways (dotted lines).</li>
+        <li><strong>Neighborhood:</strong> nearest-centroid lookup against a hand-built table &mdash; approximate, see caveats.</li>
+        <li><strong>De-dupe:</strong> collapses rows sharing the same <code>(street, install_date, length)</code>.</li>
+        <li><strong>Real geometry:</strong> the true street polyline is fetched live from the Seattle Streets <code>FeatureServer/0</code> by <code>COMPKEY</code>, so lines follow the road instead of being straight stubs.</li>
+      </ul>
+      <p>The result is written as a JSON array of segment objects &mdash; each with <code>surface</code>, <code>curb</code>, <code>district</code>, <code>length</code>, <code>true_cg</code>, <code>path</code>, and so on.</p>
+    </section>
+
+    <!-- ---------- STEP 3 ---------- -->
+    <section id="step3">
+      <h2><span class="step-badge">Step 3</span>Build the map HTML</h2>
+      <p>The map is a single self-contained HTML file. The pipeline&rsquo;s output becomes an inline JavaScript array near the top of the <code>&lt;script&gt;</code> block:</p>
+      <div class="code">
+        <p class="code-label">embed the data</p>
+        <button class="copy" type="button">Copy</button>
+        <pre><code><span class="tok-k">const</span> SEGMENTS = [ <span class="tok-c">/* paste segments_data.json here */</span> ];</code></pre>
+      </div>
+      <p>Everything else keys off each segment&rsquo;s <code>true_cg</code> flag and <code>district</code>. The rendering conventions:</p>
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Type</th><th>Line</th><th>End caps</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Concrete curb &amp; gutter</strong> (<code>true_cg: true</code>)</td><td>solid</td><td>filled circle</td></tr>
+          <tr><td><strong>Asphalt walkway</strong> (<code>true_cg: false</code>)</td><td>dotted</td><td>filled diamond</td></tr>
+          <tr><td><strong>21st Ave S</strong> (the <code>CORRIDOR</code> object)</td><td>long red dash</td><td>open red diamond</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p>Colors are keyed to council district. 21st Ave S is a separate hardcoded <code>CORRIDOR</code> constant (it isn&rsquo;t in the built dataset because it hasn&rsquo;t been built) drawn on top so it reads as the outlier. A legend on the left lets you toggle each district and surface group; clicking any segment opens an info window with its full record and a <strong>Street View</strong> button.</p>
+      <p>The map itself is created by an <code>initMap()</code> callback that Google&rsquo;s loader script invokes once the API is ready. It sets a custom muted basemap style, plots the segments, builds the legend, tallies the sidebar counts, and fits the view to everything shown.</p>
+    </section>
+
+    <!-- ---------- STEP 4 ---------- -->
+    <section id="step4">
+      <h2><span class="step-badge">Step 4</span>Preview locally</h2>
+      <div class="callout warn">
+        <p class="co-h">Do not double-click the file</p>
+        <p>Opening the HTML directly gives it a <code>file://</code> address, and <strong>Google Maps refuses to load over <code>file://</code></strong>. You get a blank map and empty counts &mdash; nothing wrong with your code. You must serve it over <code>http://</code>.</p>
+      </div>
+      <p>Start a tiny local web server from the site folder, then open the <code>localhost</code> URL in your browser:</p>
+      <div class="code">
+        <p class="code-label">serve + open</p>
+        <button class="copy" type="button">Copy</button>
+        <pre><code>cd 21st-Ave-S_GeneratedOutput
+python3 -m http.server 8000
+<span class="tok-c"># then open:</span>
+<span class="tok-c"># http://localhost:8000/protype_concrete-non-arterials_v1.html</span></code></pre>
+      </div>
+      <p>You should see the Seattle basemap fill with colored segments and the sidebar counts populate (e.g. <em>58 segments · 16,177 ft</em>). If the sidebar shows but the map is grey, jump to Troubleshooting.</p>
+    </section>
+
+    <!-- ---------- STEP 5 ---------- -->
+    <section id="step5">
+      <h2><span class="step-badge">Step 5</span>Get a Google Maps API key</h2>
+      <p>The map loads Google&rsquo;s JavaScript API, which needs a key. In the <a href="https://console.cloud.google.com/google/maps-apis" target="_blank" rel="noopener noreferrer">Google Cloud Console</a>:</p>
+      <ol>
+        <li>Create (or pick) a project and make sure a <strong>billing account</strong> is attached.</li>
+        <li>Enable the <strong>Maps JavaScript API</strong>. <em>(Street View here uses <code>StreetViewService</code> / the embedded panorama, which is part of the Maps JavaScript API &mdash; no separate API to enable.)</em></li>
+        <li>Under <strong>Credentials</strong>, create an <strong>API key</strong>.</li>
+        <li>Paste it into the loader tag at the bottom of the map HTML:</li>
+      </ol>
+      <div class="code">
+        <p class="code-label">the loader script (bottom of the file)</p>
+        <button class="copy" type="button">Copy</button>
+        <pre><code>&lt;script async
+  src="https://maps.googleapis.com/maps/api/js?key=<span class="tok-k">YOUR_KEY</span>&amp;libraries=geometry&amp;callback=initMap"&gt;
+&lt;/script&gt;</code></pre>
+      </div>
+      <p>The <code>libraries=geometry</code> parameter is required &mdash; the map uses it. <code>callback=initMap</code> is what fires your <code>initMap()</code> once the API finishes loading.</p>
+    </section>
+
+    <!-- ---------- STEP 6 ---------- -->
+    <section id="step6">
+      <h2><span class="step-badge">Step 6</span>Publish &amp; lock the key</h2>
+      <p>Publishing is just committing the files to the GitHub Pages repo (they serve over <code>https://</code>, which Maps is happy with):</p>
+      <div class="code">
+        <p class="code-label">publish to GitHub Pages</p>
+        <button class="copy" type="button">Copy</button>
+        <pre><code>git add protype_concrete-non-arterials_v1.html segments_data.json
+git commit -m "Publish non-arterial sidewalk map"
+git push</code></pre>
+      </div>
+      <p>Live at <code>safesidewalks.github.io/&hellip;/protype_concrete-non-arterials_v1.html</code> once Pages rebuilds.</p>
+      <div class="callout warn">
+        <p class="co-h">Restrict the key before you share it</p>
+        <p>Your API key sits in plain text in the page source &mdash; anyone can read it. If it&rsquo;s unrestricted, someone can copy it and run up charges on <em>your</em> billing account. Lock it down in the Cloud Console first.</p>
+      </div>
+      <p>On the key&rsquo;s settings page:</p>
+      <ul>
+        <li><strong>Application restrictions &rarr; Websites.</strong> Add your published domain and localhost:
+          <div class="code" style="margin-top:8px">
+            <button class="copy" type="button">Copy</button>
+            <pre><code>https://safesidewalks.github.io/*
+http://localhost:*</code></pre>
+          </div>
+        </li>
+        <li><strong>API restrictions.</strong> Limit the key to <strong>Maps JavaScript API</strong> only.</li>
+        <li><strong>Billing.</strong> Set a budget alert or quota cap so a leaked key can&rsquo;t cost real money.</li>
+      </ul>
+      <div class="callout note">
+        <p class="co-h">Expected side effect</p>
+        <p>Once restricted to those domains, the map works on the published site and on <code>localhost</code> &mdash; but no longer from a random <code>file://</code> open. That&rsquo;s correct and intended.</p>
+      </div>
+    </section>
+
+    <!-- ---------- TROUBLESHOOTING ---------- -->
+    <section id="trouble">
+      <h2>Troubleshooting: a blank or grey map</h2>
+      <p>Work down this list &mdash; it&rsquo;s roughly most-common first.</p>
+      <ol>
+        <li><strong>Opened as a file?</strong> If the address bar says <code>file://</code>, that&rsquo;s the problem. Serve over <code>http://</code> (Step&nbsp;4).</li>
+        <li><strong>Sidebar renders but counts are empty and the map is blank?</strong> That signature means the whole <code>&lt;script&gt;</code> block died on a <strong>JavaScript syntax error</strong> &mdash; one bad character voids the entire block, so the data, legend, and map all vanish together. The classic culprit is an <strong>unescaped apostrophe inside a single-quoted string</strong>, e.g. <code>'You're viewing&hellip;'</code>. Escape it as <code>'You\'re viewing&hellip;'</code>.</li>
+      </ol>
+      <div class="callout tip">
+        <p class="co-h">Fast way to find a syntax error</p>
+        <p>Node can check the script without running it. Pull the script block into a <code>.js</code> file and run <code>node --check file.js</code> &mdash; it prints the exact line and character. (Or open the browser DevTools Console; the red error names the line.)</p>
+      </div>
+      <ol start="3">
+        <li><strong><code>RefererNotAllowedMapError</code> in the console?</strong> The key&rsquo;s website restrictions don&rsquo;t include the domain you&rsquo;re viewing from. Add it (Step&nbsp;6), or add <code>http://localhost:*</code> for local testing.</li>
+        <li><strong><code>InvalidKeyMapError</code> / <code>ApiNotActivatedMapError</code>?</strong> The key is wrong or the Maps JavaScript API isn&rsquo;t enabled on that project (Step&nbsp;5).</li>
+        <li><strong>Grey map, &ldquo;For development purposes only&rdquo; watermark?</strong> Billing isn&rsquo;t enabled on the project.</li>
+      </ol>
+    </section>
+
+    <!-- ---------- CAVEATS ---------- -->
+    <section id="caveats">
+      <h2>Data caveats to remember</h2>
+      <ul>
+        <li><strong>Neighborhood labels are approximate.</strong> Each segment is assigned to the nearest neighborhood centroid from a hand-built table &mdash; imprecise near boundaries.</li>
+        <li><strong>West Marginal Way SW is excluded.</strong> Two segments there are functionally arterial and were dropped by name.</li>
+        <li><strong><code>1/1/YYYY</code> install dates mean &ldquo;year known, day unknown.&rdquo;</strong> Many records only carry a year; the pipeline normalizes those to Jan&nbsp;1 and the map labels them &ldquo;(planned / day unknown)&rdquo; where relevant.</li>
+        <li><strong>Counts reflect what&rsquo;s shown.</strong> The sidebar tally counts only concrete + asphalt-walkway segments (the two categories drawn), not every raw row.</li>
+        <li><strong>The dataset is a snapshot.</strong> It reflects the Seattle open-data download date. Re-pull and re-run to refresh.</li>
+      </ul>
+    </section>
+
+    <!-- ---------- APPENDIX ---------- -->
+    <section id="appendix">
+      <h2>Appendix</h2>
+      <h3>Source links</h3>
+      <ul>
+        <li><a href="https://data-seattlecitygis.opendata.arcgis.com/datasets/SeattleCityGIS::sidewalks-1/about" target="_blank" rel="noopener noreferrer">Sidewalks &mdash; Seattle GeoData</a></li>
+        <li><a href="https://data-seattlecitygis.opendata.arcgis.com/maps/SeattleCityGIS::seattle-streets/about" target="_blank" rel="noopener noreferrer">Seattle Streets &mdash; Seattle GeoData</a></li>
+        <li><a href="https://data-seattlecitygis.opendata.arcgis.com/" target="_blank" rel="noopener noreferrer">Seattle GeoData portal</a> (browse other SDOT layers)</li>
+      </ul>
+      <h3>File map</h3>
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>File</th><th>Role</th></tr></thead>
+        <tbody>
+          <tr><td><code>SeattleGeoData/build_dataset.py</code></td><td>The pipeline: join, filter, enrich, fetch geometry, write JSON.</td></tr>
+          <tr><td><code>SeattleGeoData/Sidewalks_CDL_&hellip;.csv</code></td><td>Source: SDOT sidewalk inventory (download).</td></tr>
+          <tr><td><code>SeattleGeoData/Seattle_Streets_1_&hellip;.csv</code></td><td>Source: street centerlines + arterial class (download).</td></tr>
+          <tr><td><code>segments_data.json</code></td><td>Pipeline output; pasted into the map as <code>SEGMENTS</code>.</td></tr>
+          <tr><td><code>protype_concrete-non-arterials_v1.html</code></td><td>The interactive map itself.</td></tr>
+          <tr><td><code>SDOT_NonArterial_*.csv</code></td><td>Readable exports of the same result (columns map 1:1 to the JSON; <em>Concrete Curb &amp; Gutter</em> = <code>true_cg</code>).</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="callout note">
+        <p class="co-h">The CSV vs. the JSON</p>
+        <p>The <code>SDOT_NonArterial_Sidewalks_LastFiveYears.csv</code> is a human-readable table of the <em>same</em> segment set the pipeline produces &mdash; its columns map one-to-one to <code>segments_data.json</code>. The JSON is the reproducible artifact; the CSV is a convenience export.</p>
+      </div>
+    </section>
+
+    <div class="foot">
+      Reproduction guide for the 21st Ave S sidewalk advocacy project · sources traceable to Seattle GeoData (SeattleCityGIS) · rebuild by re-running <code>build_dataset.py</code>.
+    </div>
+  </main>
+</div>
+
+<script>
+  // ---- copy-to-clipboard on code blocks ----
+  function flash(btn) {
+    var old = btn.getAttribute('data-label') || btn.textContent;
+    btn.setAttribute('data-label', old);
+    btn.textContent = 'Copied';
+    btn.classList.add('done');
+    setTimeout(function () { btn.textContent = old; btn.classList.remove('done'); }, 1400);
+  }
+  function legacyCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed'; ta.style.top = '-1000px';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+  document.querySelectorAll('.copy').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var pre = btn.parentElement.querySelector('pre');
+      if (!pre) return;
+      var text = pre.innerText;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { flash(btn); },
+                                                  function () { legacyCopy(text); flash(btn); });
+      } else {
+        legacyCopy(text); flash(btn);
+      }
+    });
+  });
+
+  // ---- scrollspy: highlight the current section in the TOC ----
+  var links = Array.prototype.slice.call(document.querySelectorAll('.toc a'));
+  var map = {};
+  links.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a; });
+  var sections = Array.prototype.slice.call(document.querySelectorAll('main section'));
+  var spy = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) {
+        links.forEach(function (a) { a.classList.remove('active'); });
+        if (map[e.target.id]) map[e.target.id].classList.add('active');
+      }
+    });
+  }, { rootMargin: '-10% 0px -80% 0px', threshold: 0 });
+  sections.forEach(function (s) { spy.observe(s); });
+</script>
+</body>
+</html>
