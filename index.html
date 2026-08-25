@@ -1511,7 +1511,6 @@ body {
      so the pot's left/right edges line up with the outer circles below */
   max-width: 408px; margin: 0 auto;
 }
-.sc-pot .sc-mdot { width: 12px; height: 12px; }
 .sc-cols {
   position: absolute; inset: 0; padding-top: 104px;
   display: flex; align-items: flex-start; justify-content: center; gap: 30px;
@@ -1551,9 +1550,11 @@ body {
 .sc-rest-label { margin-top: 0.5rem; font-size: 10.5px; line-height: 1.3; color: var(--ink-muted); }
 
 .sc-mdot {
-  width: 10px; height: 10px; border-radius: 50%; background: var(--ink);
+  /* width/height set once in JS at creation (see UNIFORM_DOTR) and never touched again --
+     no size here and no width/height transition, so a dot can't visibly grow or shrink */
+  border-radius: 50%; background: var(--ink);
   flex: 0 0 auto;
-  transition: opacity 0.5s ease, width 0.5s ease, height 0.5s ease;
+  transition: opacity 0.5s ease;
 }
 /* a per-stretch dot — phase 4 only. One ≈ $1,000, shown inside the single
    zoomed stretch, so dots × $1,000 read straight off as dollars-per-stretch */
@@ -2672,7 +2673,7 @@ body {
       <details class="sc-note">
         <summary>Data &amp; method</summary>
         <div class="sc-note-inner">
-          Money is each district's minimum levy floor from the 2024 Seattle Transportation Levy ($111M for new sidewalks). Need here is each district's share of segments scoring the maximum (12 of 12) on SDOT's equity/historical-underinvestment measure &mdash; not simply all missing sidewalk, since dividing the levy floor by <em>every</em> missing segment turns out to be a nearly even split across districts and doesn't show a real disparity. District counts are derived by joining each segment's <code>SEGKEY</code> to the Seattle Streets layer's <code>COMPKEY</code> to read SDOT's own council-district field (see <code>SeattleGeoData/build_dotgrid_data.py</code>). Each circle shown is a scaled stand-in, not a literal tally &mdash; roughly 250 highest-need segments per circle for Districts 1 and 2; District 5's circle count is set a little higher relative to its segment count purely for legibility of the coin illustration, so no single circle is asked to hold more dots than reads cleanly. The real, sourced figures are the segment counts and dollar amounts stated in each column, not the circle count. The per-stretch dollars divide each district's levy floor by its highest-need segment count &mdash; which assumes every stretch costs the same to build. It does not, so no exact total is claimed.
+          Money is each district's minimum levy floor from the 2024 Seattle Transportation Levy ($111M for new sidewalks). Need here is each district's share of segments scoring the maximum (12 of 12) on SDOT's equity/historical-underinvestment measure &mdash; not simply all missing sidewalk, since dividing the levy floor by <em>every</em> missing segment turns out to be a nearly even split across districts and doesn't show a real disparity. District counts are derived by joining each segment's <code>SEGKEY</code> to the Seattle Streets layer's <code>COMPKEY</code> to read SDOT's own council-district field (see <code>SeattleGeoData/build_dotgrid_data.py</code>). Each circle shown is a scaled stand-in, not a literal tally &mdash; roughly 250 highest-need segments per circle, consistently across all three districts. The per-stretch dollars divide each district's levy floor by its highest-need segment count &mdash; which assumes every stretch costs the same to build. It does not, so no exact total is claimed.
           <div class="sc-note-links">
             <a href="https://www.seattle.gov/transportation/levy" target="_blank" rel="noopener noreferrer">2024 Seattle Transportation Levy &#x2197;</a>
             <a href="https://data.seattle.gov/dataset/Missing-Sidewalks/eqw3-998w/about_data" target="_blank" rel="noopener noreferrer">SDOT missing-sidewalk inventory &#x2197;</a>
@@ -2703,7 +2704,7 @@ body {
     var DISTRICTS = [
       { key: 'd1', name: 'District 1', seg: '983 highest-need',   floor: '22% floor', perStretch: '$24,400', money: 24, circles: 4, perCircle: 6,  stretchDots: 2, focus: false },
       { key: 'd2', name: 'District 2', seg: '1,663 highest-need', floor: '17% floor', perStretch: '$11,400', money: 19, circles: 7, perCircle: 3,  stretchDots: 1, focus: true  },
-      { key: 'd5', name: 'District 5', seg: '462 highest-need',   floor: '36% floor', perStretch: '$86,600', money: 40, circles: 4, perCircle: 10, stretchDots: 9, focus: false }
+      { key: 'd5', name: 'District 5', seg: '462 highest-need',   floor: '36% floor', perStretch: '$86,600', money: 40, circles: 2, perCircle: 20, stretchDots: 9, focus: false }
     ];
     var OTHER_MONEY = 28; // 111 - (24+19+40)
 
@@ -2711,6 +2712,44 @@ body {
     var FIELD_W = COLS * CIRCLE + (COLS - 1) * GAP;          // 116
     var FIELD_H = 244;
     var HERO = 96;
+
+    var SMALL_R = CIRCLE / 2, SMALL_MARGIN = 2, SMALL_GAP = 1.5;
+
+    // Every money dot renders at ONE fixed size, set once when it's first created and never
+    // touched again anywhere -- no grow/shrink transition, so a dot looks identical in the
+    // pot, mid-flight, and settled in a district circle. Verified 2026-08-25: this replaced an
+    // earlier version where size was only set during circle layout, which left it unset for
+    // dots that were still in the pot or in the "rest of the city" cluster -- fine on first
+    // load, but once a dot HAD been laid out in a circle it kept that inline size permanently,
+    // including after moving back to the pot (placeMoney('pot') resets position/opacity but
+    // never touched width/height), so scrolling up and down left some dots stuck small and
+    // others at the CSS default, mixed together. Setting the one size at creation time,
+    // before a dot ever exists anywhere else, removes the inconsistency at the root instead
+    // of patching each place size could have leaked from.
+    // Size never encodes data here (every dot is worth the same $1M regardless of district),
+    // so one fixed size is simply more honest than letting it vary by context. Derived, not
+    // guessed: fillPositions (below -- the same bottom-settling hex-lattice pile already used
+    // for the phase-4 stretch dots) has a hard seat capacity at any given dot size, and that
+    // capacity changes in discrete jumps, not smoothly, as whole rows gain or lose room. So
+    // this binary-searches for the largest dot radius that still seats the single most-crowded
+    // circle on the page today (MAX_DOTS_PER_CIRCLE, read live from DISTRICTS -- currently D5
+    // at 20/circle), then backs off 5% from that exact edge as a safety buffer (same spirit as
+    // the 0.96/0.98 buffers used elsewhere in this file's dot-packing math) rather than sitting
+    // exactly on top of a capacity cliff. Automatically stays safe if a future edit ever makes
+    // some circle more crowded than D5 is today -- it would just search for, and land on, a
+    // smaller size instead of silently running out of seats.
+    function maxSafeFillDotR(n, R, margin, gap) {
+      var lo = 0.5, hi = R - margin - 0.05;
+      for (var i = 0; i < 40; i++) {
+        var mid = (lo + hi) / 2;
+        if (fillPositions(1e9, R, mid, margin, gap).length >= n) lo = mid; else hi = mid;
+      }
+      return lo * 0.95;
+    }
+    var MAX_DOTS_PER_CIRCLE = Math.max.apply(null, DISTRICTS.map(function (d) {
+      return Math.ceil(d.money / d.circles);
+    }));
+    var UNIFORM_DOTR = maxSafeFillDotR(MAX_DOTS_PER_CIRCLE, SMALL_R, SMALL_MARGIN, SMALL_GAP);
 
     var pot = document.getElementById('sc-pot');
     var restDots = document.getElementById('sc-restDots');
@@ -2755,6 +2794,7 @@ body {
       for (var m = 0; m < d.money; m++) {
         var dot = document.createElement('div');
         dot.className = 'sc-mdot'; dot.dataset.key = d.key;
+        dot.style.width = dot.style.height = (UNIFORM_DOTR * 2) + 'px'; // fixed for life, set once here
         pot.appendChild(dot); moneyDots.push(dot); dotEls.push(dot);
       }
 
@@ -2773,6 +2813,7 @@ body {
     for (var o = 0; o < OTHER_MONEY; o++) {
       var od = document.createElement('div');
       od.className = 'sc-mdot'; od.dataset.key = 'ot';
+      od.style.width = od.style.height = (UNIFORM_DOTR * 2) + 'px'; // same fixed size as every other money dot
       pot.appendChild(od); moneyDots.push(od); otherDots.push(od);
     }
 
@@ -2798,7 +2839,7 @@ body {
             info.circles[i % info.circles.length].appendChild(c);
           });
           info.circles.forEach(function (circle) {
-            layoutCircleDots(circle, SMALL_R, SMALL_DOTR, SMALL_MARGIN, SMALL_GAP);
+            layoutFill(circle, SMALL_R, UNIFORM_DOTR, SMALL_MARGIN, SMALL_GAP, '.sc-mdot');
           });
         });
         // the remainder (~$28M) the levy doesn't floor-commit to these three: keep it visible
@@ -2810,43 +2851,14 @@ body {
       }
     }
 
-    var PILE_ROWS = {
-      1: [1], 2: [2], 3: [2, 1], 4: [3, 1], 5: [3, 2],
-      6: [4, 2], 7: [4, 3], 8: [5, 3], 9: [5, 4],
-      10: [6, 4], 11: [6, 4, 1], 12: [6, 5, 1], 13: [6, 5, 2]
-    };
-
-    function settlePositions(n, R, dotR, margin, gap) {
-      var cx = R, cy = R;
-      var spacing = 2 * dotR + gap;
-      var rows = PILE_ROWS[n] || [n];
-      var positions = [];
-      var Re = R - dotR - margin;
-      for (var r = 0; r < rows.length; r++) {
-        if (Re < dotR) Re = dotR;
-        var count = rows[r];
-        var step = 2 * Math.asin(Math.min(0.96, spacing / (2 * Re)));
-        var start = -(count - 1) / 2;
-        for (var i = 0; i < count; i++) {
-          var theta = (start + i) * step;
-          positions.push({ left: cx + Re * Math.sin(theta) - dotR, top: cy + Re * Math.cos(theta) - dotR });
-        }
-        Re -= Re * (1 - Math.cos(step / 2)) + spacing * 0.87;
-      }
-      return positions;
-    }
-
-    function layoutCircleDots(circleEl, R, dotR, margin, gap) {
-      var dots = circleEl.querySelectorAll('.sc-mdot');
-      if (!dots.length) return;
-      var pos = settlePositions(dots.length, R, dotR, margin, gap);
-      dots.forEach(function (dot, i) {
-        dot.style.position = 'absolute';
-        dot.style.margin = '0';
-        dot.style.left = pos[i].left + 'px';
-        dot.style.top = pos[i].top + 'px';
-      });
-    }
+    // Money dots in the district circles use the exact same bottom-settling pile as the
+    // phase-4 stretch dots below (fillPositions/layoutFill) -- previously they had their own
+    // separate hand-tuned-ring-table-plus-sunflower-spiral system, replaced 2026-08-25 per
+    // Dana: a ring/spiral spreads dots through the whole circle, which doesn't read as a pile
+    // of coins the way a bottom-up hex-lattice settle does (see mockup vs. old behavior in
+    // INDEX_SOURCES.md's correction log). One pile algorithm, reused for both dot pools
+    // instead of maintained twice, and it already had the coins-settling-under-gravity look
+    // this was trying to recreate.
 
     // ── phase-4 "fuel gauge" fill ──
     // Fill the circle bottom-up like balls settling under gravity in a round bowl. We build a
@@ -2903,7 +2915,6 @@ body {
       });
     }
 
-    var SMALL_R = CIRCLE / 2, SMALL_DOTR = 5, SMALL_MARGIN = 2, SMALL_GAP = 1.5;
     var HERO_R = HERO / 2, HERO_DOTR = 8, HERO_MARGIN = 3, HERO_GAP = 3;   // 96px circle, 16px $1,000 dots; capacity ≈ 15 so D1 (13) reads nearly full
 
     // Phase 4 zooms ONE circle into a single stretch. The macro $1M money dots no longer
@@ -2945,7 +2956,7 @@ body {
           stretch.forEach(function (dot) { dot.style.display = 'none'; dot.style.animation = ''; });
           moneyInHero.forEach(function (dot) { dot.style.display = ''; dot.style.animation = ''; });
           // re-settle the money at small scale (no-op while the money still sits in the pot)
-          layoutCircleDots(h, SMALL_R, SMALL_DOTR, SMALL_MARGIN, SMALL_GAP);
+          layoutFill(h, SMALL_R, UNIFORM_DOTR, SMALL_MARGIN, SMALL_GAP, '.sc-mdot');
         }
       });
       heroZoomed = zoom;
